@@ -133,7 +133,7 @@
         "name": "readOnly",
         "type": "boolean | undefined",
         "required": false,
-        "description": "Makes the control read-only."
+        "description": "Makes the control read-only (`data-readonly` + native `readOnly`)."
       },
       {
         "name": "invalid",
