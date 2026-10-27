@@ -252,3 +252,8 @@ export async function runGates(options: GateOptions): Promise<void> {
   }
   process.exitCode = forward(process.execPath, [script]);
 }
+
+export async function startGui(): Promise<void> {
+  console.log('designharness: starting Web GUI (Showcase & Component Studio) at http://localhost:8787 ...');
+  process.exitCode = forward('pnpm', ['--filter', '@designharness/showcase', 'dev']);
+}

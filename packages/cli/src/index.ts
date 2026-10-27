@@ -8,7 +8,7 @@
  * Nothing here reimplements logic, so the CLI can never disagree with the library.
  */
 import { Command } from 'commander';
-import { runTokensBuild, runRegistryBuild, serveRegistry, startMcp, runGates, doctorReport, lintIntentJson, auditContrastJson, extractMetadata, diffIntent } from './actions.js';
+import { runTokensBuild, runRegistryBuild, serveRegistry, startMcp, runGates, doctorReport, lintIntentJson, auditContrastJson, extractMetadata, diffIntent, startGui } from './actions.js';
 
 const PROGRAM_NAME = 'designharness';
 
@@ -84,6 +84,12 @@ export function buildProgram(): Command {
     .description('Execute one tier: 1 pre-commit AST, 2 intent, 3 standard (tsc + axe), 4 release.')
     .requiredOption('--tier <1|2|3|4>', 'gate tier to run')
     .action(async (options: { tier: string }) => runGates(options));
+
+  program
+    .command('gui')
+    .alias('studio')
+    .description('Start the local Web GUI (Showcase & Component Studio) at http://localhost:8787.')
+    .action(async () => startGui());
 
   return program;
 }

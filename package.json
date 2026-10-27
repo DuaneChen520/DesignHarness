@@ -21,7 +21,9 @@
     "verify": "node tooling/gates/verify-all.mjs",
     "tokens": "pnpm --filter @designharness/tokens build",
     "dh": "node packages/cli/dist/index.js",
-    "designharness": "node packages/cli/dist/index.js"
+    "designharness": "node packages/cli/dist/index.js",
+    "gui": "pnpm --filter @designharness/showcase dev",
+    "dev": "pnpm --filter @designharness/showcase dev"
   },
   "devDependencies": {
     "designharness": "workspace:*",
