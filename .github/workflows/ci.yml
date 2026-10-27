@@ -54,7 +54,8 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm turbo run build lint typecheck test
+      - run: pnpm turbo run build
+      - run: pnpm turbo run lint typecheck test
       - name: Install browsers
         run: pnpm --filter @designharness/showcase exec playwright install --with-deps chromium
       - name: Tier 3 — tsc --noEmit + axe-core WCAG 2.2 AA (block merge)

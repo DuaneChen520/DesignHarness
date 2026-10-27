@@ -36,6 +36,10 @@
       "dependsOn": ["^build"],
       "outputs": ["coverage/**"]
     },
+    "designharness#test": {
+      "dependsOn": ["build"],
+      "outputs": ["coverage/**"]
+    },
     "metadata": {
       "dependsOn": ["^build"],
       "outputs": ["dist/**"]
