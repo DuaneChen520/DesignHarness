@@ -24,11 +24,11 @@ export const ROUTES = {
 } as const;
 
 const TITLES: Record<keyof typeof ROUTES, string> = {
-  dashboard: 'Engineering Cockpit',
-  gallery: 'Component gallery',
-  dataTable: 'Data table (contract mock)',
-  story: 'Isolated story',
-  interaction: 'Interaction fixture',
+  dashboard: '⚡ 研发工程驾驶舱',
+  gallery: '🎨 组件展厅',
+  dataTable: '📊 契约数据表',
+  story: '🔍 独立用例',
+  interaction: '🕹️ 交互演练',
 };
 
 /** The nav hrefs; the isolated route needs its story selector in the query. */
@@ -64,11 +64,17 @@ export function usePathname(): string {
   return pathname;
 }
 
+const MODE_LABELS: Record<TokenMode, string> = {
+  light: '默认浅色 (Light)',
+  dark: '驾驶舱暗色 (Dark)',
+  'high-contrast': '高对比模式 (High Contrast)',
+};
+
 function ThemeControl(props: { readonly theme: TokenMode; readonly onChange: (mode: TokenMode) => void }): ReactNode {
   return (
     <div className="showcase__theme">
       <label className="showcase__theme-label" htmlFor="showcase-theme">
-        Page theme
+        主题切换
       </label>
       <select
         className="showcase__select"
@@ -79,7 +85,7 @@ function ThemeControl(props: { readonly theme: TokenMode; readonly onChange: (mo
       >
         {TOKEN_MODES.map((mode) => (
           <option key={mode} value={mode}>
-            {mode}
+            {MODE_LABELS[mode]}
           </option>
         ))}
       </select>
@@ -119,10 +125,9 @@ export function App(): ReactNode {
   return (
     <div className="showcase" data-role="showcase-root">
       <header className="showcase__header">
-        <h1 className="showcase__title">Meridian showcase</h1>
+        <h1 className="showcase__title">DesignHarness 研发工程底座</h1>
         <p className="showcase__subtitle">
-          Every CSF story of every <code>@designharness/ui</code> component, mounted in light, dark and high contrast
-          at once. This page is the fixture host for the axe-core WCAG 2.2 AA gate and the Playwright visual gate.
+          Token 驱动、意图对齐与契约验证的设计系统工程底座。集成研发工程驾驶舱、组件展厅与 WCAG 2.2 AA 全自动化门禁。
         </p>
         <Navigation route={route} />
         <ThemeControl theme={theme} onChange={setTheme} />

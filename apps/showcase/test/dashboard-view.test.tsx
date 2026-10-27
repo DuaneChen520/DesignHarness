@@ -11,8 +11,8 @@ describe('DashboardView (Seam 3)', () => {
 
   it('renders empty state when no target project is bound', () => {
     render(<DashboardView initialProject="" />);
-    expect(screen.getByText(/No Target Project Bound/i)).toBeDefined();
-    expect(screen.getByPlaceholderText(/Enter target project absolute path/i)).toBeDefined();
+    expect(screen.getByText(/未挂载工程|No Target Project/i)).toBeDefined();
+    expect(screen.getByPlaceholderText(/输入目标工程绝对路径|Enter target project absolute path/i)).toBeDefined();
   });
 
   it('loads project report, displays health score and dual-vector metrics', async () => {
@@ -54,10 +54,10 @@ describe('DashboardView (Seam 3)', () => {
     render(<DashboardView initialProject="E:/personwork/carweb" />);
 
     await waitFor(() => {
-      expect(screen.getByText(/82\/100/i)).toBeDefined();
+      expect(screen.getByText(/82/)).toBeDefined();
     });
 
-    expect(screen.getByText(/8 \/ 10 standardized/i)).toBeDefined();
+    expect(screen.getByText(/8 \/ 10/i)).toBeDefined();
     expect(screen.getAllByText(/NeumorphicButton/i).length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText(/#94a3b8/i)).toBeDefined();
   });

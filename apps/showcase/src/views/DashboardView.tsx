@@ -1,6 +1,9 @@
 import { useEffect, useState, type ReactNode } from 'react';
 
 const RECENT_PROJECTS_KEY = 'dh_recent_projects';
+const LANG_STORAGE_KEY = 'dh_cockpit_lang';
+
+type Language = 'zh' | 'en';
 
 function getStoredRecent(): string[] {
   try {
@@ -66,6 +69,20 @@ export function DashboardView(props: DashboardViewProps): ReactNode {
   const urlParam = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('project') ?? '' : '';
   const initial = props.initialProject !== undefined ? props.initialProject : (urlParam || getStoredRecent()[0] || '');
 
+  const [lang, setLang] = useState<Language>(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem(LANG_STORAGE_KEY);
+      if (stored === 'en' || stored === 'zh') return stored;
+    }
+    return 'zh'; // Default to Chinese as requested
+  });
+
+  const toggleLanguage = (): void => {
+    const next: Language = lang === 'zh' ? 'en' : 'zh';
+    setLang(next);
+    localStorage.setItem(LANG_STORAGE_KEY, next);
+  };
+
   const [projectPath, setProjectPath] = useState<string>(initial);
   const [inputPath, setInputPath] = useState<string>(initial);
   const [recentProjects, setRecentProjects] = useState<string[]>(getStoredRecent);
@@ -77,6 +94,8 @@ export function DashboardView(props: DashboardViewProps): ReactNode {
   const [gateResult, setGateResult] = useState<{ tier?: string; summary?: string; error?: string } | null>(null);
   const [diffModal, setDiffModal] = useState<{ file: string; diff: string; content: string } | null>(null);
 
+  const isZh = lang === 'zh';
+
   const fetchProjectReport = async (path: string): Promise<void> => {
     if (!path.trim()) {
       setReport(null);
@@ -87,7 +106,7 @@ export function DashboardView(props: DashboardViewProps): ReactNode {
     try {
       const res = await fetch(`/api/harness/project?path=${encodeURIComponent(path)}`);
       if (!res.ok) {
-        throw new Error(`Project not found or unreachable (HTTP ${res.status})`);
+        throw new Error(isZh ? `未找到指定路径或无法读取 (HTTP ${res.status})` : `Project not found or unreachable (HTTP ${res.status})`);
       }
       const data = (await res.json()) as ProjectReport;
       setReport(data);
@@ -108,6 +127,7 @@ export function DashboardView(props: DashboardViewProps): ReactNode {
         void fetchProjectReport(projectPath);
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectPath]);
 
   const handleRunContrast = async (): Promise<void> => {
@@ -137,7 +157,7 @@ export function DashboardView(props: DashboardViewProps): ReactNode {
   };
 
   const handlePreviewInject = async (componentName: string): Promise<void> => {
-    const sampleContent = `import React from 'react';\n\nexport function ${componentName}() {\n  return <button className="min-h-[48px] min-w-[48px] bg-surface-raised text-primary px-4 py-2 rounded-xl">Standard ${componentName}</button>;\n}\n`;
+    const sampleContent = `import React from 'react';\n\nexport function ${componentName}() {\n  return (\n    <button className="min-h-[48px] min-w-[48px] bg-surface-raised text-primary px-4 py-2 rounded-xl border border-whisper">\n      Standard ${componentName}\n    </button>\n  );\n}\n`;
     try {
       const res = await fetch('/api/harness/mutate', {
         method: 'POST',
@@ -153,7 +173,7 @@ export function DashboardView(props: DashboardViewProps): ReactNode {
       setDiffModal({ file: `src/components/ui/${componentName}.tsx`, diff: data.diff, content: sampleContent });
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
-      alert(`Preview failed: ${message}`);
+      alert(isZh ? `生成变更预览失败: ${message}` : `Preview failed: ${message}`);
     }
   };
 
@@ -172,66 +192,80 @@ export function DashboardView(props: DashboardViewProps): ReactNode {
       });
       const data = (await res.json()) as { error?: string; file?: string };
       if (!res.ok) {
-        alert(data.error || 'Write rejected');
+        alert(data.error || (isZh ? '写入被拦截' : 'Write rejected'));
         return;
       }
-      alert(`Successfully written to ${data.file ?? 'disk'}!`);
+      alert(isZh ? `已安全写入目标工程文件: ${data.file ?? 'disk'}` : `Successfully written to ${data.file ?? 'disk'}!`);
       setDiffModal(null);
       void fetchProjectReport(projectPath);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
-      alert(`Write failed: ${message}`);
+      alert(isZh ? `写入操作失败: ${message}` : `Write failed: ${message}`);
     }
   };
 
+  // Empty state when no project path is bound
   if (!projectPath && !report) {
     return (
-      <main className="p-8 max-w-4xl mx-auto space-y-6">
-        <header className="border-b pb-4">
-          <h1 className="text-2xl font-bold text-primary">DesignHarness Cockpit</h1>
-          <p className="text-sm opacity-80">No Target Project Bound</p>
+      <main className="cockpit">
+        <header className="cockpit-header">
+          <div className="cockpit-header__left">
+            <div className="cockpit-brand">
+              <h1 className="cockpit-title">{isZh ? 'DesignHarness 研发工程驾驶舱' : 'DesignHarness Cockpit'}</h1>
+              <span className="cockpit-badge cockpit-badge--warning">{isZh ? '未挂载工程' : 'No Target Project'}</span>
+            </div>
+            <p className="cockpit-path">{isZh ? '输入外部业务工程路径，启动自动化重构监控与契约治理' : 'Bind an external application to monitor and govern its refactoring'}</p>
+          </div>
+          <button type="button" className="cockpit-btn" onClick={toggleLanguage}>
+            {isZh ? '🌐 English' : '🌐 中文'}
+          </button>
         </header>
-        <div className="bg-surface-sunken p-6 rounded-xl border border-whisper space-y-4">
-          <p className="text-sm">Enter the absolute path of a downstream application (e.g. carweb) to monitor and govern its refactoring:</p>
-          <div className="flex gap-2">
+
+        <section className="cockpit-section">
+          <p className="cockpit-card__sub">
+            {isZh ? '请输入业务工程（如 carweb）的绝对路径以开启双维度 AST 扫描与门禁审计：' : 'Enter target project absolute path to begin dual-vector AST analysis:'}
+          </p>
+          <div className="cockpit-controls">
             <input
               type="text"
-              className="flex-1 p-2 rounded bg-surface border border-whisper font-mono text-sm"
-              placeholder="Enter target project absolute path (e.g. E:/personwork/carweb)"
+              className="cockpit-select"
+              style={{ flex: 1 }}
+              placeholder={isZh ? '输入目标工程绝对路径 (例如 E:/personwork/carweb)' : 'Enter target project absolute path (e.g. E:/personwork/carweb)'}
               value={inputPath}
               onChange={(e) => setInputPath(e.target.value)}
             />
             <button
               type="button"
-              className="px-4 py-2 bg-primary text-white rounded font-medium text-sm hover:opacity-90"
+              className="cockpit-btn cockpit-btn--primary"
               onClick={() => {
                 setProjectPath(inputPath);
               }}
             >
-              Bind Project
+              {isZh ? '挂载并扫描工程' : 'Bind & Scan Project'}
             </button>
           </div>
+
           {recentProjects.length > 0 && (
-            <div className="pt-2">
-              <span className="text-xs uppercase opacity-60 font-semibold tracking-wider">Recent Projects:</span>
-              <div className="flex flex-wrap gap-2 mt-2">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-xs)' }}>
+              <span className="cockpit-card__label">{isZh ? '最近治理的项目：' : 'Recent Projects:'}</span>
+              <div className="cockpit-chips">
                 {recentProjects.map((p) => (
                   <button
                     key={p}
                     type="button"
-                    className="text-xs font-mono bg-surface px-2 py-1 rounded border border-whisper hover:border-primary"
+                    className="cockpit-chip"
                     onClick={() => {
                       setInputPath(p);
                       setProjectPath(p);
                     }}
                   >
-                    {p}
+                    📂 {p}
                   </button>
                 ))}
               </div>
             </div>
           )}
-        </div>
+        </section>
       </main>
     );
   }
@@ -239,23 +273,23 @@ export function DashboardView(props: DashboardViewProps): ReactNode {
   const dv = report?.dualVector;
 
   return (
-    <main className="p-8 max-w-6xl mx-auto space-y-8">
+    <main className="cockpit">
       {/* Top Cockpit Header */}
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b pb-6">
-        <div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-primary">Harness Cockpit</h1>
-            <span className="px-2 py-0.5 text-xs font-semibold rounded bg-primary/10 text-primary border border-primary/20">
-              Active Project
+      <header className="cockpit-header">
+        <div className="cockpit-header__left">
+          <div className="cockpit-brand">
+            <h1 className="cockpit-title">{isZh ? 'DesignHarness 研发工程驾驶舱' : 'Harness Cockpit'}</h1>
+            <span className="cockpit-badge cockpit-badge--active">
+              <span className="cockpit-dot cockpit-dot--success" />
+              {isZh ? '当前挂载工程' : 'Active Project'}
             </span>
           </div>
-          <p className="font-mono text-xs opacity-75 mt-1">{report?.path ?? projectPath}</p>
+          <p className="cockpit-path">📁 {report?.path ?? projectPath}</p>
         </div>
 
-        {/* Project Switcher */}
-        <div className="flex items-center gap-2">
+        <div className="cockpit-controls">
           <select
-            className="p-1.5 rounded bg-surface border border-whisper text-xs font-mono"
+            className="cockpit-select"
             value={projectPath}
             onChange={(e) => {
               setProjectPath(e.target.value);
@@ -270,194 +304,259 @@ export function DashboardView(props: DashboardViewProps): ReactNode {
           </select>
           <button
             type="button"
-            className="px-3 py-1 bg-surface border border-whisper rounded text-xs hover:border-primary"
+            className="cockpit-btn"
             onClick={() => {
-              const next = prompt('Enter new project absolute path:', projectPath);
+              const next = prompt(isZh ? '请输入新工程的绝对路径：' : 'Enter new project absolute path:', projectPath);
               if (next) {
                 setProjectPath(next);
                 setInputPath(next);
               }
             }}
           >
-            Switch Path
+            {isZh ? '切换路径' : 'Switch Path'}
+          </button>
+          <button
+            type="button"
+            className="cockpit-btn"
+            onClick={() => fetchProjectReport(projectPath)}
+          >
+            🔄 {isZh ? '刷新分析' : 'Refresh'}
+          </button>
+          <button type="button" className="cockpit-btn" onClick={toggleLanguage}>
+            {isZh ? '🌐 English' : '🌐 中文'}
           </button>
         </div>
       </header>
 
       {error && (
-        <div className="p-4 rounded bg-red-500/10 border border-red-500 text-red-500 text-sm">
-          {error}
+        <div className="cockpit-banner" style={{ color: 'var(--color-badge-danger-foreground)', borderColor: 'var(--color-badge-danger-background)' }}>
+          ⚠️ {error}
         </div>
       )}
 
-      {loading && <p className="text-sm opacity-60 animate-pulse">Scanning target project AST and contracts...</p>}
+      {loading && (
+        <div className="cockpit-banner">
+          ⏳ {isZh ? '正在深度扫描目标工程 AST、Token 语法树与 Git 状态...' : 'Scanning target project AST, tokens, and contracts...'}
+        </div>
+      )}
 
       {report && (
         <>
-          {/* Status Banners */}
-          <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 rounded-xl bg-surface-sunken border border-whisper">
-              <span className="text-xs opacity-60">Intent SSOT</span>
-              <div className="flex items-center gap-2 mt-1">
-                <span className={`inline-block w-2.5 h-2.5 rounded-full ${report.hasDesignMarkdown ? 'bg-green-500' : 'bg-red-500'}`} />
-                <span className="font-semibold text-sm">{report.hasDesignMarkdown ? 'DESIGN.md Active' : 'DESIGN.md Missing'}</span>
-              </div>
-            </div>
-
-            <div className="p-4 rounded-xl bg-surface-sunken border border-whisper">
-              <span className="text-xs opacity-60">Git Working Tree</span>
-              <div className="flex items-center gap-2 mt-1">
-                <span className={`inline-block w-2.5 h-2.5 rounded-full ${report.git?.isClean ? 'bg-green-500' : 'bg-amber-500'}`} />
-                <span className="font-semibold text-sm">
-                  {report.git?.isClean ? 'Clean (Safe to mutate)' : `${report.git?.dirtyFiles?.length ?? 0} Uncommitted Changes`}
+          {/* Key KPI Status Banners */}
+          <section className="cockpit-kpi-grid">
+            {/* KPI 1: Intent SSOT */}
+            <div className="cockpit-card cockpit-card--sunken">
+              <div className="cockpit-card__header">
+                <span className="cockpit-card__label">{isZh ? '设计事实源 (SSOT)' : 'Intent SSOT'}</span>
+                <span className={`cockpit-badge ${report.hasDesignMarkdown ? 'cockpit-badge--success' : 'cockpit-badge--danger'}`}>
+                  {report.hasDesignMarkdown ? (isZh ? '已就绪' : 'Active') : (isZh ? '缺失' : 'Missing')}
                 </span>
               </div>
+              <div className="cockpit-card__value">
+                {report.hasDesignMarkdown ? 'DESIGN.md' : '未检测到'}
+              </div>
+              <p className="cockpit-card__sub">
+                {report.hasDesignMarkdown
+                  ? (isZh ? '品牌调性与色彩意图单向驱动中' : 'Brand intent single source of truth active')
+                  : (isZh ? '请运行 /dh-intent 生成事实源' : 'Run /dh-intent to initialize SSOT')}
+              </p>
             </div>
 
-            <div className="p-4 rounded-xl bg-surface-sunken border border-whisper">
-              <span className="text-xs opacity-60">Overall Refactoring Health</span>
-              <div className="flex items-center justify-between mt-1">
-                <span className="text-2xl font-bold text-primary">{dv?.healthScore ?? 0}/100</span>
-                <span className="text-xs opacity-75">Dual-Vector AST</span>
+            {/* KPI 2: Git Cleanliness */}
+            <div className="cockpit-card cockpit-card--sunken">
+              <div className="cockpit-card__header">
+                <span className="cockpit-card__label">{isZh ? 'Git 工作区防腐状态' : 'Git Working Tree'}</span>
+                <span className={`cockpit-badge ${report.git?.isClean ? 'cockpit-badge--success' : 'cockpit-badge--warning'}`}>
+                  {report.git?.isClean ? (isZh ? '干净' : 'Clean') : (isZh ? '存在未暂存变更' : 'Dirty')}
+                </span>
               </div>
+              <div className="cockpit-card__value">
+                {report.git?.isClean ? (isZh ? '安全可写' : 'Safe') : `${report.git?.dirtyFiles?.length ?? 0} 个变更`}
+              </div>
+              <p className="cockpit-card__sub">
+                {report.git?.isClean
+                  ? (isZh ? '无冲突风险，允许组件投送与变更' : 'Zero uncommitted conflicts, mutations allowed')
+                  : (isZh ? '建议先暂存或提交业务代码后再投送' : 'Commit or stash changes before mutating')}
+              </p>
+            </div>
+
+            {/* KPI 3: Refactoring Health Score */}
+            <div className="cockpit-card cockpit-card--sunken">
+              <div className="cockpit-card__header">
+                <span className="cockpit-card__label">{isZh ? '重构健康指数' : 'Refactoring Health'}</span>
+                <span className="cockpit-badge cockpit-badge--active">Dual-Vector AST</span>
+              </div>
+              <div className="cockpit-card__value" style={{ color: 'var(--color-primary)' }}>
+                {dv?.healthScore ?? 0} <span style={{ fontSize: 'var(--font-size-body-sm)', color: 'var(--color-text-secondary)' }}>/ 100</span>
+              </div>
+              <p className="cockpit-card__sub">
+                {isZh
+                  ? `标准化率权重 40% + Token 纯净度权重 60%`
+                  : `40% Component Standardization + 60% Token Purity`}
+              </p>
             </div>
           </section>
 
-          {/* Dual-Vector Progress Bar */}
+          {/* Dual-Vector Governance Radar */}
           {dv && (
-            <section className="p-6 rounded-xl bg-surface-sunken border border-whisper space-y-6">
-              <h2 className="text-lg font-semibold">Dual-Vector Refactoring Governance</h2>
+            <section className="cockpit-section">
+              <h2 className="cockpit-section__title">
+                📊 {isZh ? '双维度重构治理看板 (Dual-Vector Governance)' : 'Dual-Vector Refactoring Governance'}
+              </h2>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="cockpit-grid-2">
                 {/* Vector 1: Component Standardization */}
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="font-medium">1. Component Standardization</span>
-                    <span className="font-mono text-xs opacity-80">
-                      {dv.components.standardized} / {dv.components.total} standardized ({Math.round(dv.components.standardizationRatio * 100)}%)
-                    </span>
+                <div className="cockpit-card">
+                  <div className="cockpit-meter-group">
+                    <div className="cockpit-meter-row">
+                      <span className="cockpit-card__label">
+                        {isZh ? '1. 组件标准化推进率' : '1. Component Standardization'}
+                      </span>
+                      <span style={{ fontFamily: 'var(--font-family-mono)', fontWeight: 'var(--font-weight-heading-3)' }}>
+                        {dv.components.standardized} / {dv.components.total} {isZh ? '已完成' : 'standardized'} ({Math.round(dv.components.standardizationRatio * 100)}%)
+                      </span>
+                    </div>
+                    <div className="cockpit-meter">
+                      <div
+                        className="cockpit-meter__fill cockpit-meter__fill--primary"
+                        style={{ inlineSize: `${Math.round(dv.components.standardizationRatio * 100)}%` }}
+                      />
+                    </div>
                   </div>
-                  <div className="w-full bg-surface h-2 rounded-full overflow-hidden border border-whisper">
-                    <div
-                      className="bg-primary h-full transition-all duration-300"
-                      style={{ width: `${Math.round(dv.components.standardizationRatio * 100)}%` }}
-                    />
-                  </div>
-                  <div className="pt-2 text-xs space-y-1">
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-xs)', marginTop: 'var(--space-sm)' }}>
                     {dv.components.legacyList?.length > 0 && (
                       <div>
-                        <span className="text-amber-500 font-medium">Legacy Components to Deprecate: </span>
-                        <span className="font-mono">{dv.components.legacyList.join(', ')}</span>
+                        <span style={{ color: 'var(--color-badge-warning-foreground)', fontSize: 'var(--font-size-body-sm)', fontWeight: 'bold' }}>
+                          ⚠️ {isZh ? '待废弃旧手写/拟物组件 (' : 'Legacy Components to Deprecate ('}{dv.components.legacyList.length}{isZh ? ' 个)：' : '):'}
+                        </span>
+                        <div className="cockpit-chips" style={{ marginTop: 'var(--space-xxs)' }}>
+                          {dv.components.legacyList.map((c) => (
+                            <span key={c} className="cockpit-chip cockpit-chip--warning">
+                              {c}
+                            </span>
+                          ))}
+                        </div>
                       </div>
                     )}
+
                     {dv.components.standardList?.length > 0 && (
-                      <div>
-                        <span className="text-green-500 font-medium">Standardized: </span>
-                        <span className="font-mono">{dv.components.standardList.join(', ')}</span>
+                      <div style={{ marginTop: 'var(--space-xs)' }}>
+                        <span style={{ color: 'var(--color-badge-success-foreground)', fontSize: 'var(--font-size-body-sm)', fontWeight: 'bold' }}>
+                          ✓ {isZh ? '已标准化组件 (' : 'Standardized Components ('}{dv.components.standardList.length}{isZh ? ' 个)：' : '):'}
+                        </span>
+                        <div className="cockpit-chips" style={{ marginTop: 'var(--space-xxs)' }}>
+                          {dv.components.standardList.map((c) => (
+                            <span key={c} className="cockpit-chip cockpit-chip--success">
+                              {c}
+                            </span>
+                          ))}
+                        </div>
                       </div>
                     )}
                   </div>
                 </div>
 
                 {/* Vector 2: Token Purity */}
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="font-medium">2. Token Purity (Anti-Hardcoding)</span>
-                    <span className="font-mono text-xs opacity-80">
-                      {Math.round(dv.tokens.purityRatio * 100)}% Pure ({dv.tokens.hardcodedOccurrences} violations)
-                    </span>
+                <div className="cockpit-card">
+                  <div className="cockpit-meter-group">
+                    <div className="cockpit-meter-row">
+                      <span className="cockpit-card__label">
+                        {isZh ? '2. Token 纯净度 (防硬编码)' : '2. Token Purity (Anti-Hardcoding)'}
+                      </span>
+                      <span style={{ fontFamily: 'var(--font-family-mono)', fontWeight: 'var(--font-weight-heading-3)' }}>
+                        {Math.round(dv.tokens.purityRatio * 100)}% {isZh ? '规范率' : 'Pure'} ({dv.tokens.hardcodedOccurrences} {isZh ? '处违规' : 'violations'})
+                      </span>
+                    </div>
+                    <div className="cockpit-meter">
+                      <div
+                        className="cockpit-meter__fill cockpit-meter__fill--success"
+                        style={{ inlineSize: `${Math.round(dv.tokens.purityRatio * 100)}%` }}
+                      />
+                    </div>
                   </div>
-                  <div className="w-full bg-surface h-2 rounded-full overflow-hidden border border-whisper">
-                    <div
-                      className="bg-green-500 h-full transition-all duration-300"
-                      style={{ width: `${Math.round(dv.tokens.purityRatio * 100)}%` }}
-                    />
-                  </div>
-                  <p className="text-xs opacity-60">
-                    AST scanner evaluating {dv.tokens.totalClassOccurrences} class occurrences across all UI modules.
+
+                  <p className="cockpit-card__sub" style={{ marginTop: 'var(--space-xs)' }}>
+                    {isZh
+                      ? `AST 静态分析器评估了全端 ${dv.tokens.totalClassOccurrences} 处样式声明，其中包含 ${dv.tokens.semanticTokenOccurrences} 处规范语义变量。`
+                      : `AST evaluated ${dv.tokens.totalClassOccurrences} occurrences with ${dv.tokens.semanticTokenOccurrences} compliant tokens.`}
                   </p>
+
+                  {/* Violations List */}
+                  {dv.tokens.violations?.length > 0 && (
+                    <div style={{ marginTop: 'var(--space-sm)' }}>
+                      <span style={{ color: 'var(--color-badge-danger-foreground)', fontSize: 'var(--font-size-body-sm)', fontWeight: 'bold' }}>
+                        🚫 {isZh ? '检测到的硬编码样式违规清单：' : 'Hardcoded Style Violations:'}
+                      </span>
+                      <div className="cockpit-violations" style={{ marginTop: 'var(--space-xxs)' }}>
+                        {dv.tokens.violations.map((v: TokenViolationItem, index: number) => (
+                          <div key={index} className="cockpit-violation-row">
+                            <span className="cockpit-violation-file">📄 {v.file}:{v.line}</span>
+                            <span className="cockpit-violation-raw"><code>{v.raw}</code></span>
+                            <span className="cockpit-violation-reason">{v.reason}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
-
-              {/* Violations List */}
-              {dv.tokens.violations?.length > 0 && (
-                <div className="border-t pt-4">
-                  <h3 className="text-xs font-semibold uppercase opacity-75 mb-2">Hardcoded Style Violations:</h3>
-                  <div className="max-h-40 overflow-y-auto space-y-1 font-mono text-xs">
-                    {dv.tokens.violations.map((v: TokenViolationItem, index: number) => (
-                      <div key={index} className="flex justify-between p-1.5 rounded bg-surface border border-whisper">
-                        <span className="text-red-400">{v.file}:{v.line}</span>
-                        <span className="font-bold text-amber-300">{v.raw}</span>
-                        <span className="opacity-60">{v.reason}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
             </section>
           )}
 
-          {/* Actions & Sensor Radars */}
-          <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Sensor Radar & Component Delivery */}
+          <section className="cockpit-grid-2">
             {/* Sensor Radar */}
-            <div className="p-6 rounded-xl bg-surface-sunken border border-whisper space-y-4">
-              <h2 className="text-lg font-semibold">Sensor Gates Radar</h2>
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  className="px-3 py-1.5 bg-surface border border-whisper rounded text-xs font-medium hover:border-primary"
-                  onClick={() => handleRunGate('1')}
-                >
-                  Run Tier 1 (AST)
+            <div className="cockpit-section">
+              <h2 className="cockpit-section__title">🛡️ {isZh ? '质量传感器雷达 (Sensor Gates)' : 'Sensor Gates Radar'}</h2>
+              <p className="cockpit-card__sub">
+                {isZh ? '在提交代码前一键执行分级门禁，防止劣质代码与样式漂移流出：' : 'Execute tiered sensors before code submission to block drift:'}
+              </p>
+              <div className="cockpit-controls">
+                <button type="button" className="cockpit-btn" onClick={() => handleRunGate('1')}>
+                  {isZh ? '运行 Tier 1 (AST 语法门禁)' : 'Run Tier 1 (AST)'}
                 </button>
-                <button
-                  type="button"
-                  className="px-3 py-1.5 bg-surface border border-whisper rounded text-xs font-medium hover:border-primary"
-                  onClick={() => handleRunGate('2')}
-                >
-                  Run Tier 2 (Intent)
+                <button type="button" className="cockpit-btn" onClick={() => handleRunGate('2')}>
+                  {isZh ? '运行 Tier 2 (设计意图校验)' : 'Run Tier 2 (Intent)'}
                 </button>
-                <button
-                  type="button"
-                  className="px-3 py-1.5 bg-surface border border-whisper rounded text-xs font-medium hover:border-primary"
-                  onClick={() => handleRunGate('3')}
-                >
-                  Run Tier 3 (a11y)
+                <button type="button" className="cockpit-btn" onClick={() => handleRunGate('3')}>
+                  {isZh ? '运行 Tier 3 (WCAG 无障碍)' : 'Run Tier 3 (a11y)'}
                 </button>
               </div>
 
               {gateResult && (
-                <div className="p-3 rounded bg-surface border border-whisper text-xs font-mono">
-                  <div className="text-green-400 font-bold">✓ Gate Tier {gateResult.tier} Executed Cleanly</div>
-                  <p className="opacity-75 mt-1">{gateResult.summary}</p>
+                <div className="cockpit-banner" style={{ color: 'var(--color-badge-success-foreground)' }}>
+                  ✓ {isZh ? `门禁 Tier ${gateResult.tier} 校验通过` : `Gate Tier ${gateResult.tier} Executed Cleanly`}
+                  <div style={{ marginTop: 'var(--space-xxs)', color: 'var(--color-text-primary)' }}>{gateResult.summary}</div>
                 </div>
               )}
             </div>
 
             {/* Token & Component Actions */}
-            <div className="p-6 rounded-xl bg-surface-sunken border border-whisper space-y-4">
-              <h2 className="text-lg font-semibold">Token Lab & Component Delivery</h2>
-              <div className="flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  className="px-3 py-1.5 bg-surface border border-whisper rounded text-xs font-medium hover:border-primary"
-                  onClick={handleRunContrast}
-                >
-                  Audit WCAG 2.2 AA Contrast
+            <div className="cockpit-section">
+              <h2 className="cockpit-section__title">⚡ {isZh ? 'Token 实验室与安全投送' : 'Token Lab & Delivery'}</h2>
+              <p className="cockpit-card__sub">
+                {isZh ? '进程内直接执行对比度数学审计，或向目标工程投送无头标准组件：' : 'In-process contrast math audit and standard component injection:'}
+              </p>
+              <div className="cockpit-controls">
+                <button type="button" className="cockpit-btn" onClick={handleRunContrast}>
+                  🧪 {isZh ? '运行 WCAG 2.2 AA 对比度审计' : 'Audit WCAG 2.2 AA Contrast'}
                 </button>
                 <button
                   type="button"
-                  className="px-3 py-1.5 bg-primary text-white rounded text-xs font-medium hover:opacity-90"
+                  className="cockpit-btn cockpit-btn--primary"
                   onClick={() => handlePreviewInject('Button')}
                 >
-                  Deploy Standard Button (with Diff)
+                  🚀 {isZh ? '向工程投送标准 Button (带 Diff 审查)' : 'Deploy Standard Button (with Diff)'}
                 </button>
               </div>
 
               {contrastResult && (
-                <div className="p-3 rounded bg-surface border border-whisper text-xs font-mono">
-                  <div className="font-bold text-green-400">WCAG 2.2 AA Audit Passed</div>
-                  <p className="opacity-75">{contrastResult.results?.length ?? 1} token pairs audited.</p>
+                <div className="cockpit-banner" style={{ color: 'var(--color-badge-success-foreground)' }}>
+                  ✓ {isZh ? 'WCAG 2.2 AA 对比度法定审计通过' : 'WCAG 2.2 AA Contrast Audit Passed'}
+                  <div style={{ marginTop: 'var(--space-xxs)', color: 'var(--color-text-primary)' }}>
+                    {isZh ? `已审计 ${contrastResult.results?.length ?? 1} 组前/背景令牌对，符合车规与弱光视认标准。` : `${contrastResult.results?.length ?? 1} token pairs audited.`}
+                  </div>
                 </div>
               )}
             </div>
@@ -467,32 +566,36 @@ export function DashboardView(props: DashboardViewProps): ReactNode {
 
       {/* Side-by-Side Diff Modal Guard */}
       {diffModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-surface border border-whisper rounded-xl max-w-2xl w-full p-6 space-y-4 shadow-2xl">
-            <div className="flex justify-between items-center border-b pb-3">
-              <h3 className="font-bold text-base text-primary">Mutation Safety Guard: Review Diff</h3>
-              <span className="font-mono text-xs opacity-60">{diffModal.file}</span>
+        <div className="cockpit-modal-backdrop">
+          <div className="cockpit-modal">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: 'var(--border-width-hairline) solid var(--color-border-subtle)', paddingBottom: 'var(--space-sm)' }}>
+              <h3 style={{ margin: 0, color: 'var(--color-primary)', fontFamily: 'var(--font-family-display)', fontSize: 'var(--font-size-heading-3)' }}>
+                🛡️ {isZh ? '安全防腐审查：变更代码 Diff 对比' : 'Mutation Safety Guard: Review Diff'}
+              </h3>
+              <span className="cockpit-path">{diffModal.file}</span>
             </div>
-            <p className="text-xs opacity-75">
-              Verify the exact lines that will be written to target project disk. Uncommitted Git changes are verified before mutation.
+            <p className="cockpit-card__sub">
+              {isZh
+                ? '以下为即将写入外部工程物理磁盘的代码改动。系统已自动验证 Git 工作区状态无冲突，请仔细审查：'
+                : 'Verify the exact lines that will be written to target project disk. Uncommitted Git changes are verified before mutation.'}
             </p>
-            <pre className="p-3 bg-surface-sunken rounded font-mono text-xs max-h-60 overflow-y-auto text-green-300">
+            <pre className="cockpit-diff-pre" style={{ color: 'var(--color-badge-success-foreground)' }}>
               {diffModal.diff}
             </pre>
-            <div className="flex justify-end gap-3 pt-2">
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-sm)', paddingTop: 'var(--space-sm)' }}>
               <button
                 type="button"
-                className="px-4 py-2 rounded bg-surface border border-whisper text-xs hover:border-primary"
+                className="cockpit-btn"
                 onClick={() => setDiffModal(null)}
               >
-                Cancel
+                {isZh ? '取消放弃' : 'Cancel'}
               </button>
               <button
                 type="button"
-                className="px-4 py-2 rounded bg-primary text-white text-xs font-medium hover:opacity-90"
+                className="cockpit-btn cockpit-btn--primary"
                 onClick={handleConfirmWrite}
               >
-                Confirm & Write to Disk
+                💾 {isZh ? '确认并写入目标磁盘' : 'Confirm & Write to Disk'}
               </button>
             </div>
           </div>
