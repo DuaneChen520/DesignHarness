@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-10-27T03:58:38.606Z",
+  "generatedAt": "2026-10-27T07:11:26.364Z",
   "generator": {
     "script": "packages/contracts/scripts/codegen.mjs",
     "runtime": "node v24.13.0",
@@ -44,15 +44,15 @@
     },
     {
       "path": "packages/contracts/generated/component-metadata.json",
-      "sha256": "0db3e34445102fdbcd6dac33ab12ba9d1e73e2a6480607e6a5b3148fe14cc49c",
-      "bytes": 32151
+      "sha256": "53f36fd0943ff24dfaa8617a92fdcb70f2d5e48f7c46261df1e299e0171d0658",
+      "bytes": 32256
     }
   ],
   "componentMetadata": {
     "status": "generated",
     "path": "packages/contracts/generated/component-metadata.json",
     "components": 5,
-    "inputs": 11
+    "inputs": 12
   },
   "provenance": "Every handler in generated/handlers.mjs is produced by @msw/source fromOpenApi from the inputs above. Nothing in this package hand-writes a mock response body, so editing a contract is the only way to change the mock."
 }

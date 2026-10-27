@@ -2,6 +2,7 @@ import type { InputInputProps, InputRootProps } from '@designharness/primitives'
 import { Input as InputPrimitive } from '@designharness/primitives';
 import { type ReactNode, forwardRef } from 'react';
 import { cx, element } from './internal/classnames.js';
+import { isPresent } from './internal/presence.js';
 
 /**
  * Styled `Input` field.
@@ -32,8 +33,6 @@ export type UIInputProps = InputRootProps & {
   /** Escape hatch for the remaining native `<input>` attributes. */
   inputProps?: InputInputProps | undefined;
 };
-
-const isPresent = (value: ReactNode): boolean => value !== undefined && value !== null && value !== false && value !== '';
 
 /** Field root. Adds the `dh-input` block class and nothing else. */
 export const InputRoot = forwardRef<HTMLDivElement, InputRootProps>(function InputRoot(props, ref) {

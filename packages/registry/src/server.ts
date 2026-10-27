@@ -16,13 +16,13 @@
  *                      operation `designharness registry serve --sync-to <dir>` performs
  *                      at boot.
  */
-import { createHash } from 'node:crypto';
 import { existsSync } from 'node:fs';
 import { mkdir, readFile, readdir, stat, writeFile } from 'node:fs/promises';
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
 import { isAbsolute, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { registryItemsDirName, registryOutputDir, designMarkdownPath, toRelative } from './paths.js';
+import { sha256Of } from './sources.js';
 import type { RegistryIndex } from '@designharness/engine';
 
 export interface RegistryServerOptions {
@@ -74,7 +74,7 @@ interface CachedDocument {
 async function readJson(absolutePath: string): Promise<CachedDocument | undefined> {
   if (!existsSync(absolutePath)) return undefined;
   const contents = await readFile(absolutePath, 'utf8');
-  return { contents, etag: `"${createHash('sha256').update(contents).digest('hex').slice(0, 32)}"`, bytes: Buffer.byteLength(contents) };
+  return { contents, etag: `"${sha256Of(contents).slice(0, 32)}"`, bytes: Buffer.byteLength(contents) };
 }
 
 function send(response: ServerResponse, status: number, body: string, contentType: string, etag?: string, cacheControl = CACHE_CONTROL): void {
@@ -181,7 +181,7 @@ export async function syncDesignMarkdown(targetRoot: string, options: { readonly
     throw new Error(`${target} already exists — pass --force to replace it (a downstream DESIGN.md may carry hand edits)`);
   }
   await writeFile(target, contents, 'utf8');
-  return { source: toRelative(source), target, bytes: Buffer.byteLength(contents), sha256: createHash('sha256').update(contents).digest('hex'), overwritten };
+  return { source: toRelative(source), target, bytes: Buffer.byteLength(contents), sha256: sha256Of(contents), overwritten };
 }
 
 /** The request handler, exported separately so tests can drive it without a socket. */
@@ -242,7 +242,7 @@ export function createRegistryHandler(options: RegistryServerOptions = {}) {
         return;
       }
       const contents = await readFile(designMd, 'utf8');
-      const etag = `"${createHash('sha256').update(contents).digest('hex').slice(0, 32)}"`;
+      const etag = `"${sha256Of(contents).slice(0, 32)}"`;
       if (request.headers['if-none-match'] === etag) {
         send(response, 304, '', MARKDOWN_TYPE, etag);
         return;

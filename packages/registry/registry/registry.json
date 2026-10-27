@@ -33,7 +33,7 @@
       "name": "dialog",
       "type": "registry:component",
       "title": "Dialog",
-      "description": "Meridian Dialog — @designharness/ui source distributed verbatim from packages/ui/src/dialog.tsx (6024 bytes, sha256 c26ce18756744a5856247115f1d4eac8fbb0051016bff5cb68846cda9dd438ac). Depends on @designharness/primitives, react and shares packages/ui/src/internal/classnames.ts. Styled by packages/ui/src/styles/dialog.css (6515 bytes, 37 token references). Registry index barrel: packages/ui/src/styles.css.",
+      "description": "Meridian Dialog — @designharness/ui source distributed verbatim from packages/ui/src/dialog.tsx (5952 bytes, sha256 13bd19e9d0775133cb5cd0ad1f9c213d88263494705d8c8a803518c01c24dbc2). Depends on @designharness/primitives, react and shares packages/ui/src/internal/classnames.ts, packages/ui/src/internal/presence.ts. Styled by packages/ui/src/styles/dialog.css (6515 bytes, 37 token references). Registry index barrel: packages/ui/src/styles.css.",
       "registryDependencies": [
         "meridian-base"
       ]
@@ -42,7 +42,7 @@
       "name": "input",
       "type": "registry:component",
       "title": "Input",
-      "description": "Meridian Input — @designharness/ui source distributed verbatim from packages/ui/src/input.tsx (3816 bytes, sha256 323b6c1b7df8efdb5711a3482886167e8397551707b83f843b3a491e3492372c). Depends on @designharness/primitives, react and shares packages/ui/src/internal/classnames.ts. Styled by packages/ui/src/styles/input.css (4920 bytes, 28 token references). Registry index barrel: packages/ui/src/styles.css.",
+      "description": "Meridian Input — @designharness/ui source distributed verbatim from packages/ui/src/input.tsx (3744 bytes, sha256 65eac1602c162be23fff70ab21f485ddaf7f705f4398324e312537aea8a72243). Depends on @designharness/primitives, react and shares packages/ui/src/internal/classnames.ts, packages/ui/src/internal/presence.ts. Styled by packages/ui/src/styles/input.css (4920 bytes, 28 token references). Registry index barrel: packages/ui/src/styles.css.",
       "registryDependencies": [
         "meridian-base"
       ]

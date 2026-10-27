@@ -3,7 +3,7 @@ import type { PropTypes } from '@zag-js/react';
 import type { ChangeEvent, ComponentPropsWithRef, KeyboardEvent, MouseEvent, ReactNode } from 'react';
 import { connect, machine as paginationMachine } from '@zag-js/pagination';
 import { normalizeProps, useMachine } from '@zag-js/react';
-import { useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { tableAnatomy } from './internal/anatomy.js';
 import { createPartContext } from './internal/context.js';
 import { ariaAttr, dataAttr } from './internal/props.js';
@@ -297,54 +297,69 @@ export function DataTableRoot<TRow extends object>(props: DataTableRootProps<TRo
   });
   const pagination = connect(service, normalizeProps);
 
-  const emitQuery = (override: Partial<DataTableQuery>): void => {
-    if (onQueryChange === undefined) return;
-    onQueryChange(
-      buildQuery({
-        page: pagination.page,
-        pageSize: pagination.pageSize,
-        sortBy,
-        sortOrder,
-        q: searchValue,
-        ...override,
-      }),
-    );
-  };
+  const emitQuery = useCallback(
+    (override: Partial<DataTableQuery>): void => {
+      if (onQueryChange === undefined) return;
+      onQueryChange(
+        buildQuery({
+          page: pagination.page,
+          pageSize: pagination.pageSize,
+          sortBy,
+          sortOrder,
+          q: searchValue,
+          ...override,
+        }),
+      );
+    },
+    [onQueryChange, pagination.page, pagination.pageSize, sortBy, sortOrder, searchValue],
+  );
 
-  const toggleSort = (accessor: string): void => {
-    const next: DataTableSortState =
-      sortBy === accessor
-        ? sortOrder === 'asc'
-          ? { sortBy: accessor, sortOrder: 'desc' }
-          : { sortBy: undefined, sortOrder: 'asc' }
-        : { sortBy: accessor, sortOrder: 'asc' };
-    if (sortByProp === undefined && sortOrderProp === undefined) {
-      setInternalSort(next);
-    }
-    onSortChange?.(next);
-    emitQuery({ sortBy: next.sortBy, sortOrder: next.sortBy === undefined ? undefined : next.sortOrder });
-  };
+  const toggleSort = useCallback(
+    (accessor: string): void => {
+      const next: DataTableSortState =
+        sortBy === accessor
+          ? sortOrder === 'asc'
+            ? { sortBy: accessor, sortOrder: 'desc' }
+            : { sortBy: undefined, sortOrder: 'asc' }
+          : { sortBy: accessor, sortOrder: 'asc' };
+      if (sortByProp === undefined && sortOrderProp === undefined) {
+        setInternalSort(next);
+      }
+      onSortChange?.(next);
+      emitQuery({ sortBy: next.sortBy, sortOrder: next.sortBy === undefined ? undefined : next.sortOrder });
+    },
+    [sortBy, sortOrder, sortByProp, sortOrderProp, onSortChange, emitQuery],
+  );
 
-  const commitSelection = (next: ReadonlySet<string>): void => {
-    const ids = Array.from(next);
-    if (selectedIdsProp === undefined) {
-      setInternalSelection(ids);
-    }
-    onSelectionChange?.(ids);
-  };
+  const commitSelection = useCallback(
+    (next: ReadonlySet<string>): void => {
+      const ids = Array.from(next);
+      if (selectedIdsProp === undefined) {
+        setInternalSelection(ids);
+      }
+      onSelectionChange?.(ids);
+    },
+    [selectedIdsProp, onSelectionChange],
+  );
 
-  const resolveRowId = (row: unknown, index: number): string =>
-    getRowIdProp !== undefined ? getRowIdProp(row as TRow, index) : defaultGetRowId(row, index);
+  const resolveRowId = useCallback(
+    (row: unknown, index: number): string =>
+      getRowIdProp !== undefined ? getRowIdProp(row as TRow, index) : defaultGetRowId(row, index),
+    [getRowIdProp],
+  );
 
-  const toggleRowSelect = (rowId: string): void => {
-    const next = new Set(selectedSet);
-    if (next.has(rowId)) {
-      next.delete(rowId);
-    } else {
-      next.add(rowId);
-    }
-    commitSelection(next);
-  };
+  const toggleRowSelect = useCallback(
+    (rowId: string): void => {
+      const next = new Set(selectedSet);
+      if (next.has(rowId)) {
+        next.delete(rowId);
+      } else {
+        next.add(rowId);
+      }
+      commitSelection(next);
+    },
+    [selectedSet, commitSelection],
+  );
 
   const sortedRows = useMemo(() => {
     if (sortBy === undefined) return rows;
@@ -376,7 +391,7 @@ export function DataTableRoot<TRow extends object>(props: DataTableRootProps<TRo
     return selectedOnPage === pageRowIds.length ? 'all' : 'some';
   }, [pageRowIds, selectedSet]);
 
-  const toggleSelectAll = (): void => {
+  const toggleSelectAll = useCallback((): void => {
     const next = new Set(selectedSet);
     if (selectAllState === 'all') {
       for (const id of pageRowIds) next.delete(id);
@@ -384,23 +399,32 @@ export function DataTableRoot<TRow extends object>(props: DataTableRootProps<TRo
       for (const id of pageRowIds) next.add(id);
     }
     commitSelection(next);
-  };
+  }, [selectedSet, selectAllState, pageRowIds, commitSelection]);
 
-  const onSearchChange = (value: string): void => {
-    if (qProp === undefined) {
-      setInternalQ(value);
-    }
-    emitQuery({ q: value.length > 0 ? value : undefined, page: 1 });
-  };
+  const onSearchChange = useCallback(
+    (value: string): void => {
+      if (qProp === undefined) {
+        setInternalQ(value);
+      }
+      emitQuery({ q: value.length > 0 ? value : undefined, page: 1 });
+    },
+    [qProp, emitQuery],
+  );
 
-  const defaultLabelFromColumns = (row: unknown, index: number): string => {
-    const first = columns[0];
-    if (first === undefined) return String(index);
-    return textOf(row === null || typeof row !== 'object' ? undefined : (row as TRow)[first.accessor]);
-  };
+  const defaultLabelFromColumns = useCallback(
+    (row: unknown, index: number): string => {
+      const first = columns[0];
+      if (first === undefined) return String(index);
+      return textOf(row === null || typeof row !== 'object' ? undefined : (row as TRow)[first.accessor]);
+    },
+    [columns],
+  );
 
-  const resolveRowLabel = (row: unknown, index: number): string =>
-    getRowLabelProp !== undefined ? getRowLabelProp(row as TRow, index) : defaultLabelFromColumns(row, index);
+  const resolveRowLabel = useCallback(
+    (row: unknown, index: number): string =>
+      getRowLabelProp !== undefined ? getRowLabelProp(row as TRow, index) : defaultLabelFromColumns(row, index),
+    [getRowLabelProp, defaultLabelFromColumns],
+  );
 
   const internalColumns = useMemo<readonly InternalColumn[]>(
     () =>
@@ -446,7 +470,6 @@ export function DataTableRoot<TRow extends object>(props: DataTableRootProps<TRo
       caption,
     }),
     // Re-built whenever any input that parts render from changes.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       internalColumns,
       pageRows,
@@ -464,13 +487,12 @@ export function DataTableRoot<TRow extends object>(props: DataTableRootProps<TRo
       loadingText,
       error,
       caption,
-      getRowIdProp,
-      getRowLabelProp,
-      selectedIdsProp,
-      qProp,
-      onQueryChange,
-      onSelectionChange,
-      onSortChange,
+      resolveRowId,
+      resolveRowLabel,
+      toggleRowSelect,
+      toggleSelectAll,
+      toggleSort,
+      onSearchChange,
     ],
   );
 

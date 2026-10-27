@@ -7,6 +7,7 @@ import type {
 import { Dialog as DialogPrimitive } from '@designharness/primitives';
 import { type ReactNode, forwardRef } from 'react';
 import { cx, element, modifier } from './internal/classnames.js';
+import { isPresent } from './internal/presence.js';
 
 /**
  * Styled `Dialog`.
@@ -91,8 +92,6 @@ export type UIDialogProps = Omit<DialogRootProps, 'children' | 'className'> & {
   children: ReactNode;
   className?: string | undefined;
 };
-
-const isPresent = (value: ReactNode): boolean => value !== undefined && value !== null && value !== false && value !== '';
 
 /**
  * Complete dialog: trigger, backdrop, positioner, sized surface, header with close
