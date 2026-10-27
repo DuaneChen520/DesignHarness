@@ -368,7 +368,9 @@ function normaliseMetadata(entries) {
       default: prop.default === undefined ? null : prop.default,
       description: typeof prop.description === 'string' ? prop.description : '',
     }));
-    byComponent[kebab(name)] = { props, source: entry.fileName ?? entry.sourceFile ?? null };
+    const rawSource = entry.fileName ?? entry.sourceFile ?? null;
+    const source = typeof rawSource === 'string' ? repositoryPath(rawSource) : null;
+    byComponent[kebab(name)] = { props, source };
   }
   return byComponent;
 }

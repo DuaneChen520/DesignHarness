@@ -79,7 +79,7 @@
         "description": "Stretch the control to its container's inline size."
       }
     ],
-    "source": "E:/personalwork/designharness/.worktrees/ticket-01/packages/ui/src/button.tsx"
+    "source": "packages/ui/src/button.tsx"
   },
   "combobox": {
     "props": [
@@ -441,7 +441,7 @@
         "description": "Make the trigger reachable with Tab in addition to the input."
       }
     ],
-    "source": "E:/personalwork/designharness/.worktrees/ticket-01/packages/ui/src/combobox.tsx"
+    "source": "packages/ui/src/combobox.tsx"
   },
   "data-table": {
     "props": [
@@ -649,7 +649,7 @@
         "description": ""
       }
     ],
-    "source": "E:/personalwork/designharness/.worktrees/ticket-01/packages/ui/src/data-table.tsx"
+    "source": "packages/ui/src/data-table.tsx"
   },
   "dialog": {
     "props": [
@@ -878,7 +878,7 @@
         "description": "Heading level rendered for the title."
       }
     ],
-    "source": "E:/personalwork/designharness/.worktrees/ticket-01/packages/ui/src/dialog.tsx"
+    "source": "packages/ui/src/dialog.tsx"
   },
   "input": {
     "props": [
@@ -922,7 +922,7 @@
         "type": "boolean | undefined",
         "required": false,
         "default": null,
-        "description": "Makes the control read-only."
+        "description": "Makes the control read-only (`data-readonly` + native `readOnly`)."
       },
       {
         "name": "invalid",
@@ -981,6 +981,6 @@
         "description": "Escape hatch for the remaining native `<input>` attributes."
       }
     ],
-    "source": "E:/personalwork/designharness/.worktrees/ticket-01/packages/ui/src/input.tsx"
+    "source": "packages/ui/src/input.tsx"
   }
 }

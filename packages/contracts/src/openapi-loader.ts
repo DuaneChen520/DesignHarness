@@ -7,7 +7,7 @@
  * this module entirely and pass the documents they imported from
  * `@designharness/contracts/openapi/*` themselves.
  */
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -32,11 +32,8 @@ export function resolveContractPath(fileName: string): string {
     ];
     for (const candidate of locations) {
       tried.push(candidate);
-      try {
-        readFileSync(candidate, 'utf8');
+      if (existsSync(candidate)) {
         return candidate;
-      } catch {
-        // try next
       }
     }
   }
@@ -49,11 +46,8 @@ export function resolveContractPath(fileName: string): string {
   ];
   for (const candidate of cwdCandidates) {
     tried.push(candidate);
-    try {
-      readFileSync(candidate, 'utf8');
+    if (existsSync(candidate)) {
       return candidate;
-    } catch {
-      // try next
     }
   }
 
