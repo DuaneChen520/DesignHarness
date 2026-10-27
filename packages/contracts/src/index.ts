@@ -93,5 +93,18 @@ export type {
   TableResult,
 } from './types.js';
 
+export {
+  INSTRUMENTS_SEARCH_OPERATION_ID,
+  INSTRUMENTS_SEARCH_PATH,
+  POSITIONS_OPERATION_ID,
+  POSITIONS_PATH,
+  comboboxSearchQueryKey,
+  dataTableQueryKey,
+  defaultContractFetcher,
+  useComboboxSearchQuery,
+  useDataTableQuery,
+} from './hooks.js';
+export type { UseComboboxSearchQueryOptions, UseDataTableQueryOptions } from './hooks.js';
+
 export { assertMatchesSchema, ContractAssertionError, resolveRef, supportedKeywords, validateSchema } from './testing/openapi-assert.js';
 export type { JsonSchema, ValidationIssue, ValidationResult, ValidatorOptions } from './testing/openapi-assert.js';
