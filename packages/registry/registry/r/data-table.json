@@ -1,0 +1,565 @@
+{
+  "name": "data-table",
+  "type": "registry:component",
+  "title": "DataTable",
+  "description": "Meridian DataTable — @designharness/ui source distributed verbatim from packages/ui/src/data-table.tsx (5404 bytes, sha256 e0db7368e1d556370514ffd0b640e286f9e348da15d75a095f33c0868f5b2153). Depends on @designharness/primitives, react and shares packages/ui/src/internal/classnames.ts. Styled by packages/ui/src/styles/data-table.css (12698 bytes, 42 token references). Registry index barrel: packages/ui/src/styles.css.",
+  "homepage": "http://localhost:4870/r/data-table.json",
+  "dependencies": [
+    "@designharness/primitives",
+    "react"
+  ],
+  "registryDependencies": [
+    "meridian-base"
+  ],
+  "files": [
+    {
+      "path": "components/designharness/data-table.tsx",
+      "type": "registry:component",
+      "content": "import type { DataTableQuery, DataTableRootProps } from '@designharness/primitives';\nimport { DataTable as DataTablePrimitive } from '@designharness/primitives';\nimport type { ReactNode } from 'react';\nimport { cx, element } from './internal/classnames.js';\n\n/**\n * Styled `DataTable`.\n *\n * Sorting (`aria-sort` on the columnheader, the real `<button>` inside it), selection\n * (`aria-selected`, the indeterminate select-all), the `@zag-js/pagination` machine\n * behind the labelled pagination nav, `aria-busy` while loading and the\n * `role=\"status\"`/`role=\"alert\"` empty-state region are all primitive-owned. This layer\n * arranges the toolbar, table and pager and styles every part from tokens.\n */\n\n/**\n * The query handed to `onQueryChange`.\n *\n * Structurally identical to `TableQuery` in `packages/contracts/src/types.ts`: every\n * member a contract request may carry (`page`, `pageSize`, `sortBy`, `sortOrder`, `q`)\n * is present with the same name and type, and a `UIDataTableQuery` value is assignable\n * straight into `TableQuery`. It is re-declared here rather than imported because\n * `ui -> contracts` would close a package cycle.\n */\nexport type UIDataTableQuery = DataTableQuery;\n\n/** Block class for every table selector in `styles/data-table.css`. */\nexport const DATA_TABLE_BLOCK = 'dh-data-table';\n\n/** Props of the faithful styled `table` anatomy root. */\nexport type UIDataTableRootProps<TRow extends object> = DataTableRootProps<TRow> & {\n  className?: string | undefined;\n};\n\n/** Anatomy root: context provider only, exactly like `DataTable.Root` in the primitives. */\nexport function DataTableRoot<TRow extends object>(props: UIDataTableRootProps<TRow>): ReactNode {\n  const { className, children, ...restProps } = props;\n  return (\n    <DataTablePrimitive.Root {...restProps} className={cx(DATA_TABLE_BLOCK, className)}>\n      {children}\n    </DataTablePrimitive.Root>\n  );\n}\n\nexport type UIDataTableProps<TRow extends object> = Omit<DataTableRootProps<TRow>, 'children'> & {\n  /** Placeholder for the filter control — an example, never an instruction. */\n  searchPlaceholder?: string | undefined;\n  /** Extra controls rendered in the toolbar next to the filter (filters, export, …). */\n  toolbarActions?: ReactNode | undefined;\n  /** Render the toolbar with the search field. @default true */\n  showToolbar?: boolean | undefined;\n  /** Render the pagination nav, status and page text. @default true */\n  showPagination?: boolean | undefined;\n  className?: string | undefined;\n};\n\n/**\n * Complete table: toolbar (filter + actions), the table itself and a footer row with\n * the \"Showing X–Y of Z\" status, the pager nav and the page text. `columns`, `rows`,\n * `total`, `loading`, `error` and `onQueryChange` keep the primitive's exact names and\n * the `DataTableQuery` shape that is structurally identical to `TableQuery` in\n * `packages/contracts/src/types.ts`.\n */\nexport function UIDataTable<TRow extends object>(props: UIDataTableProps<TRow>): ReactNode {\n  const {\n    searchPlaceholder = 'Filter rows',\n    toolbarActions,\n    showToolbar = true,\n    showPagination = true,\n    className,\n    ...restProps\n  } = props;\n\n  return (\n    <DataTableRoot {...restProps} className={className}>\n      {showToolbar ? (\n        <DataTablePrimitive.Toolbar className={element(DATA_TABLE_BLOCK, 'toolbar')}>\n          <DataTablePrimitive.SearchField placeholder={searchPlaceholder} />\n          {toolbarActions !== undefined && toolbarActions !== null ? (\n            <div className={element(DATA_TABLE_BLOCK, 'toolbar-actions')}>{toolbarActions}</div>\n          ) : null}\n        </DataTablePrimitive.Toolbar>\n      ) : null}\n      <DataTablePrimitive.Table className={element(DATA_TABLE_BLOCK, 'table')} />\n      {showPagination ? (\n        <div className={element(DATA_TABLE_BLOCK, 'footer')}>\n          <DataTablePrimitive.Status />\n          <DataTablePrimitive.Pagination />\n          <DataTablePrimitive.PageText />\n        </div>\n      ) : null}\n    </DataTableRoot>\n  );\n}\n\n/** Callable table plus the frozen compound parts. */\nexport interface DataTableComponent {\n  <TRow extends object>(props: UIDataTableProps<TRow>): ReactNode;\n  Root: typeof DataTableRoot;\n  Toolbar: typeof DataTablePrimitive.Toolbar;\n  SearchField: typeof DataTablePrimitive.SearchField;\n  Table: typeof DataTablePrimitive.Table;\n  Pagination: typeof DataTablePrimitive.Pagination;\n  FirstTrigger: typeof DataTablePrimitive.FirstTrigger;\n  PrevTrigger: typeof DataTablePrimitive.PrevTrigger;\n  Item: typeof DataTablePrimitive.Item;\n  Ellipsis: typeof DataTablePrimitive.Ellipsis;\n  NextTrigger: typeof DataTablePrimitive.NextTrigger;\n  LastTrigger: typeof DataTablePrimitive.LastTrigger;\n  Status: typeof DataTablePrimitive.Status;\n  PageText: typeof DataTablePrimitive.PageText;\n}\n\nexport const DataTable: DataTableComponent = Object.assign(UIDataTable, {\n  Root: DataTableRoot,\n  Toolbar: DataTablePrimitive.Toolbar,\n  SearchField: DataTablePrimitive.SearchField,\n  Table: DataTablePrimitive.Table,\n  Pagination: DataTablePrimitive.Pagination,\n  FirstTrigger: DataTablePrimitive.FirstTrigger,\n  PrevTrigger: DataTablePrimitive.PrevTrigger,\n  Item: DataTablePrimitive.Item,\n  Ellipsis: DataTablePrimitive.Ellipsis,\n  NextTrigger: DataTablePrimitive.NextTrigger,\n  LastTrigger: DataTablePrimitive.LastTrigger,\n  Status: DataTablePrimitive.Status,\n  PageText: DataTablePrimitive.PageText,\n});\n"
+    },
+    {
+      "path": "styles/designharness/data-table.css",
+      "type": "registry:style",
+      "content": "/*\n * DataTable — styling for the frozen `table` anatomy: `root`, `toolbar`, `search-field`,\n * `table`, `caption`, `head`, `row`, `columnheader`, `rowheader`, `cell`, `select`,\n * `pagination`, `pagination-page-text`, `first-trigger`, `prev-trigger`, `item`,\n * `ellipsis`, `next-trigger`, `last-trigger`, `status`, `empty-state`.\n *\n * Numeric truth first (DESIGN.md): every `data-value-type=\"numeric\"` cell is set in the\n * tabular monospace face and aligned by the machine's own `data-align` attribute, so a\n * column of digits tracks without re-reading each glyph. The root declares\n * `container-type: inline-size`, so toolbar and pager re-flow on the table's width.\n */\n\n@layer components {\n  [data-part=\"root\"]:where([data-scope=\"table\"]) {\n    container-type: inline-size;\n    display: flex;\n    flex-direction: column;\n    gap: var(--space-sm);\n    box-sizing: border-box;\n    inline-size: 100%;\n    font-family: var(--font-family-body);\n    font-size: var(--font-size-body-md);\n    line-height: var(--line-height-body-md);\n    color: var(--color-text-primary);\n  }\n\n  /* --- toolbar ------------------------------------------------------------------- */\n\n  .dh-data-table__toolbar {\n    display: flex;\n    flex-wrap: wrap;\n    align-items: center;\n    gap: var(--space-xs);\n  }\n\n  .dh-data-table__toolbar-actions {\n    display: flex;\n    align-items: center;\n    gap: var(--space-xs);\n    margin-inline-start: auto;\n  }\n\n  [data-part=\"search-field\"]:where([data-scope=\"table\"]) {\n    box-sizing: border-box;\n    inline-size: 100%;\n    min-block-size: var(--input-height);\n    padding-block: var(--space-xxs);\n    padding-inline: var(--input-padding-inline);\n    border-width: var(--border-width-hairline);\n    border-style: solid;\n    border-color: var(--color-border-strong);\n    border-radius: var(--radius-sm);\n    background-color: var(--color-surface);\n    color: var(--color-text-primary);\n    font-family: inherit;\n    font-size: var(--font-size-body-md);\n    transition:\n      border-color var(--duration-fast) var(--easing-standard),\n      background-color var(--duration-fast) var(--easing-standard);\n  }\n\n  [data-part=\"search-field\"]:where([data-scope=\"table\"])::placeholder {\n    color: var(--color-text-secondary);\n    opacity: 1;\n  }\n\n  /* --- the table ----------------------------------------------------------------- */\n\n  [data-part=\"table\"]:where([data-scope=\"table\"]) {\n    inline-size: 100%;\n    border-collapse: collapse;\n    caption-side: top;\n    transition: opacity var(--duration-fast) var(--easing-standard);\n  }\n\n  /*\n   * `aria-busy` is machine-owned; the dim plus a working cursor is the loading cue.\n   *\n   * The dim is 0.85 and not lighter because the axe gate measured a blanket `opacity: 0.6`\n   * here as a real WCAG 2.2 SC 1.4.3 failure: opacity on the table dims *text*, not just\n   * chrome — caption, header buttons and the loading region all fell to 2.88:1 (light) and\n   * 3.73:1 (dark). At 0.85 the same state measures 4.92:1 light / 6.57:1 dark, the busy\n   * cursor and the `role=\"status\"` loading row still say \"in flight\", and nothing has to be\n   * excluded from the sensor to make the state pass.\n   */\n  [data-part=\"table\"][aria-busy=\"true\"]:where([data-scope=\"table\"]) {\n    opacity: 0.85;\n    cursor: progress;\n  }\n\n  [data-part=\"caption\"]:where([data-scope=\"table\"]) {\n    padding-block-end: var(--space-xs);\n    font-size: var(--font-size-label-caps);\n    font-weight: var(--font-weight-label-caps);\n    line-height: var(--line-height-label-caps);\n    letter-spacing: var(--letter-spacing-label-caps);\n    text-transform: uppercase;\n    text-align: start;\n    color: var(--color-text-secondary);\n  }\n\n  [data-part=\"head\"]:where([data-scope=\"table\"]) {\n    background-color: var(--color-surface-sunken);\n  }\n\n  [data-part=\"columnheader\"]:where([data-scope=\"table\"]) {\n    position: sticky;\n    inset-block-start: 0rem;\n    z-index: 1;\n    box-sizing: border-box;\n    block-size: var(--table-header-height);\n    padding-block: var(--space-xxs);\n    padding-inline: var(--table-cell-padding-inline);\n    /* A sticky header keeps a real border so column identity survives scrolling. */\n    border-block-end: var(--border-width-strong) solid var(--color-border-strong);\n    background-color: var(--color-surface-sunken);\n    color: var(--color-text-secondary);\n    font-size: var(--font-size-label-caps);\n    font-weight: var(--font-weight-label-caps);\n    line-height: var(--line-height-label-caps);\n    letter-spacing: var(--letter-spacing-label-caps);\n    text-transform: uppercase;\n    text-align: start;\n    white-space: nowrap;\n  }\n\n  /* Sortable headers are real buttons: reset the UA, keep the header's own type. */\n  [data-part=\"columnheader\"] button {\n    display: inline-flex;\n    align-items: center;\n    gap: var(--space-xxs);\n    margin: 0rem;\n    padding: 0rem;\n    border: none;\n    background-color: transparent;\n    color: var(--color-text-secondary);\n    font-family: inherit;\n    font-size: var(--font-size-label-caps);\n    font-weight: var(--font-weight-label-caps);\n    line-height: var(--line-height-label-caps);\n    letter-spacing: var(--letter-spacing-label-caps);\n    text-transform: uppercase;\n    text-decoration: underline;\n    text-underline-offset: var(--space-xxs);\n    cursor: default;\n    transition: color var(--duration-fast) var(--easing-standard);\n  }\n\n  [data-part=\"columnheader\"] button:hover {\n    color: var(--color-text-primary);\n  }\n\n  /* Direction is a glyph and an underline, never a colour (DESIGN.md \"Do's\"). */\n  [data-part=\"columnheader\"][aria-sort=\"ascending\"] button::after {\n    content: \"▲\";\n    font-size: var(--font-size-body-sm);\n    letter-spacing: normal;\n  }\n\n  [data-part=\"columnheader\"][aria-sort=\"descending\"] button::after {\n    content: \"▼\";\n    font-size: var(--font-size-body-sm);\n    letter-spacing: normal;\n  }\n\n  [data-part=\"body\"]:where([data-scope=\"table\"]) {\n    background-color: var(--color-surface);\n  }\n\n  [data-part=\"row\"]:where([data-scope=\"table\"]) {\n    block-size: var(--table-row-height-standard);\n    background-color: transparent;\n    transition: background-color var(--duration-fast) var(--easing-standard);\n  }\n\n  [data-part=\"row\"]:where([data-scope=\"table\"]):hover {\n    background-color: var(--color-surface-sunken);\n  }\n\n  [data-part=\"row\"][data-selected]:where([data-scope=\"table\"]) {\n    background-color: var(--color-primary-subtle);\n  }\n\n  [data-part=\"cell\"]:where([data-scope=\"table\"]),\n  [data-part=\"rowheader\"]:where([data-scope=\"table\"]) {\n    box-sizing: border-box;\n    padding-block: var(--space-xxs);\n    padding-inline: var(--table-cell-padding-inline);\n    border-block-end: var(--border-width-hairline) solid var(--color-border-subtle);\n    background-color: transparent;\n    color: var(--color-text-primary);\n    font-size: var(--font-size-body-md);\n    line-height: var(--line-height-body-md);\n    text-align: start;\n    vertical-align: middle;\n  }\n\n  [data-part=\"rowheader\"]:where([data-scope=\"table\"]) {\n    font-weight: var(--font-weight-label-caps);\n    color: var(--color-text-primary);\n  }\n\n  /* --- numeric columns: the product ---------------------------------------------- */\n\n  [data-part=\"cell\"][data-value-type=\"numeric\"]:where([data-scope=\"table\"]),\n  [data-part=\"rowheader\"][data-value-type=\"numeric\"]:where([data-scope=\"table\"]) {\n    font-family: var(--font-family-mono);\n    font-size: var(--font-size-numeric-md);\n    font-weight: var(--font-weight-numeric-md);\n    line-height: var(--line-height-numeric-md);\n    /* Tabular figures: the keyword form plus the OpenType feature, so alignment does not\n       depend on a `--font-feature-*` token (the frozen §3 list has none). */\n    font-variant-numeric: tabular-nums;\n    font-feature-settings: \"tnum\" 1;\n  }\n\n  [data-part=\"cell\"][data-align=\"end\"]:where([data-scope=\"table\"]),\n  [data-part=\"rowheader\"][data-align=\"end\"]:where([data-scope=\"table\"]),\n  [data-part=\"columnheader\"][data-align=\"end\"]:where([data-scope=\"table\"]) {\n    text-align: end;\n  }\n\n  [data-part=\"cell\"][data-align=\"center\"]:where([data-scope=\"table\"]),\n  [data-part=\"rowheader\"][data-align=\"center\"]:where([data-scope=\"table\"]),\n  [data-part=\"columnheader\"][data-align=\"center\"]:where([data-scope=\"table\"]) {\n    text-align: center;\n  }\n\n  /* --- selection column ----------------------------------------------------------- */\n\n  [data-part=\"select\"]:where([data-scope=\"table\"]) {\n    box-sizing: border-box;\n    inline-size: var(--target-size-min);\n    block-size: var(--target-size-min);\n    margin: 0rem;\n    accent-color: var(--color-primary);\n    cursor: default;\n  }\n\n  /* --- empty / loading / error region ---------------------------------------------- */\n\n  [data-part=\"empty-state\"]:where([data-scope=\"table\"]) {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    gap: var(--space-xs);\n    padding-block: var(--space-lg);\n    padding-inline: var(--space-md);\n    color: var(--color-text-secondary);\n    font-size: var(--font-size-body-sm);\n    line-height: var(--line-height-body-sm);\n  }\n\n  /* `role=\"alert\"` is the machine's failed-request signal; it reads as danger and\n     carries a seam, so the state is never colour alone. */\n  [data-part=\"empty-state\"][role=\"alert\"]:where([data-scope=\"table\"]) {\n    padding-inline-start: var(--space-xs);\n    border-inline-start: var(--border-width-strong) solid var(--color-danger);\n    color: var(--color-danger);\n    font-weight: var(--font-weight-label-caps);\n  }\n\n  /* --- footer: status, pager, page text -------------------------------------------- */\n\n  .dh-data-table__footer {\n    display: flex;\n    flex-wrap: wrap;\n    align-items: center;\n    gap: var(--space-xs);\n  }\n\n  [data-part=\"status\"]:where([data-scope=\"table\"]),\n  [data-part=\"pagination-page-text\"]:where([data-scope=\"table\"]) {\n    font-family: var(--font-family-mono);\n    font-size: var(--font-size-body-sm);\n    line-height: var(--line-height-body-sm);\n    font-variant-numeric: tabular-nums;\n    color: var(--color-text-secondary);\n  }\n\n  [data-part=\"pagination\"]:where([data-scope=\"table\"]) {\n    display: flex;\n    align-items: center;\n    gap: var(--space-xs);\n    margin-inline-start: auto;\n  }\n\n  [data-part=\"first-trigger\"],\n  [data-part=\"prev-trigger\"],\n  [data-part=\"item\"],\n  [data-part=\"next-trigger\"],\n  [data-part=\"last-trigger\"] {\n    box-sizing: border-box;\n    margin: 0rem;\n    min-inline-size: var(--target-size-min);\n    min-block-size: var(--control-height-sm);\n    padding-inline: var(--space-xs);\n    border-width: var(--border-width-hairline);\n    border-style: solid;\n    border-color: transparent;\n    border-radius: var(--radius-sm);\n    background-color: transparent;\n    color: var(--color-primary);\n    font-family: var(--font-family-mono);\n    font-size: var(--font-size-numeric-md);\n    font-weight: var(--font-weight-numeric-md);\n    line-height: var(--line-height-numeric-md);\n    font-variant-numeric: tabular-nums;\n    text-decoration: underline;\n    cursor: default;\n    transition:\n      background-color var(--duration-fast) var(--easing-standard),\n      border-color var(--duration-fast) var(--easing-standard),\n      color var(--duration-fast) var(--easing-standard);\n  }\n\n  [data-part=\"first-trigger\"]:hover,\n  [data-part=\"prev-trigger\"]:hover,\n  [data-part=\"item\"]:hover,\n  [data-part=\"next-trigger\"]:hover,\n  [data-part=\"last-trigger\"]:hover {\n    background-color: var(--color-primary-subtle);\n    border-color: var(--color-border-strong);\n    color: var(--color-on-primary-subtle);\n  }\n\n  [data-part=\"first-trigger\"]:disabled,\n  [data-part=\"prev-trigger\"]:disabled,\n  [data-part=\"item\"]:disabled,\n  [data-part=\"next-trigger\"]:disabled,\n  [data-part=\"last-trigger\"]:disabled {\n    color: var(--color-text-secondary);\n    text-decoration: none;\n    opacity: 0.55;\n  }\n\n  /* The current page is underlined-seam + heavy: `aria-current` is the machine's cue. */\n  [data-part=\"item\"][aria-current=\"page\"] {\n    background-color: var(--color-primary-subtle);\n    border-color: var(--color-border-selected);\n    color: var(--color-on-primary-subtle);\n    text-decoration: none;\n  }\n\n  [data-part=\"ellipsis\"]:where([data-scope=\"table\"]) {\n    color: var(--color-text-secondary);\n    font-family: var(--font-family-mono);\n    font-variant-numeric: tabular-nums;\n  }\n\n  /* --- container variants ---------------------------------------------------------- */\n\n  @container (min-width: 40rem) {\n    .dh-data-table__toolbar {\n      flex-wrap: nowrap;\n      align-items: end;\n      gap: var(--space-md);\n    }\n\n    [data-part=\"search-field\"]:where([data-scope=\"table\"]) {\n      inline-size: calc(var(--space-xxxl) * 4);\n    }\n\n    .dh-data-table__footer {\n      gap: var(--space-lg);\n    }\n  }\n}\n"
+    },
+    {
+      "path": "components/designharness/internal/classnames.ts",
+      "type": "registry:lib",
+      "content": "/**\n * Class-name helpers for the styled layer.\n *\n * The styled layer's only DOM contribution is *class names*: every structural and\n * state signal (`data-scope`, `data-part`, `data-open`, `data-disabled`, `aria-*`)\n * is owned by `@designharness/primitives` and is never re-implemented, renamed or\n * overridden here (TOKEN-API.md §5). Component CSS is authored against those\n * attributes plus the `dh-<component>` block / `dh-<component>--<variant>` modifier\n * classes produced by these helpers.\n */\n\n/** Any value that a class list may legitimately contain. */\nexport type ClassValue = string | false | null | undefined;\n\n/** Join a class list, dropping empty entries and collapsing to a single string. */\nexport function cx(...values: readonly ClassValue[]): string {\n  const parts: string[] = [];\n  for (const value of values) {\n    if (typeof value === 'string' && value.length > 0) parts.push(value);\n  }\n  return parts.join(' ');\n}\n\n/**\n * BEM-ish modifier builder: `modifier('dh-button', 'primary')` → `dh-button--primary`.\n * A `false`/`undefined` modifier yields `undefined` so it can be passed to `cx` directly.\n */\nexport function modifier(block: string, value: string | false | null | undefined): string | undefined {\n  if (!value) return undefined;\n  return `${block}--${value}`;\n}\n\n/**\n * Element builder: `element('dh-button', 'spinner')` → `dh-button__spinner`.\n * Elements are markup *the styled layer itself renders* — never anatomy parts.\n */\nexport function element(block: string, name: string): string {\n  return `${block}__${name}`;\n}\n\n/**\n * Merge a consumer `className` after the styled-layer classes so a host app can add\n * utility classes without ever losing the tokenized base (source order, no `!important`).\n */\nexport function withConsumerClass(styled: string, className: ClassValue): string {\n  return cx(styled, className);\n}\n"
+    }
+  ],
+  "meta": {
+    "tier": "component",
+    "componentId": "data-table",
+    "displayName": "DataTable",
+    "entry": {
+      "path": "packages/ui/src/data-table.tsx",
+      "sha256": "e0db7368e1d556370514ffd0b640e286f9e348da15d75a095f33c0868f5b2153",
+      "bytes": 5404
+    },
+    "stylesheet": {
+      "path": "packages/ui/src/styles/data-table.css",
+      "sha256": "04311c6ef81d7511e3b05cb8e4ecfaa9cbdd5a47e6f08ab27cb6a9a9fe7943c5",
+      "bytes": 12698
+    },
+    "shared": [
+      {
+        "path": "packages/ui/src/internal/classnames.ts",
+        "sha256": "4ffd9f0b3117c43ef927aa237c5f54813d8acf11d781474da4f89b4e596cabb2",
+        "bytes": 1872
+      }
+    ],
+    "npmDependencies": [
+      "@designharness/primitives",
+      "react"
+    ],
+    "interComponentDependencies": [],
+    "stories": {
+      "path": "packages/ui/src/data-table.stories.tsx"
+    },
+    "tokenReferences": [
+      "--border-width-hairline",
+      "--border-width-strong",
+      "--color-border-selected",
+      "--color-border-strong",
+      "--color-border-subtle",
+      "--color-danger",
+      "--color-on-primary-subtle",
+      "--color-primary",
+      "--color-primary-subtle",
+      "--color-surface",
+      "--color-surface-sunken",
+      "--color-text-primary",
+      "--color-text-secondary",
+      "--control-height-sm",
+      "--duration-fast",
+      "--easing-standard",
+      "--font-family-body",
+      "--font-family-mono",
+      "--font-size-body-md",
+      "--font-size-body-sm",
+      "--font-size-label-caps",
+      "--font-size-numeric-md",
+      "--font-weight-label-caps",
+      "--font-weight-numeric-md",
+      "--input-height",
+      "--input-padding-inline",
+      "--letter-spacing-label-caps",
+      "--line-height-body-md",
+      "--line-height-body-sm",
+      "--line-height-label-caps",
+      "--line-height-numeric-md",
+      "--radius-sm",
+      "--space-lg",
+      "--space-md",
+      "--space-sm",
+      "--space-xs",
+      "--space-xxs",
+      "--space-xxxl",
+      "--table-cell-padding-inline",
+      "--table-header-height",
+      "--table-row-height-standard",
+      "--target-size-min"
+    ],
+    "tokensReferenced": 42,
+    "props": [
+      {
+        "name": "caption",
+        "type": "ReactNode | undefined",
+        "required": false,
+        "description": "`<caption>` content for the table."
+      },
+      {
+        "name": "q",
+        "type": "string | undefined",
+        "required": false,
+        "description": "Controlled search text bound to `DataTable.SearchField`."
+      },
+      {
+        "name": "loading",
+        "type": "boolean | undefined",
+        "required": false,
+        "description": "Request in flight: sets `aria-busy` and renders the loading empty-state region."
+      },
+      {
+        "name": "rows",
+        "type": "readonly TRow[]",
+        "required": true,
+        "description": "The rows to render (client mode: every row; server mode: the current page)."
+      },
+      {
+        "name": "columns",
+        "type": "readonly DataTableColumn<TRow>[]",
+        "required": true
+      },
+      {
+        "name": "total",
+        "type": "number | undefined",
+        "required": false,
+        "description": "Full result size when the origin already sliced the page. With `total` the\nrows are rendered as given; without it the machine paginates `rows` itself."
+      },
+      {
+        "name": "page",
+        "type": "number | undefined",
+        "required": false,
+        "description": "Controlled page number (1-based) handed to the pagination machine."
+      },
+      {
+        "name": "defaultPage",
+        "type": "number | undefined",
+        "required": false,
+        "description": "Initial page for uncontrolled pagination."
+      },
+      {
+        "name": "pageSize",
+        "type": "number | undefined",
+        "required": false,
+        "description": "Controlled page size handed to the pagination machine."
+      },
+      {
+        "name": "defaultPageSize",
+        "type": "number | undefined",
+        "required": false,
+        "description": "Initial page size for uncontrolled pagination."
+      },
+      {
+        "name": "sortBy",
+        "type": "string | undefined",
+        "required": false,
+        "description": "Controlled sort column (`undefined` = unsorted)."
+      },
+      {
+        "name": "sortOrder",
+        "type": "DataTableSortOrder | undefined",
+        "required": false,
+        "description": "Controlled sort direction (only meaningful with `sortBy`)."
+      },
+      {
+        "name": "defaultSortBy",
+        "type": "string | undefined",
+        "required": false,
+        "description": "Initial sort column for uncontrolled sorting."
+      },
+      {
+        "name": "defaultSortOrder",
+        "type": "DataTableSortOrder | undefined",
+        "required": false,
+        "description": "Initial sort direction for uncontrolled sorting."
+      },
+      {
+        "name": "selectedRowIds",
+        "type": "readonly string[] | undefined",
+        "required": false,
+        "description": "Controlled selection, keyed by `getRowId`."
+      },
+      {
+        "name": "defaultSelectedRowIds",
+        "type": "readonly string[] | undefined",
+        "required": false,
+        "description": "Initial selection for uncontrolled `selectedRowIds`."
+      },
+      {
+        "name": "getRowId",
+        "type": "((row: TRow, index: number) => string) | undefined",
+        "required": false,
+        "description": "Stable row identity. Defaults to a string/number `id` property, then the row index."
+      },
+      {
+        "name": "getRowLabel",
+        "type": "((row: TRow, index: number) => string) | undefined",
+        "required": false,
+        "description": "Human row name used for the row `aria-label` and the select checkbox label."
+      },
+      {
+        "name": "defaultQ",
+        "type": "string | undefined",
+        "required": false,
+        "description": "Initial search text for uncontrolled `q`."
+      },
+      {
+        "name": "error",
+        "type": "ReactNode | undefined",
+        "required": false,
+        "description": "Request failure surfaced through the `role=\"alert\"` empty-state region."
+      },
+      {
+        "name": "emptyText",
+        "type": "ReactNode | undefined",
+        "required": false,
+        "description": "Content for the `role=\"status\"` empty-state region when there are no rows."
+      },
+      {
+        "name": "loadingText",
+        "type": "ReactNode | undefined",
+        "required": false,
+        "description": "Content for the loading region while `loading` is true."
+      },
+      {
+        "name": "selectable",
+        "type": "boolean | undefined",
+        "required": false,
+        "description": "Enable the selection checkbox column."
+      },
+      {
+        "name": "searchPlaceholder",
+        "type": "string | undefined",
+        "required": false,
+        "description": "Placeholder for the filter control — an example, never an instruction."
+      },
+      {
+        "name": "toolbarActions",
+        "type": "ReactNode | undefined",
+        "required": false,
+        "description": "Extra controls rendered in the toolbar next to the filter (filters, export, …)."
+      },
+      {
+        "name": "showToolbar",
+        "type": "boolean | undefined",
+        "required": false,
+        "description": "Render the toolbar with the search field."
+      },
+      {
+        "name": "showPagination",
+        "type": "boolean | undefined",
+        "required": false,
+        "description": "Render the pagination nav, status and page text."
+      },
+      {
+        "name": "children",
+        "type": "ReactNode",
+        "required": true
+      }
+    ],
+    "propCount": 28,
+    "contractPropCount": 29,
+    "requiredPropCount": 3,
+    "documentedPropCount": 26,
+    "events": [],
+    "metadataProvenance": "contracts-metadata",
+    "metadataSource": "packages/contracts/generated/component-metadata.json",
+    "a11y": {
+      "status": "provisional",
+      "standard": "WCAG 2.2 AA",
+      "gate": 3,
+      "axe": {
+        "status": "not-run",
+        "report": "no axe-core report found in: apps/showcase/reports/a11y.json, apps/showcase/test-results/a11y.json, packages/ui/reports/a11y.json",
+        "violations": 0,
+        "incomplete": 0
+      },
+      "contrast": {
+        "audited": 26,
+        "failures": 0,
+        "pairs": [
+          {
+            "id": "light/border-selected-on-surface-ui",
+            "mode": "light",
+            "pair": "color.semantic.border-selected on color.semantic.surface",
+            "kind": "ui",
+            "required": 3,
+            "ratio": 5.847,
+            "pass": true,
+            "lc": 78.57
+          },
+          {
+            "id": "light/border-strong-on-canvas-ui",
+            "mode": "light",
+            "pair": "color.semantic.border-strong on color.semantic.canvas",
+            "kind": "ui",
+            "required": 3,
+            "ratio": 4.43,
+            "pass": true,
+            "lc": 69.17
+          },
+          {
+            "id": "light/border-strong-on-surface-ui",
+            "mode": "light",
+            "pair": "color.semantic.border-strong on color.semantic.surface",
+            "kind": "ui",
+            "required": 3,
+            "ratio": 4.621,
+            "pass": true,
+            "lc": 72.12
+          },
+          {
+            "id": "light/danger-on-surface-text",
+            "mode": "light",
+            "pair": "color.semantic.danger on color.semantic.surface",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 6.574,
+            "pass": true,
+            "lc": 80.88
+          },
+          {
+            "id": "light/focus-on-surface-ui",
+            "mode": "light",
+            "pair": "color.semantic.focus on color.semantic.surface",
+            "kind": "ui",
+            "required": 3,
+            "ratio": 5.847,
+            "pass": true,
+            "lc": 78.57
+          },
+          {
+            "id": "light/on-danger-on-danger-text",
+            "mode": "light",
+            "pair": "color.semantic.on-danger on color.semantic.danger",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 6.574,
+            "pass": true,
+            "lc": -86.02
+          },
+          {
+            "id": "light/on-primary-on-primary-text",
+            "mode": "light",
+            "pair": "color.semantic.on-primary on color.semantic.primary",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 5.847,
+            "pass": true,
+            "lc": -83.82
+          },
+          {
+            "id": "light/on-primary-subtle-on-primary-subtle-text",
+            "mode": "light",
+            "pair": "color.semantic.on-primary-subtle on color.semantic.primary-subtle",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 5.151,
+            "pass": true,
+            "lc": 69.9
+          },
+          {
+            "id": "light/primary-on-canvas-text",
+            "mode": "light",
+            "pair": "color.semantic.primary on color.semantic.canvas",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 5.605,
+            "pass": true,
+            "lc": 75.61
+          },
+          {
+            "id": "light/primary-on-surface-text",
+            "mode": "light",
+            "pair": "color.semantic.primary on color.semantic.surface",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 5.847,
+            "pass": true,
+            "lc": 78.57
+          },
+          {
+            "id": "light/success-on-surface-text",
+            "mode": "light",
+            "pair": "color.semantic.success on color.semantic.surface",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 5.373,
+            "pass": true,
+            "lc": 76.3
+          },
+          {
+            "id": "light/text-primary-on-canvas-text",
+            "mode": "light",
+            "pair": "color.semantic.text-primary on color.semantic.canvas",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 17.221,
+            "pass": true,
+            "lc": 101.76
+          },
+          {
+            "id": "light/text-primary-on-surface-large-text",
+            "mode": "light",
+            "pair": "color.semantic.text-primary on color.semantic.surface",
+            "kind": "large-text",
+            "required": 3,
+            "ratio": 17.963,
+            "pass": true,
+            "lc": 104.71
+          },
+          {
+            "id": "light/text-primary-on-surface-raised-text",
+            "mode": "light",
+            "pair": "color.semantic.text-primary on color.semantic.surface-raised",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 17.963,
+            "pass": true,
+            "lc": 104.71
+          },
+          {
+            "id": "light/text-primary-on-surface-sunken-text",
+            "mode": "light",
+            "pair": "color.semantic.text-primary on color.semantic.surface-sunken",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 16.036,
+            "pass": true,
+            "lc": 96.93
+          },
+          {
+            "id": "light/text-primary-on-surface-text",
+            "mode": "light",
+            "pair": "color.semantic.text-primary on color.semantic.surface",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 17.963,
+            "pass": true,
+            "lc": 104.71
+          },
+          {
+            "id": "light/text-secondary-on-canvas-text",
+            "mode": "light",
+            "pair": "color.semantic.text-secondary on color.semantic.canvas",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 7.634,
+            "pass": true,
+            "lc": 84.67
+          },
+          {
+            "id": "light/text-secondary-on-surface-sunken-text",
+            "mode": "light",
+            "pair": "color.semantic.text-secondary on color.semantic.surface-sunken",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 7.109,
+            "pass": true,
+            "lc": 79.84
+          },
+          {
+            "id": "light/text-secondary-on-surface-text",
+            "mode": "light",
+            "pair": "color.semantic.text-secondary on color.semantic.surface",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 7.963,
+            "pass": true,
+            "lc": 87.62
+          },
+          {
+            "id": "light/text.link",
+            "mode": "light",
+            "pair": "color.semantic.primary on color.semantic.surface",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 5.847,
+            "pass": true,
+            "lc": 78.57
+          },
+          {
+            "id": "light/text.on-primary",
+            "mode": "light",
+            "pair": "color.semantic.on-primary on color.semantic.primary",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 5.847,
+            "pass": true,
+            "lc": -83.82
+          },
+          {
+            "id": "light/text.secondary",
+            "mode": "light",
+            "pair": "color.semantic.text-secondary on color.semantic.surface",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 7.963,
+            "pass": true,
+            "lc": 87.62
+          },
+          {
+            "id": "light/ui.border-selected",
+            "mode": "light",
+            "pair": "color.semantic.border-selected on color.semantic.surface",
+            "kind": "ui",
+            "required": 3,
+            "ratio": 5.847,
+            "pass": true,
+            "lc": 78.57
+          },
+          {
+            "id": "light/ui.border-strong",
+            "mode": "light",
+            "pair": "color.semantic.border-strong on color.semantic.surface",
+            "kind": "ui",
+            "required": 3,
+            "ratio": 4.621,
+            "pass": true,
+            "lc": 72.12
+          },
+          {
+            "id": "light/ui.focus",
+            "mode": "light",
+            "pair": "color.semantic.focus on color.semantic.surface",
+            "kind": "ui",
+            "required": 3,
+            "ratio": 5.847,
+            "pass": true,
+            "lc": 78.57
+          },
+          {
+            "id": "light/warning-on-surface-text",
+            "mode": "light",
+            "pair": "color.semantic.warning on color.semantic.surface",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 6.388,
+            "pass": true,
+            "lc": 81.38
+          }
+        ]
+      },
+      "reasons": [
+        "the Tier-3 axe-core run has not produced a report for this component"
+      ]
+    },
+    "intent": {
+      "file": "DESIGN.md",
+      "sha256": "036bbfc393f294dd8d7ec0b2f00b73c848d4104f5f7404579c2245a329b74218"
+    }
+  }
+}

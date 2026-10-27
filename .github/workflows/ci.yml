@@ -1,0 +1,119 @@
+---
+name: CI
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+    tags: ['v*']
+  schedule:
+    - cron: '20 3 * * *'
+  workflow_dispatch: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  TURBO_TEAM: design-harness
+  NODE_VERSION: '22.11.0'
+
+jobs:
+  # Tier 1 + Tier 2 — the fast gates: AST sensors and the intent/drift audit.
+  fast-gates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Tier 1 — Stylelint + ESLint AST sensors (block commit)
+        run: pnpm run gate:tier1
+      - name: Tier 2 — @google/design.md lint + drift (block merge)
+        run: pnpm run gate:tier2
+
+  # Tier 3 — types + axe-core WCAG 2.2 AA. Zero violations is the only hard accessibility gate.
+  standard-gate:
+    needs: fast-gates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm turbo run build lint typecheck test
+      - name: Install browsers
+        run: pnpm --filter @designharness/showcase exec playwright install --with-deps chromium
+      - name: Tier 3 — tsc --noEmit + axe-core WCAG 2.2 AA (block merge)
+        run: pnpm run gate:tier3
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: a11y-report
+          path: apps/showcase/playwright-report
+          retention-days: 14
+
+  # Tier 4 — nightly / release only: cross-kernel pixel regression + OpenAPI/MSW contract depth.
+  release-gate:
+    if: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/v') }}
+    needs: standard-gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Install browsers (chromium + firefox + webkit)
+        run: pnpm --filter @designharness/showcase exec playwright install --with-deps chromium firefox webkit
+      - name: Tier 4 — visual regression + contract tests (block release)
+        run: pnpm run gate:tier4
+      - uses: actions/upload-artifact@v4
+        if: ${{ failure() }}
+        with:
+          name: visual-diff
+          path: |
+            apps/showcase/test-results
+            apps/showcase/playwright-report
+          retention-days: 14
+
+  # Publish the shadcn-compatible registry artifact so `npx shadcn add <url>` has a target.
+  registry:
+    needs: fast-gates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @designharness/tokens build
+      - run: pnpm --filter @designharness/registry build
+      - name: Assert the registry is shadcn-consumable
+        run: node -e "const i=JSON.parse(require('fs').readFileSync('packages/registry/registry/registry.json','utf8'));if(!Array.isArray(i.items)||i.items.length<5)throw new Error('registry index too small');console.log('registry items:',i.items.map(x=>x.name).join(', '))"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: registry
+          path: packages/registry/registry
+          retention-days: 14

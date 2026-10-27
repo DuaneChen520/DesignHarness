@@ -1,0 +1,524 @@
+{
+  "name": "dialog",
+  "type": "registry:component",
+  "title": "Dialog",
+  "description": "Meridian Dialog — @designharness/ui source distributed verbatim from packages/ui/src/dialog.tsx (6024 bytes, sha256 c26ce18756744a5856247115f1d4eac8fbb0051016bff5cb68846cda9dd438ac). Depends on @designharness/primitives, react and shares packages/ui/src/internal/classnames.ts. Styled by packages/ui/src/styles/dialog.css (6515 bytes, 37 token references). Registry index barrel: packages/ui/src/styles.css.",
+  "homepage": "http://localhost:4870/r/dialog.json",
+  "dependencies": [
+    "@designharness/primitives",
+    "react"
+  ],
+  "registryDependencies": [
+    "meridian-base"
+  ],
+  "files": [
+    {
+      "path": "components/designharness/dialog.tsx",
+      "type": "registry:component",
+      "content": "import type {\n  DialogContentProps,\n  DialogRootProps,\n  DialogTitleProps,\n  DialogTriggerProps,\n} from '@designharness/primitives';\nimport { Dialog as DialogPrimitive } from '@designharness/primitives';\nimport { type ReactNode, forwardRef } from 'react';\nimport { cx, element, modifier } from './internal/classnames.js';\n\n/**\n * Styled `Dialog`.\n *\n * `role=\"dialog\"`/`alertdialog`, `aria-modal`, `aria-labelledby`, `aria-describedby`,\n * the focus trap, `Escape`/outside-click dismissal and the presence lifecycle all come\n * from the `@zag-js/dialog` machine behind the primitive. This layer sizes the surface,\n * lays it out with a container query and adds the footer element DESIGN.md asks for.\n */\n\n/** Block class for every dialog selector in `styles/dialog.css`. */\nexport const DIALOG_BLOCK = 'dh-dialog';\n\n/** Surface widths, mapped onto `--dialog-max-width-sm|md|lg`. */\nexport const DIALOG_SIZES = ['sm', 'md', 'lg'] as const;\nexport type DialogSize = (typeof DIALOG_SIZES)[number];\n\n/** Anatomy root: context provider only, exactly like `Dialog.Root` in the primitives. */\nexport function DialogRoot(props: DialogRootProps): ReactNode {\n  const { className, children, ...restProps } = props;\n  return (\n    <DialogPrimitive.Root {...restProps} className={cx(element(DIALOG_BLOCK, 'root'), className)}>\n      {children}\n    </DialogPrimitive.Root>\n  );\n}\n\nexport type UIDialogContentProps = DialogContentProps & {\n  /** Surface width step. @default \"md\" */\n  size?: DialogSize | undefined;\n};\n\n/** Class list for the dialog surface; exported so tests and stories can assert the mapping. */\nexport function dialogContentClassNames(size: DialogSize = 'md', className?: string | undefined): string {\n  return cx(DIALOG_BLOCK, modifier(DIALOG_BLOCK, size), className);\n}\n\n/**\n * The dialog surface. `size` selects `--dialog-max-width-*` and the `@container`\n * breakpoint for the header/body/footer arrangement; `data-state`, `role` and the\n * labelled-by/described-by wiring stay machine-owned.\n */\nexport const DialogContent = forwardRef<HTMLDivElement, UIDialogContentProps>(function DialogContent(props, ref) {\n  const { size, className, children, ...restProps } = props;\n  return (\n    <DialogPrimitive.Content {...restProps} ref={ref} className={dialogContentClassNames(size, className)}>\n      {children}\n    </DialogPrimitive.Content>\n  );\n});\n\n/** Close trigger with the styled layer's glyph; `aria-label=\"Close\"` comes from the primitive. */\nexport function DialogCloseTrigger(props: DialogTriggerProps): ReactNode {\n  const { children, className, ...restProps } = props;\n  return (\n    <DialogPrimitive.CloseTrigger {...restProps} className={cx(element(DIALOG_BLOCK, 'close'), className)}>\n      {children ?? <span className={element(DIALOG_BLOCK, 'close-glyph')} aria-hidden=\"true\">×</span>}\n    </DialogPrimitive.CloseTrigger>\n  );\n}\n\n/** Heading wrapper so the title and the close trigger share one row. */\nexport function DialogTitle(props: DialogTitleProps): ReactNode {\n  const { className, ...restProps } = props;\n  return <DialogPrimitive.Title {...restProps} className={cx(element(DIALOG_BLOCK, 'title'), className)} />;\n}\n\nexport type UIDialogProps = Omit<DialogRootProps, 'children' | 'className'> & {\n  /** Dialog title. Required: an unnamed dialog is an accessibility defect, not a style. */\n  title: ReactNode;\n  /** Surface width step. @default \"md\" */\n  size?: DialogSize | undefined;\n  /** Footer content, right-aligned on wide surfaces (DESIGN.md: action row). */\n  footer?: ReactNode | undefined;\n  /** Trigger label. Omit it to drive the dialog with `open` instead. */\n  trigger?: ReactNode | undefined;\n  /** Props for the rendered trigger (e.g. `variant`-styled `Button`). */\n  triggerProps?: DialogTriggerProps | undefined;\n  /** Render the close trigger in the header. @default true */\n  closable?: boolean | undefined;\n  /** Body content. */\n  children: ReactNode;\n  className?: string | undefined;\n};\n\nconst isPresent = (value: ReactNode): boolean => value !== undefined && value !== null && value !== false && value !== '';\n\n/**\n * Complete dialog: trigger, backdrop, positioner, sized surface, header with close\n * trigger, body and an optional footer row.\n */\nexport function UIDialog(props: UIDialogProps): ReactNode {\n  const { title, size = 'md', footer, trigger, triggerProps, closable = true, children, className, ...restProps } = props;\n\n  return (\n    <DialogRoot {...restProps} className={className}>\n      {isPresent(trigger) ? <DialogPrimitive.Trigger {...triggerProps}>{trigger}</DialogPrimitive.Trigger> : null}\n      <DialogPrimitive.Backdrop />\n      <DialogPrimitive.Positioner>\n        <DialogContent size={size}>\n          <DialogPrimitive.Header className={element(DIALOG_BLOCK, 'header')}>\n            <DialogTitle>{title}</DialogTitle>\n            {closable ? <DialogCloseTrigger /> : null}\n          </DialogPrimitive.Header>\n          <DialogPrimitive.Body className={element(DIALOG_BLOCK, 'body')}>{children}</DialogPrimitive.Body>\n          {isPresent(footer) ? <div className={element(DIALOG_BLOCK, 'footer')}>{footer}</div> : null}\n        </DialogContent>\n      </DialogPrimitive.Positioner>\n    </DialogRoot>\n  );\n}\n\n/** Callable dialog plus the frozen compound parts. */\nexport interface DialogComponent {\n  (props: UIDialogProps): ReactNode;\n  Root: typeof DialogRoot;\n  Trigger: typeof DialogPrimitive.Trigger;\n  Backdrop: typeof DialogPrimitive.Backdrop;\n  Positioner: typeof DialogPrimitive.Positioner;\n  Content: typeof DialogContent;\n  Header: typeof DialogPrimitive.Header;\n  Title: typeof DialogTitle;\n  Body: typeof DialogPrimitive.Body;\n  CloseTrigger: typeof DialogCloseTrigger;\n}\n\nexport const Dialog: DialogComponent = Object.assign(UIDialog, {\n  Root: DialogRoot,\n  Trigger: DialogPrimitive.Trigger,\n  Backdrop: DialogPrimitive.Backdrop,\n  Positioner: DialogPrimitive.Positioner,\n  Content: DialogContent,\n  Header: DialogPrimitive.Header,\n  Title: DialogTitle,\n  Body: DialogPrimitive.Body,\n  CloseTrigger: DialogCloseTrigger,\n});\n"
+    },
+    {
+      "path": "styles/designharness/dialog.css",
+      "type": "registry:style",
+      "content": "/*\n * Dialog — styling for the frozen `dialog` anatomy: `root`, `trigger`, `backdrop`,\n * `positioner`, `content`, `header`, `title`, `body`, `close-trigger`, plus the footer\n * row DESIGN.md requires (a styled-layer element: `footer` is not a frozen anatomy part,\n * so it carries a class and never a `data-part`).\n *\n * The surface declares `container-type: inline-size`, so the header/body/footer\n * arrangement responds to the *dialog's own width* — a 24rem dialog in a drawer and a\n * 48rem dialog on a stage each self-arrange (RESEARCH.md §6.1).\n */\n\n@layer components {\n  [data-part=\"backdrop\"]:where([data-scope=\"dialog\"]) {\n    position: fixed;\n    inset: 0rem;\n    /* DESIGN.md \"Elevation & Depth\": overlay elevation pairs a scrim with the shadow.\n       The scrim token is a flat ink, so alpha is expressed as element opacity — the\n       token gate forbids authored colour functions like `color-mix()`. The machine\n       toggles `hidden`, so the scrim never intercepts pointer events while closed. */\n    background-color: var(--color-scrim);\n    opacity: 0.6;\n    transition: opacity var(--duration-moderate) var(--easing-standard);\n  }\n\n  [data-part=\"positioner\"]:where([data-scope=\"dialog\"]) {\n    position: fixed;\n    inset: 0rem;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    box-sizing: border-box;\n    padding: var(--space-md);\n  }\n\n  /* --- the surface -------------------------------------------------------------- */\n\n  [data-part=\"content\"]:where([data-scope=\"dialog\"]) {\n    container-type: inline-size;\n    box-sizing: border-box;\n    inline-size: 100%;\n    max-block-size: calc(100vb - var(--space-xxl));\n    display: flex;\n    flex-direction: column;\n    gap: var(--space-md);\n    padding: var(--dialog-padding);\n    border-width: var(--border-width-hairline);\n    border-style: solid;\n    border-color: var(--color-border-strong);\n    border-radius: var(--dialog-radius);\n    background-color: var(--color-surface);\n    color: var(--color-text-primary);\n    font-family: var(--font-family-body);\n    font-size: var(--font-size-body-md);\n    line-height: var(--line-height-body-md);\n    box-shadow: var(--elevation-2);\n    opacity: 0;\n    transition: opacity var(--duration-moderate) var(--easing-entry);\n  }\n\n  [data-part=\"content\"][data-state=\"open\"]:where([data-scope=\"dialog\"]) {\n    opacity: 1;\n  }\n\n  [data-part=\"content\"][data-state=\"closed\"]:where([data-scope=\"dialog\"]) {\n    transition-timing-function: var(--easing-exit);\n  }\n\n  /* The machine marks the surface `hidden` while it is closed. An authored `display`\n     declaration outranks the UA `[hidden] { display: none }`, so honour it explicitly:\n     a closed dialog must be neither painted nor hit-testable, and assistive technology\n     must not be able to walk into it (WCAG 2.2 SC 4.1.2). */\n  [data-part=\"content\"][hidden]:where([data-scope=\"dialog\"]) {\n    display: none;\n  }\n\n  /* Width ladder from `--dialog-max-width-*`; the modifiers follow the block so the\n     single-class specificity budget stays intact. */\n  .dh-dialog {\n    max-inline-size: var(--dialog-max-width-md);\n  }\n\n  .dh-dialog--sm {\n    max-inline-size: var(--dialog-max-width-sm);\n  }\n\n  .dh-dialog--md {\n    max-inline-size: var(--dialog-max-width-md);\n  }\n\n  .dh-dialog--lg {\n    max-inline-size: var(--dialog-max-width-lg);\n  }\n\n  /* --- header, title, close ------------------------------------------------------ */\n\n  .dh-dialog__header {\n    display: flex;\n    align-items: flex-start;\n    gap: var(--space-sm);\n  }\n\n  [data-part=\"title\"]:where([data-scope=\"dialog\"]) {\n    /* Fluid heading: no breakpoint jump between a rail and a stage (DESIGN.md\n       \"Typography\"), still clamped inside the declared type scale. */\n    font-size: clamp(\n      var(--font-size-heading-3),\n      calc(var(--font-size-body-md) + 1.5cqi),\n      var(--font-size-heading-2)\n    );\n    font-family: var(--font-family-display);\n    font-weight: var(--font-weight-heading-2);\n    line-height: var(--line-height-heading-2);\n    letter-spacing: var(--letter-spacing-heading-2);\n    color: var(--color-text-primary);\n    margin: 0rem;\n    inline-size: 100%;\n  }\n\n  [data-part=\"close-trigger\"]:where([data-scope=\"dialog\"]) {\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    flex: none;\n    box-sizing: border-box;\n    margin: 0rem;\n    inline-size: var(--control-height-md);\n    min-block-size: var(--control-height-md);\n    padding: 0rem;\n    border-width: var(--border-width-hairline);\n    border-style: solid;\n    border-color: transparent;\n    border-radius: var(--radius-sm);\n    background-color: transparent;\n    color: var(--color-text-secondary);\n    cursor: default;\n    transition:\n      background-color var(--duration-fast) var(--easing-standard),\n      border-color var(--duration-fast) var(--easing-standard),\n      color var(--duration-fast) var(--easing-standard);\n  }\n\n  [data-part=\"close-trigger\"]:where([data-scope=\"dialog\"]):hover {\n    background-color: var(--color-surface-sunken);\n    border-color: var(--color-border-strong);\n    color: var(--color-text-primary);\n  }\n\n  .dh-dialog__close-glyph {\n    font-family: var(--font-family-body);\n    font-size: var(--font-size-body-lg);\n    line-height: var(--line-height-body-lg);\n  }\n\n  /* --- body ---------------------------------------------------------------------- */\n\n  [data-part=\"body\"]:where([data-scope=\"dialog\"]) {\n    /* Prose measure is 72ch (DESIGN.md \"Layout\"). */\n    max-inline-size: 72ch;\n    margin: 0rem;\n    color: var(--color-text-primary);\n    font-size: var(--font-size-body-md);\n    line-height: var(--line-height-body-md);\n    overflow-y: auto;\n  }\n\n  /* --- footer (styled-layer element, not an anatomy part) ------------------------ */\n\n  .dh-dialog__footer {\n    display: flex;\n    flex-wrap: wrap;\n    align-items: center;\n    /* Never put two interactive targets closer than 8px (DESIGN.md \"Don'ts\"). */\n    gap: var(--space-xs);\n    justify-content: flex-end;\n    border-block-start: var(--border-width-hairline) solid var(--color-border-subtle);\n    padding-block-start: var(--space-sm);\n  }\n\n  .dh-dialog__footer > * {\n    inline-size: 100%;\n  }\n\n  /* Wide surfaces: the action row right-aligns and sizes to its content. */\n  @container (min-width: 40rem) {\n    .dh-dialog__header {\n      gap: var(--space-lg);\n    }\n\n    .dh-dialog__footer {\n      flex-wrap: nowrap;\n      padding-block-start: var(--space-md);\n    }\n\n    .dh-dialog__footer > * {\n      inline-size: auto;\n    }\n  }\n}\n"
+    },
+    {
+      "path": "components/designharness/internal/classnames.ts",
+      "type": "registry:lib",
+      "content": "/**\n * Class-name helpers for the styled layer.\n *\n * The styled layer's only DOM contribution is *class names*: every structural and\n * state signal (`data-scope`, `data-part`, `data-open`, `data-disabled`, `aria-*`)\n * is owned by `@designharness/primitives` and is never re-implemented, renamed or\n * overridden here (TOKEN-API.md §5). Component CSS is authored against those\n * attributes plus the `dh-<component>` block / `dh-<component>--<variant>` modifier\n * classes produced by these helpers.\n */\n\n/** Any value that a class list may legitimately contain. */\nexport type ClassValue = string | false | null | undefined;\n\n/** Join a class list, dropping empty entries and collapsing to a single string. */\nexport function cx(...values: readonly ClassValue[]): string {\n  const parts: string[] = [];\n  for (const value of values) {\n    if (typeof value === 'string' && value.length > 0) parts.push(value);\n  }\n  return parts.join(' ');\n}\n\n/**\n * BEM-ish modifier builder: `modifier('dh-button', 'primary')` → `dh-button--primary`.\n * A `false`/`undefined` modifier yields `undefined` so it can be passed to `cx` directly.\n */\nexport function modifier(block: string, value: string | false | null | undefined): string | undefined {\n  if (!value) return undefined;\n  return `${block}--${value}`;\n}\n\n/**\n * Element builder: `element('dh-button', 'spinner')` → `dh-button__spinner`.\n * Elements are markup *the styled layer itself renders* — never anatomy parts.\n */\nexport function element(block: string, name: string): string {\n  return `${block}__${name}`;\n}\n\n/**\n * Merge a consumer `className` after the styled-layer classes so a host app can add\n * utility classes without ever losing the tokenized base (source order, no `!important`).\n */\nexport function withConsumerClass(styled: string, className: ClassValue): string {\n  return cx(styled, className);\n}\n"
+    }
+  ],
+  "meta": {
+    "tier": "component",
+    "componentId": "dialog",
+    "displayName": "Dialog",
+    "entry": {
+      "path": "packages/ui/src/dialog.tsx",
+      "sha256": "c26ce18756744a5856247115f1d4eac8fbb0051016bff5cb68846cda9dd438ac",
+      "bytes": 6024
+    },
+    "stylesheet": {
+      "path": "packages/ui/src/styles/dialog.css",
+      "sha256": "6dcba7a1177c55726c7cf66c9118388c8683eab49e35392acff83257735ffaa5",
+      "bytes": 6515
+    },
+    "shared": [
+      {
+        "path": "packages/ui/src/internal/classnames.ts",
+        "sha256": "4ffd9f0b3117c43ef927aa237c5f54813d8acf11d781474da4f89b4e596cabb2",
+        "bytes": 1872
+      }
+    ],
+    "npmDependencies": [
+      "@designharness/primitives",
+      "react"
+    ],
+    "interComponentDependencies": [],
+    "stories": {
+      "path": "packages/ui/src/dialog.stories.tsx"
+    },
+    "tokenReferences": [
+      "--border-width-hairline",
+      "--color-border-strong",
+      "--color-border-subtle",
+      "--color-scrim",
+      "--color-surface",
+      "--color-surface-sunken",
+      "--color-text-primary",
+      "--color-text-secondary",
+      "--control-height-md",
+      "--dialog-max-width-lg",
+      "--dialog-max-width-md",
+      "--dialog-max-width-sm",
+      "--dialog-padding",
+      "--dialog-radius",
+      "--duration-fast",
+      "--duration-moderate",
+      "--easing-entry",
+      "--easing-exit",
+      "--easing-standard",
+      "--elevation-2",
+      "--font-family-body",
+      "--font-family-display",
+      "--font-size-body-lg",
+      "--font-size-body-md",
+      "--font-size-heading-2",
+      "--font-size-heading-3",
+      "--font-weight-heading-2",
+      "--letter-spacing-heading-2",
+      "--line-height-body-lg",
+      "--line-height-body-md",
+      "--line-height-heading-2",
+      "--radius-sm",
+      "--space-lg",
+      "--space-md",
+      "--space-sm",
+      "--space-xs",
+      "--space-xxl"
+    ],
+    "tokensReferenced": 37,
+    "props": [
+      {
+        "name": "dir",
+        "type": "\"ltr\" | \"rtl\" | undefined",
+        "required": false,
+        "description": "The document's text/writing direction."
+      },
+      {
+        "name": "id",
+        "type": "string",
+        "required": true,
+        "description": "The unique identifier of the machine."
+      },
+      {
+        "name": "role",
+        "type": "\"dialog\" | \"alertdialog\" | undefined",
+        "required": false,
+        "description": "The dialog's role"
+      },
+      {
+        "name": "aria-label",
+        "type": "string | undefined",
+        "required": false,
+        "description": "Human readable label for the dialog, in event the dialog title is not rendered"
+      },
+      {
+        "name": "open",
+        "type": "boolean | undefined",
+        "required": false,
+        "description": "The controlled open state of the dialog"
+      },
+      {
+        "name": "defaultOpen",
+        "type": "boolean | undefined",
+        "required": false,
+        "description": "The initial open state of the dialog when rendered.\nUse when you don't need to control the open state of the dialog."
+      },
+      {
+        "name": "ids",
+        "type": "ElementIds | undefined",
+        "required": false,
+        "description": "The ids of the elements in the dialog. Useful for composition."
+      },
+      {
+        "name": "getRootNode",
+        "type": "(() => ShadowRoot | Document | Node) | undefined",
+        "required": false,
+        "description": "A root node to correctly resolve document in custom environments. E.x.: Iframes, Electron."
+      },
+      {
+        "name": "lazyMount",
+        "type": "boolean",
+        "required": false,
+        "description": "Do not mount the dialog content until it is first opened."
+      },
+      {
+        "name": "unmountOnExit",
+        "type": "boolean",
+        "required": false,
+        "description": "Unmount the dialog content once the closing animation finishes."
+      },
+      {
+        "name": "trapFocus",
+        "type": "boolean | undefined",
+        "required": false,
+        "description": "Whether to trap focus inside the dialog when it's opened"
+      },
+      {
+        "name": "preventScroll",
+        "type": "boolean | undefined",
+        "required": false,
+        "description": "Whether to prevent scrolling behind the dialog when it's opened"
+      },
+      {
+        "name": "modal",
+        "type": "boolean | undefined",
+        "required": false,
+        "description": "Whether to prevent pointer interaction outside the element and hide all content below it"
+      },
+      {
+        "name": "initialFocusEl",
+        "type": "(() => MaybeElement | false) | undefined",
+        "required": false,
+        "description": "Element to receive focus when the dialog is opened.\nReturn `false` to skip moving focus, or `null` to use the default."
+      },
+      {
+        "name": "finalFocusEl",
+        "type": "(() => MaybeElement) | undefined",
+        "required": false,
+        "description": "Element to receive focus when the dialog is closed"
+      },
+      {
+        "name": "restoreFocus",
+        "type": "boolean | undefined",
+        "required": false,
+        "description": "Whether to restore focus to the element that had focus before the dialog was opened"
+      },
+      {
+        "name": "closeOnInteractOutside",
+        "type": "boolean | undefined",
+        "required": false,
+        "description": "Whether to close the dialog when the outside is clicked"
+      },
+      {
+        "name": "closeOnEscape",
+        "type": "boolean | undefined",
+        "required": false,
+        "description": "Whether to close the dialog when the escape key is pressed"
+      },
+      {
+        "name": "triggerValue",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": "The controlled active trigger value"
+      },
+      {
+        "name": "defaultTriggerValue",
+        "type": "string | null | undefined",
+        "required": false,
+        "description": "The initial active trigger value when rendered.\nUse when you don't need to control the active trigger value."
+      },
+      {
+        "name": "persistentElements",
+        "type": "Array<() => Element | null> | undefined",
+        "required": false,
+        "description": "Returns the persistent elements that:\n- should not have pointer-events disabled\n- should not trigger the dismiss event"
+      },
+      {
+        "name": "forceMount",
+        "type": "boolean",
+        "required": false,
+        "description": "Keep the content mounted even when closed (overrides `lazyMount`/`unmountOnExit`)."
+      },
+      {
+        "name": "size",
+        "type": "DialogSize | undefined",
+        "required": false,
+        "description": "Surface width step."
+      },
+      {
+        "name": "footer",
+        "type": "ReactNode | undefined",
+        "required": false,
+        "description": "Footer content, right-aligned on wide surfaces (DESIGN.md: action row)."
+      },
+      {
+        "name": "trigger",
+        "type": "ReactNode | undefined",
+        "required": false,
+        "description": "Trigger label. Omit it to drive the dialog with `open` instead."
+      },
+      {
+        "name": "triggerProps",
+        "type": "DialogTriggerProps | undefined",
+        "required": false,
+        "description": "Props for the rendered trigger (e.g. `variant`-styled `Button`)."
+      },
+      {
+        "name": "closable",
+        "type": "boolean | undefined",
+        "required": false,
+        "description": "Render the close trigger in the header."
+      },
+      {
+        "name": "children",
+        "type": "ReactNode",
+        "required": true,
+        "description": "Body content."
+      },
+      {
+        "name": "value",
+        "type": "string",
+        "required": false,
+        "description": "Identifies this trigger when several triggers open the same dialog."
+      },
+      {
+        "name": "level",
+        "type": "1 | 2 | 3 | 4 | 5 | 6",
+        "required": false,
+        "description": "Heading level rendered for the title."
+      }
+    ],
+    "propCount": 30,
+    "contractPropCount": 32,
+    "requiredPropCount": 2,
+    "documentedPropCount": 30,
+    "events": [],
+    "metadataProvenance": "contracts-metadata",
+    "metadataSource": "packages/contracts/generated/component-metadata.json",
+    "a11y": {
+      "status": "provisional",
+      "standard": "WCAG 2.2 AA",
+      "gate": 3,
+      "axe": {
+        "status": "not-run",
+        "report": "no axe-core report found in: apps/showcase/reports/a11y.json, apps/showcase/test-results/a11y.json, packages/ui/reports/a11y.json",
+        "violations": 0,
+        "incomplete": 0
+      },
+      "contrast": {
+        "audited": 21,
+        "failures": 0,
+        "pairs": [
+          {
+            "id": "light/border-selected-on-surface-ui",
+            "mode": "light",
+            "pair": "color.semantic.border-selected on color.semantic.surface",
+            "kind": "ui",
+            "required": 3,
+            "ratio": 5.847,
+            "pass": true,
+            "lc": 78.57
+          },
+          {
+            "id": "light/border-strong-on-canvas-ui",
+            "mode": "light",
+            "pair": "color.semantic.border-strong on color.semantic.canvas",
+            "kind": "ui",
+            "required": 3,
+            "ratio": 4.43,
+            "pass": true,
+            "lc": 69.17
+          },
+          {
+            "id": "light/border-strong-on-surface-ui",
+            "mode": "light",
+            "pair": "color.semantic.border-strong on color.semantic.surface",
+            "kind": "ui",
+            "required": 3,
+            "ratio": 4.621,
+            "pass": true,
+            "lc": 72.12
+          },
+          {
+            "id": "light/danger-on-surface-text",
+            "mode": "light",
+            "pair": "color.semantic.danger on color.semantic.surface",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 6.574,
+            "pass": true,
+            "lc": 80.88
+          },
+          {
+            "id": "light/focus-on-surface-ui",
+            "mode": "light",
+            "pair": "color.semantic.focus on color.semantic.surface",
+            "kind": "ui",
+            "required": 3,
+            "ratio": 5.847,
+            "pass": true,
+            "lc": 78.57
+          },
+          {
+            "id": "light/primary-on-surface-text",
+            "mode": "light",
+            "pair": "color.semantic.primary on color.semantic.surface",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 5.847,
+            "pass": true,
+            "lc": 78.57
+          },
+          {
+            "id": "light/success-on-surface-text",
+            "mode": "light",
+            "pair": "color.semantic.success on color.semantic.surface",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 5.373,
+            "pass": true,
+            "lc": 76.3
+          },
+          {
+            "id": "light/text-primary-on-canvas-text",
+            "mode": "light",
+            "pair": "color.semantic.text-primary on color.semantic.canvas",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 17.221,
+            "pass": true,
+            "lc": 101.76
+          },
+          {
+            "id": "light/text-primary-on-surface-large-text",
+            "mode": "light",
+            "pair": "color.semantic.text-primary on color.semantic.surface",
+            "kind": "large-text",
+            "required": 3,
+            "ratio": 17.963,
+            "pass": true,
+            "lc": 104.71
+          },
+          {
+            "id": "light/text-primary-on-surface-raised-text",
+            "mode": "light",
+            "pair": "color.semantic.text-primary on color.semantic.surface-raised",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 17.963,
+            "pass": true,
+            "lc": 104.71
+          },
+          {
+            "id": "light/text-primary-on-surface-sunken-text",
+            "mode": "light",
+            "pair": "color.semantic.text-primary on color.semantic.surface-sunken",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 16.036,
+            "pass": true,
+            "lc": 96.93
+          },
+          {
+            "id": "light/text-primary-on-surface-text",
+            "mode": "light",
+            "pair": "color.semantic.text-primary on color.semantic.surface",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 17.963,
+            "pass": true,
+            "lc": 104.71
+          },
+          {
+            "id": "light/text-secondary-on-canvas-text",
+            "mode": "light",
+            "pair": "color.semantic.text-secondary on color.semantic.canvas",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 7.634,
+            "pass": true,
+            "lc": 84.67
+          },
+          {
+            "id": "light/text-secondary-on-surface-sunken-text",
+            "mode": "light",
+            "pair": "color.semantic.text-secondary on color.semantic.surface-sunken",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 7.109,
+            "pass": true,
+            "lc": 79.84
+          },
+          {
+            "id": "light/text-secondary-on-surface-text",
+            "mode": "light",
+            "pair": "color.semantic.text-secondary on color.semantic.surface",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 7.963,
+            "pass": true,
+            "lc": 87.62
+          },
+          {
+            "id": "light/text.link",
+            "mode": "light",
+            "pair": "color.semantic.primary on color.semantic.surface",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 5.847,
+            "pass": true,
+            "lc": 78.57
+          },
+          {
+            "id": "light/text.secondary",
+            "mode": "light",
+            "pair": "color.semantic.text-secondary on color.semantic.surface",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 7.963,
+            "pass": true,
+            "lc": 87.62
+          },
+          {
+            "id": "light/ui.border-selected",
+            "mode": "light",
+            "pair": "color.semantic.border-selected on color.semantic.surface",
+            "kind": "ui",
+            "required": 3,
+            "ratio": 5.847,
+            "pass": true,
+            "lc": 78.57
+          },
+          {
+            "id": "light/ui.border-strong",
+            "mode": "light",
+            "pair": "color.semantic.border-strong on color.semantic.surface",
+            "kind": "ui",
+            "required": 3,
+            "ratio": 4.621,
+            "pass": true,
+            "lc": 72.12
+          },
+          {
+            "id": "light/ui.focus",
+            "mode": "light",
+            "pair": "color.semantic.focus on color.semantic.surface",
+            "kind": "ui",
+            "required": 3,
+            "ratio": 5.847,
+            "pass": true,
+            "lc": 78.57
+          },
+          {
+            "id": "light/warning-on-surface-text",
+            "mode": "light",
+            "pair": "color.semantic.warning on color.semantic.surface",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 6.388,
+            "pass": true,
+            "lc": 81.38
+          }
+        ]
+      },
+      "reasons": [
+        "the Tier-3 axe-core run has not produced a report for this component"
+      ]
+    },
+    "intent": {
+      "file": "DESIGN.md",
+      "sha256": "036bbfc393f294dd8d7ec0b2f00b73c848d4104f5f7404579c2245a329b74218"
+    }
+  }
+}

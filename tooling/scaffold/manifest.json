@@ -1,0 +1,38 @@
+[
+  {
+    "dir": "packages/engine",
+    "name": "@designharness/engine"
+  },
+  {
+    "dir": "packages/tokens",
+    "name": "@designharness/tokens"
+  },
+  {
+    "dir": "packages/primitives",
+    "name": "@designharness/primitives"
+  },
+  {
+    "dir": "packages/ui",
+    "name": "@designharness/ui"
+  },
+  {
+    "dir": "packages/contracts",
+    "name": "@designharness/contracts"
+  },
+  {
+    "dir": "packages/registry",
+    "name": "@designharness/registry"
+  },
+  {
+    "dir": "packages/mcp-server",
+    "name": "@designharness/mcp"
+  },
+  {
+    "dir": "packages/cli",
+    "name": "designharness"
+  },
+  {
+    "dir": "apps/showcase",
+    "name": "@designharness/showcase"
+  }
+]

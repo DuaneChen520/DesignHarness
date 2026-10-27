@@ -1,0 +1,239 @@
+/*
+ * Button — styling for the frozen `button` anatomy (`data-scope="button"`,
+ * `data-part="root"`), plus the two elements the styled layer renders for the loading
+ * state. DESIGN.md "Components": minimum hit area 36×36, loading keeps the label's
+ * width so the surrounding layout never jumps.
+ *
+ * Cascade order inside this file is deliberate: block → variants → sizes → modifiers →
+ * machine states, so the state rules win on ties (specificity is capped at (0,2,0) and
+ * `!important` is banned).
+ */
+
+@layer components {
+  .dh-button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs);
+    box-sizing: border-box;
+    margin: 0rem;
+    min-block-size: var(--button-height);
+    min-inline-size: var(--target-size-min);
+    padding-block: var(--space-xxs);
+    padding-inline: var(--button-padding-inline);
+    border-width: var(--border-width-hairline);
+    border-style: solid;
+    border-color: var(--color-border-strong);
+    border-radius: var(--button-radius);
+    background-color: var(--color-surface);
+    color: var(--color-text-primary);
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body-md);
+    font-weight: var(--font-weight-body-md);
+    line-height: var(--line-height-body-md);
+    text-align: center;
+    transition:
+      background-color var(--duration-fast) var(--easing-standard),
+      border-color var(--duration-fast) var(--easing-standard),
+      color var(--duration-fast) var(--easing-standard),
+      box-shadow var(--duration-fast) var(--easing-standard);
+  }
+
+  /* --- variants --------------------------------------------------------------- */
+
+  .dh-button--primary {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--color-on-primary);
+  }
+
+  .dh-button--primary:hover {
+    background-color: var(--color-primary-hover);
+    border-color: var(--color-primary-hover);
+  }
+
+  .dh-button--primary:active {
+    background-color: var(--color-primary-pressed);
+    border-color: var(--color-primary-pressed);
+  }
+
+  .dh-button--secondary {
+    background-color: var(--color-surface);
+    border-color: var(--color-border-strong);
+    color: var(--color-text-primary);
+  }
+
+  .dh-button--secondary:hover {
+    background-color: var(--color-surface-sunken);
+  }
+
+  .dh-button--secondary:active {
+    border-color: var(--color-primary);
+    background-color: var(--color-surface-sunken);
+  }
+
+  .dh-button--danger {
+    background-color: var(--color-danger);
+    border-color: var(--color-danger);
+    color: var(--color-on-danger);
+  }
+
+  .dh-button--danger:hover {
+    box-shadow: var(--elevation-1);
+  }
+
+  .dh-button--danger:active {
+    border-color: var(--color-danger-subtle);
+    box-shadow: none;
+  }
+
+  /* Outline: the label carries the weight, the surface stays neutral (hover = subtle). */
+  .dh-button--outline {
+    background-color: var(--color-surface);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    font-weight: var(--font-weight-label-caps);
+  }
+
+  .dh-button--outline:hover {
+    background-color: var(--color-primary-subtle);
+    color: var(--color-on-primary-subtle);
+  }
+
+  .dh-button--outline:active {
+    border-color: var(--color-primary-pressed);
+    background-color: var(--color-primary-subtle);
+    color: var(--color-primary);
+  }
+
+  /* Icon variant: square, sunken, secondary ink — never a coloured block. */
+  .dh-button--icon {
+    padding-inline: 0rem;
+    aspect-ratio: 1;
+    background-color: var(--color-surface-sunken);
+    border-color: var(--color-border-subtle);
+    color: var(--color-text-secondary);
+  }
+
+  .dh-button--icon:hover {
+    background-color: var(--color-primary-subtle);
+    border-color: var(--color-border-strong);
+    color: var(--color-on-primary-subtle);
+  }
+
+  .dh-button--icon:active {
+    background-color: var(--color-surface-sunken);
+    color: var(--color-text-primary);
+  }
+
+  /* --- sizes: the three sanctioned control heights ------------------------------
+     `md` is DESIGN.md's stated 36px button; `sm` drops to the 32px control height,
+     still comfortably above the WCAG 2.2 SC 2.5.8 24px floor the same document sets. */
+
+  .dh-button--sm {
+    min-block-size: var(--control-height-sm);
+    padding-inline: var(--space-xs);
+    font-size: var(--font-size-body-sm);
+    line-height: var(--line-height-body-sm);
+  }
+
+  .dh-button--md {
+    min-block-size: var(--control-height-md);
+  }
+
+  .dh-button--lg {
+    min-block-size: var(--control-height-lg);
+    padding-inline: var(--space-md);
+    font-size: var(--font-size-body-lg);
+    line-height: var(--line-height-body-lg);
+  }
+
+  /* --- modifiers -------------------------------------------------------------- */
+
+  .dh-button--full-width {
+    inline-size: 100%;
+  }
+
+  /* --- label + spinner -------------------------------------------------------- */
+
+  .dh-button__label {
+    display: inline-block;
+    max-inline-size: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: opacity var(--duration-fast) var(--easing-standard);
+  }
+
+  /*
+   * The label is hidden by opacity, never removed: the button keeps its measured width
+   * while the request is in flight, so the surrounding toolbar or form row does not move.
+   */
+  .dh-button--loading .dh-button__label {
+    opacity: 0;
+  }
+
+  .dh-button__spinner {
+    position: absolute;
+    inset: 0rem;
+    margin: auto;
+    inline-size: var(--space-md);
+    block-size: var(--space-md);
+    border-width: var(--border-width-strong);
+    border-style: solid;
+    border-color: var(--color-primary-subtle);
+    border-block-start-color: var(--color-primary);
+    border-radius: var(--radius-full);
+    animation: dh-button-spin var(--duration-slow) linear infinite;
+  }
+
+  .dh-button--secondary .dh-button__spinner,
+  .dh-button--outline .dh-button__spinner {
+    border-color: var(--color-border-subtle);
+    border-block-start-color: var(--color-primary);
+  }
+
+  .dh-button--danger .dh-button__spinner {
+    border-color: var(--color-on-danger);
+    border-block-start-color: var(--color-danger-subtle);
+  }
+
+  /* --- machine states (never signalled by colour alone) ------------------------ */
+
+  .dh-button[data-disabled] {
+    background-color: var(--color-surface-sunken);
+    border-color: var(--color-border-subtle);
+    color: var(--color-text-secondary);
+    box-shadow: none;
+    cursor: default;
+    opacity: 0.55;
+  }
+
+  .dh-button[data-loading] {
+    cursor: default;
+  }
+
+  /* Toggle mode: the machine's pressed state is a raised surface plus a selected seam. */
+  .dh-button[data-state="pressed"] {
+    background-color: var(--color-primary-subtle);
+    border-color: var(--color-border-selected);
+    color: var(--color-on-primary-subtle);
+    font-weight: var(--font-weight-label-caps);
+  }
+
+  .dh-button[data-icon-only] {
+    padding-inline: 0rem;
+    aspect-ratio: 1;
+  }
+
+  @keyframes dh-button-spin {
+    from {
+      rotate: 0turn;
+    }
+
+    to {
+      rotate: 1turn;
+    }
+  }
+}

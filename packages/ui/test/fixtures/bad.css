@@ -1,0 +1,25 @@
+/*
+ * Deliberately non-compliant fixture for the CSS gate's negative test.
+ * Every harness sensor must fire on this file: hardcoded colour, hardcoded length,
+ * !important, a non-tokenized declaration, and a selector above (0,2,0).
+ */
+
+.dh-bad {
+  color: #ff0000;
+  background: rgb(0 0 0 / 50%);
+  padding: 12px;
+  border-radius: 4px !important;
+  box-shadow: 0 2px 4px #000000;
+  font-family: "Helvetica Neue";
+}
+
+.dh-bad .nested .deeper {
+  color: green;
+  margin: 8px;
+}
+
+@media (min-width: 640px) {
+  .dh-bad {
+    gap: 16px;
+  }
+}

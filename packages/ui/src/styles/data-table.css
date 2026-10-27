@@ -1,0 +1,368 @@
+/*
+ * DataTable — styling for the frozen `table` anatomy: `root`, `toolbar`, `search-field`,
+ * `table`, `caption`, `head`, `row`, `columnheader`, `rowheader`, `cell`, `select`,
+ * `pagination`, `pagination-page-text`, `first-trigger`, `prev-trigger`, `item`,
+ * `ellipsis`, `next-trigger`, `last-trigger`, `status`, `empty-state`.
+ *
+ * Numeric truth first (DESIGN.md): every `data-value-type="numeric"` cell is set in the
+ * tabular monospace face and aligned by the machine's own `data-align` attribute, so a
+ * column of digits tracks without re-reading each glyph. The root declares
+ * `container-type: inline-size`, so toolbar and pager re-flow on the table's width.
+ */
+
+@layer components {
+  [data-part="root"]:where([data-scope="table"]) {
+    container-type: inline-size;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    box-sizing: border-box;
+    inline-size: 100%;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body-md);
+    line-height: var(--line-height-body-md);
+    color: var(--color-text-primary);
+  }
+
+  /* --- toolbar ------------------------------------------------------------------- */
+
+  .dh-data-table__toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-xs);
+  }
+
+  .dh-data-table__toolbar-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    margin-inline-start: auto;
+  }
+
+  [data-part="search-field"]:where([data-scope="table"]) {
+    box-sizing: border-box;
+    inline-size: 100%;
+    min-block-size: var(--input-height);
+    padding-block: var(--space-xxs);
+    padding-inline: var(--input-padding-inline);
+    border-width: var(--border-width-hairline);
+    border-style: solid;
+    border-color: var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    background-color: var(--color-surface);
+    color: var(--color-text-primary);
+    font-family: inherit;
+    font-size: var(--font-size-body-md);
+    transition:
+      border-color var(--duration-fast) var(--easing-standard),
+      background-color var(--duration-fast) var(--easing-standard);
+  }
+
+  [data-part="search-field"]:where([data-scope="table"])::placeholder {
+    color: var(--color-text-secondary);
+    opacity: 1;
+  }
+
+  /* --- the table ----------------------------------------------------------------- */
+
+  [data-part="table"]:where([data-scope="table"]) {
+    inline-size: 100%;
+    border-collapse: collapse;
+    caption-side: top;
+    transition: opacity var(--duration-fast) var(--easing-standard);
+  }
+
+  /*
+   * `aria-busy` is machine-owned; the dim plus a working cursor is the loading cue.
+   *
+   * The dim is 0.85 and not lighter because the axe gate measured a blanket `opacity: 0.6`
+   * here as a real WCAG 2.2 SC 1.4.3 failure: opacity on the table dims *text*, not just
+   * chrome — caption, header buttons and the loading region all fell to 2.88:1 (light) and
+   * 3.73:1 (dark). At 0.85 the same state measures 4.92:1 light / 6.57:1 dark, the busy
+   * cursor and the `role="status"` loading row still say "in flight", and nothing has to be
+   * excluded from the sensor to make the state pass.
+   */
+  [data-part="table"][aria-busy="true"]:where([data-scope="table"]) {
+    opacity: 0.85;
+    cursor: progress;
+  }
+
+  [data-part="caption"]:where([data-scope="table"]) {
+    padding-block-end: var(--space-xs);
+    font-size: var(--font-size-label-caps);
+    font-weight: var(--font-weight-label-caps);
+    line-height: var(--line-height-label-caps);
+    letter-spacing: var(--letter-spacing-label-caps);
+    text-transform: uppercase;
+    text-align: start;
+    color: var(--color-text-secondary);
+  }
+
+  [data-part="head"]:where([data-scope="table"]) {
+    background-color: var(--color-surface-sunken);
+  }
+
+  [data-part="columnheader"]:where([data-scope="table"]) {
+    position: sticky;
+    inset-block-start: 0rem;
+    z-index: 1;
+    box-sizing: border-box;
+    block-size: var(--table-header-height);
+    padding-block: var(--space-xxs);
+    padding-inline: var(--table-cell-padding-inline);
+    /* A sticky header keeps a real border so column identity survives scrolling. */
+    border-block-end: var(--border-width-strong) solid var(--color-border-strong);
+    background-color: var(--color-surface-sunken);
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-label-caps);
+    font-weight: var(--font-weight-label-caps);
+    line-height: var(--line-height-label-caps);
+    letter-spacing: var(--letter-spacing-label-caps);
+    text-transform: uppercase;
+    text-align: start;
+    white-space: nowrap;
+  }
+
+  /* Sortable headers are real buttons: reset the UA, keep the header's own type. */
+  [data-part="columnheader"] button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xxs);
+    margin: 0rem;
+    padding: 0rem;
+    border: none;
+    background-color: transparent;
+    color: var(--color-text-secondary);
+    font-family: inherit;
+    font-size: var(--font-size-label-caps);
+    font-weight: var(--font-weight-label-caps);
+    line-height: var(--line-height-label-caps);
+    letter-spacing: var(--letter-spacing-label-caps);
+    text-transform: uppercase;
+    text-decoration: underline;
+    text-underline-offset: var(--space-xxs);
+    cursor: default;
+    transition: color var(--duration-fast) var(--easing-standard);
+  }
+
+  [data-part="columnheader"] button:hover {
+    color: var(--color-text-primary);
+  }
+
+  /* Direction is a glyph and an underline, never a colour (DESIGN.md "Do's"). */
+  [data-part="columnheader"][aria-sort="ascending"] button::after {
+    content: "▲";
+    font-size: var(--font-size-body-sm);
+    letter-spacing: normal;
+  }
+
+  [data-part="columnheader"][aria-sort="descending"] button::after {
+    content: "▼";
+    font-size: var(--font-size-body-sm);
+    letter-spacing: normal;
+  }
+
+  [data-part="body"]:where([data-scope="table"]) {
+    background-color: var(--color-surface);
+  }
+
+  [data-part="row"]:where([data-scope="table"]) {
+    block-size: var(--table-row-height-standard);
+    background-color: transparent;
+    transition: background-color var(--duration-fast) var(--easing-standard);
+  }
+
+  [data-part="row"]:where([data-scope="table"]):hover {
+    background-color: var(--color-surface-sunken);
+  }
+
+  [data-part="row"][data-selected]:where([data-scope="table"]) {
+    background-color: var(--color-primary-subtle);
+  }
+
+  [data-part="cell"]:where([data-scope="table"]),
+  [data-part="rowheader"]:where([data-scope="table"]) {
+    box-sizing: border-box;
+    padding-block: var(--space-xxs);
+    padding-inline: var(--table-cell-padding-inline);
+    border-block-end: var(--border-width-hairline) solid var(--color-border-subtle);
+    background-color: transparent;
+    color: var(--color-text-primary);
+    font-size: var(--font-size-body-md);
+    line-height: var(--line-height-body-md);
+    text-align: start;
+    vertical-align: middle;
+  }
+
+  [data-part="rowheader"]:where([data-scope="table"]) {
+    font-weight: var(--font-weight-label-caps);
+    color: var(--color-text-primary);
+  }
+
+  /* --- numeric columns: the product ---------------------------------------------- */
+
+  [data-part="cell"][data-value-type="numeric"]:where([data-scope="table"]),
+  [data-part="rowheader"][data-value-type="numeric"]:where([data-scope="table"]) {
+    font-family: var(--font-family-mono);
+    font-size: var(--font-size-numeric-md);
+    font-weight: var(--font-weight-numeric-md);
+    line-height: var(--line-height-numeric-md);
+    /* Tabular figures: the keyword form plus the OpenType feature, so alignment does not
+       depend on a `--font-feature-*` token (the frozen §3 list has none). */
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+  }
+
+  [data-part="cell"][data-align="end"]:where([data-scope="table"]),
+  [data-part="rowheader"][data-align="end"]:where([data-scope="table"]),
+  [data-part="columnheader"][data-align="end"]:where([data-scope="table"]) {
+    text-align: end;
+  }
+
+  [data-part="cell"][data-align="center"]:where([data-scope="table"]),
+  [data-part="rowheader"][data-align="center"]:where([data-scope="table"]),
+  [data-part="columnheader"][data-align="center"]:where([data-scope="table"]) {
+    text-align: center;
+  }
+
+  /* --- selection column ----------------------------------------------------------- */
+
+  [data-part="select"]:where([data-scope="table"]) {
+    box-sizing: border-box;
+    inline-size: var(--target-size-min);
+    block-size: var(--target-size-min);
+    margin: 0rem;
+    accent-color: var(--color-primary);
+    cursor: default;
+  }
+
+  /* --- empty / loading / error region ---------------------------------------------- */
+
+  [data-part="empty-state"]:where([data-scope="table"]) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs);
+    padding-block: var(--space-lg);
+    padding-inline: var(--space-md);
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-body-sm);
+    line-height: var(--line-height-body-sm);
+  }
+
+  /* `role="alert"` is the machine's failed-request signal; it reads as danger and
+     carries a seam, so the state is never colour alone. */
+  [data-part="empty-state"][role="alert"]:where([data-scope="table"]) {
+    padding-inline-start: var(--space-xs);
+    border-inline-start: var(--border-width-strong) solid var(--color-danger);
+    color: var(--color-danger);
+    font-weight: var(--font-weight-label-caps);
+  }
+
+  /* --- footer: status, pager, page text -------------------------------------------- */
+
+  .dh-data-table__footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-xs);
+  }
+
+  [data-part="status"]:where([data-scope="table"]),
+  [data-part="pagination-page-text"]:where([data-scope="table"]) {
+    font-family: var(--font-family-mono);
+    font-size: var(--font-size-body-sm);
+    line-height: var(--line-height-body-sm);
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-secondary);
+  }
+
+  [data-part="pagination"]:where([data-scope="table"]) {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    margin-inline-start: auto;
+  }
+
+  [data-part="first-trigger"],
+  [data-part="prev-trigger"],
+  [data-part="item"],
+  [data-part="next-trigger"],
+  [data-part="last-trigger"] {
+    box-sizing: border-box;
+    margin: 0rem;
+    min-inline-size: var(--target-size-min);
+    min-block-size: var(--control-height-sm);
+    padding-inline: var(--space-xs);
+    border-width: var(--border-width-hairline);
+    border-style: solid;
+    border-color: transparent;
+    border-radius: var(--radius-sm);
+    background-color: transparent;
+    color: var(--color-primary);
+    font-family: var(--font-family-mono);
+    font-size: var(--font-size-numeric-md);
+    font-weight: var(--font-weight-numeric-md);
+    line-height: var(--line-height-numeric-md);
+    font-variant-numeric: tabular-nums;
+    text-decoration: underline;
+    cursor: default;
+    transition:
+      background-color var(--duration-fast) var(--easing-standard),
+      border-color var(--duration-fast) var(--easing-standard),
+      color var(--duration-fast) var(--easing-standard);
+  }
+
+  [data-part="first-trigger"]:hover,
+  [data-part="prev-trigger"]:hover,
+  [data-part="item"]:hover,
+  [data-part="next-trigger"]:hover,
+  [data-part="last-trigger"]:hover {
+    background-color: var(--color-primary-subtle);
+    border-color: var(--color-border-strong);
+    color: var(--color-on-primary-subtle);
+  }
+
+  [data-part="first-trigger"]:disabled,
+  [data-part="prev-trigger"]:disabled,
+  [data-part="item"]:disabled,
+  [data-part="next-trigger"]:disabled,
+  [data-part="last-trigger"]:disabled {
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    opacity: 0.55;
+  }
+
+  /* The current page is underlined-seam + heavy: `aria-current` is the machine's cue. */
+  [data-part="item"][aria-current="page"] {
+    background-color: var(--color-primary-subtle);
+    border-color: var(--color-border-selected);
+    color: var(--color-on-primary-subtle);
+    text-decoration: none;
+  }
+
+  [data-part="ellipsis"]:where([data-scope="table"]) {
+    color: var(--color-text-secondary);
+    font-family: var(--font-family-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* --- container variants ---------------------------------------------------------- */
+
+  @container (min-width: 40rem) {
+    .dh-data-table__toolbar {
+      flex-wrap: nowrap;
+      align-items: end;
+      gap: var(--space-md);
+    }
+
+    [data-part="search-field"]:where([data-scope="table"]) {
+      inline-size: calc(var(--space-xxxl) * 4);
+    }
+
+    .dh-data-table__footer {
+      gap: var(--space-lg);
+    }
+  }
+}

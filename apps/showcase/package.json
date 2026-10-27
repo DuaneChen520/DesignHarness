@@ -1,0 +1,62 @@
+{
+  "name": "@designharness/showcase",
+  "version": "0.1.0",
+  "description": "Component gallery used as the fixture host for axe-core WCAG 2.2 AA assertions and Playwright visual regression.",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint src e2e test playwright.config.ts vite.config.ts && stylelint \"src/**/*.css\"",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --config vitest.config.ts",
+    "test:e2e": "playwright test",
+    "test:a11y": "playwright test --grep @a11y",
+    "test:visual": "playwright test e2e/visual.spec.ts",
+    "test:contract": "playwright test e2e/contract.spec.ts",
+    "test:snapshots": "playwright test --update-snapshots"
+  },
+  "dependencies": {
+    "@designharness/contracts": "workspace:*",
+    "@designharness/tokens": "workspace:*",
+    "@designharness/ui": "workspace:*",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "msw": "catalog:",
+    "tailwindcss": "catalog:",
+    "@tailwindcss/vite": "catalog:"
+  },
+  "devDependencies": {
+    "vitest": "catalog:",
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "jsdom": "catalog:",
+    "@testing-library/react": "catalog:",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "catalog:",
+    "@testing-library/user-event": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@vitejs/plugin-react": "catalog:",
+    "playwright": "catalog:",
+    "@axe-core/playwright": "catalog:",
+    "axe-core": "catalog:",
+    "vite": "catalog:",
+    "eslint": "catalog:",
+    "@eslint/js": "catalog:",
+    "typescript-eslint": "catalog:",
+    "eslint-plugin-jsx-a11y": "catalog:",
+    "eslint-plugin-react-hooks": "catalog:",
+    "globals": "catalog:",
+    "stylelint": "catalog:",
+    "@designharness/stylelint-plugin": "workspace:*",
+    "@playwright/test": "catalog:"
+  }
+}

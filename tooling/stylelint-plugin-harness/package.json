@@ -1,0 +1,23 @@
+{
+  "name": "@designharness/stylelint-plugin",
+  "version": "0.1.0",
+  "description": "Tier-1 Stylelint sensors: hardcoded color / length / !important / token-reference gates.",
+  "private": true,
+  "type": "module",
+  "main": "./index.mjs",
+  "exports": {
+    ".": "./index.mjs"
+  },
+  "files": ["index.mjs", "rules"],
+  "scripts": {
+    "test": "node --test-reporter=spec --test",
+    "lint": "eslint .",
+    "typecheck": "node --check index.mjs"
+  },
+  "peerDependencies": {
+    "stylelint": ">=17"
+  },
+  "devDependencies": {
+    "stylelint": "catalog:"
+  }
+}

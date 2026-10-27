@@ -1,0 +1,986 @@
+{
+  "button": {
+    "props": [
+      {
+        "name": "aria-label",
+        "type": "string | undefined",
+        "required": false,
+        "default": null,
+        "description": "Defines a string value that labels the current element."
+      },
+      {
+        "name": "aria-labelledby",
+        "type": "string | undefined",
+        "required": false,
+        "default": null,
+        "description": "Identifies the element (or elements) that labels the current element."
+      },
+      {
+        "name": "type",
+        "type": "'button' | 'submit' | 'reset' | undefined",
+        "required": false,
+        "default": null,
+        "description": "The native `type` attribute. Never rely on the implicit `submit` default."
+      },
+      {
+        "name": "loading",
+        "type": "boolean | undefined",
+        "required": false,
+        "default": null,
+        "description": "Async action in progress: sets `aria-busy`, disables the button and swallows activation."
+      },
+      {
+        "name": "toggle",
+        "type": "boolean | undefined",
+        "required": false,
+        "default": null,
+        "description": "Toggle mode: the `@zag-js/toggle` state machine owns `aria-pressed` and `data-state`."
+      },
+      {
+        "name": "pressed",
+        "type": "boolean | undefined",
+        "required": false,
+        "default": null,
+        "description": "Controlled pressed state — only meaningful with `toggle`."
+      },
+      {
+        "name": "defaultPressed",
+        "type": "boolean | undefined",
+        "required": false,
+        "default": null,
+        "description": "Uncontrolled initial pressed state — only meaningful with `toggle`."
+      },
+      {
+        "name": "iconOnly",
+        "type": "boolean | undefined",
+        "required": false,
+        "default": null,
+        "description": "Marks the button as icon-only. An accessible name becomes a hard requirement\n(`aria-label` or `aria-labelledby`), enforced by the type and at runtime."
+      },
+      {
+        "name": "variant",
+        "type": "ButtonVariant | undefined",
+        "required": false,
+        "default": null,
+        "description": "Visual variant."
+      },
+      {
+        "name": "size",
+        "type": "ButtonSize | undefined",
+        "required": false,
+        "default": null,
+        "description": "Height/padding step."
+      },
+      {
+        "name": "fullWidth",
+        "type": "boolean | undefined",
+        "required": false,
+        "default": null,
+        "description": "Stretch the control to its container's inline size."
+      }
+    ],
+    "source": "E:/personalwork/designharness/packages/ui/src/button.tsx"
+  },
+  "combobox": {
+    "props": [
+      {
+        "name": "form",
+        "type": "string | undefined",
+        "required": false,
+        "default": null,
+        "description": "The associate form of the combobox."
+      },
+      {
+        "name": "disabled",
+        "type": "boolean | undefined",
+        "required": false,
+        "default": null,
+        "description": "Whether the combobox is disabled"
+      },
+      {
+        "name": "name",
+        "type": "string | undefined",
+        "required": false,
+        "default": null,
+        "description": "The `name` attribute of the combobox's input. Useful for form submission"
+      },
+      {
+        "name": "value",
+        "type": "string[] | undefined",
+        "required": false,
+        "default": null,
+        "description": "The controlled value of the combobox's selected items"
+      },
+      {
+        "name": "defaultValue",
+        "type": "string[] | undefined",
+        "required": false,
+        "default": null,
+        "description": "The initial value of the combobox's selected items when rendered.\nUse when you don't need to control the value of the combobox's selected items."
+      },
+      {
+        "name": "autoFocus",
+        "type": "boolean | undefined",
+        "required": false,
+        "default": null,
+        "description": "Whether to autofocus the input on mount"
+      },
+      {
+        "name": "dir",
+        "type": "\"ltr\" | \"rtl\" | undefined",
+        "required": false,
+        "default": null,
+        "description": "The document's text/writing direction."
+      },
+      {
+        "name": "id",
+        "type": "string",
+        "required": true,
+        "default": null,
+        "description": "The unique identifier of the machine."
+      },
+      {
+        "name": "open",
+        "type": "boolean | undefined",
+        "required": false,
+        "default": null,
+        "description": "The controlled open state of the combobox"
+      },
+      {
+        "name": "defaultOpen",
+        "type": "boolean | undefined",
+        "required": false,
+        "default": null,
+        "description": "The initial open state of the combobox when rendered.\nUse when you don't need to control the open state of the combobox."
+      },
+      {
+        "name": "ids",
+        "type": "ElementIds | undefined",
+        "required": false,
+        "default": null,
+        "description": "The ids of the elements in the combobox. Useful for composition."
+      },
+      {
+        "name": "inputValue",
+        "type": "string | undefined",
+        "required": false,
+        "default": null,
+        "description": "The controlled value of the combobox's input"
+      },
+      {
+        "name": "defaultInputValue",
+        "type": "string | undefined",
+        "required": false,
+        "default": null,
+        "description": "The initial value of the combobox's input when rendered.\nUse when you don't need to control the value of the combobox's input."
+      },
+      {
+        "name": "readOnly",
+        "type": "boolean | undefined",
+        "required": false,
+        "default": null,
+        "description": "Whether the combobox is readonly. This puts the combobox in a \"non-editable\" mode\nbut the user can still interact with it"
+      },
+      {
+        "name": "invalid",
+        "type": "boolean | undefined",
+        "required": false,
+        "default": null,
+        "description": "Whether the combobox is invalid"
+      },
+      {
+        "name": "required",
+        "type": "boolean | undefined",
+        "required": false,
+        "default": null,
+        "description": "Whether the combobox is required"
+      },
+      {
+        "name": "placeholder",
+        "type": "string | undefined",
+        "required": false,
+        "default": null,
+        "description": "The placeholder text of the combobox's input"
+      },
+      {
+        "name": "defaultHighlightedValue",
+        "type": "string | null | undefined",
+        "required": false,
+        "default": null,
+        "description": "The initial highlighted value of the combobox when rendered.\nUse when you don't need to control the highlighted value of the combobox."
+      },
+      {
+        "name": "highlightedValue",
+        "type": "string | null | undefined",
+        "required": false,
+        "default": null,
+        "description": "The controlled highlighted value of the combobox"
+      },
+      {
+        "name": "inputBehavior",
+        "type": "\"autohighlight\" | \"autocomplete\" | \"none\" | undefined",
+        "required": false,
+        "default": null,
+        "description": "Defines the auto-completion behavior of the combobox.\n\n- `autohighlight`: The first focused item is highlighted as the user types\n- `autocomplete`: Navigating the listbox with the arrow keys selects the item and the input is updated"
+      },
+      {
+        "name": "selectionBehavior",
+        "type": "\"clear\" | \"replace\" | \"preserve\" | undefined",
+        "required": false,
+        "default": null,
+        "description": "The behavior of the combobox input when an item is selected\n\n- `replace`: The selected item string is set as the input value\n- `clear`: The input value is cleared\n- `preserve`: The input value is preserved"
+      },
+      {
+        "name": "openOnClick",
+        "type": "boolean | undefined",
+        "required": false,
+        "default": null,
+        "description": "Whether to open the combobox popup on initial click on the input"
+      },
+      {
+        "name": "openOnChange",
+        "type": "boolean | ((details: InputValueChangeDetails) => boolean) | undefined",
+        "required": false,
+        "default": null,
+        "description": "Whether to show the combobox when the input value changes"
+      },
+      {
+        "name": "allowCustomValue",
+        "type": "boolean | undefined",
+        "required": false,
+        "default": null,
+        "description": "Whether to allow typing custom values in the input"
+      },
+      {
+        "name": "alwaysSubmitOnEnter",
+        "type": "boolean | undefined",
+        "required": false,
+        "default": null,
+        "description": "Whether to always submit on Enter key press, even if popup is open.\nUseful for single-field autocomplete forms where Enter should submit the form."
+      },
+      {
+        "name": "loopFocus",
+        "type": "boolean | undefined",
+        "required": false,
+        "default": null,
+        "description": "Whether to loop the keyboard navigation through the items"
+      },
+      {
+        "name": "positioning",
+        "type": "PositioningOptions | undefined",
+        "required": false,
+        "default": null,
+        "description": "The positioning options to dynamically position the menu"
+      },
+      {
+        "name": "translations",
+        "type": "IntlTranslations | undefined",
+        "required": false,
+        "default": null,
+        "description": "Specifies the localized strings that identifies the accessibility elements and their states"
+      },
+      {
+        "name": "multiple",
+        "type": "boolean | undefined",
+        "required": false,
+        "default": null,
+        "description": "Whether to allow multiple selection.\n\n**Good to know:** When `multiple` is `true`, the `selectionBehavior` is automatically set to `clear`.\nIt is recommended to render the selected items in a separate container."
+      },
+      {
+        "name": "closeOnSelect",
+        "type": "boolean | undefined",
+        "required": false,
+        "default": null,
+        "description": "Whether to close the combobox when an item is selected."
+      },
+      {
+        "name": "openOnKeyPress",
+        "type": "boolean | undefined",
+        "required": false,
+        "default": null,
+        "description": "Whether to open the combobox on arrow key press"
+      },
+      {
+        "name": "scrollToIndexFn",
+        "type": "((details: ScrollToIndexDetails) => void) | undefined",
+        "required": false,
+        "default": null,
+        "description": "Function to scroll to a specific index"
+      },
+      {
+        "name": "composite",
+        "type": "boolean | undefined",
+        "required": false,
+        "default": null,
+        "description": "Whether the combobox is a composed with other composite widgets like tabs"
+      },
+      {
+        "name": "disableLayer",
+        "type": "boolean | undefined",
+        "required": false,
+        "default": null,
+        "description": "Whether to disable registering this a dismissable layer"
+      },
+      {
+        "name": "navigate",
+        "type": "((details: NavigateDetails) => void) | null | undefined",
+        "required": false,
+        "default": null,
+        "description": "Function to navigate to the selected item"
+      },
+      {
+        "name": "getRootNode",
+        "type": "(() => ShadowRoot | Document | Node) | undefined",
+        "required": false,
+        "default": null,
+        "description": "A root node to correctly resolve document in custom environments. E.x.: Iframes, Electron."
+      },
+      {
+        "name": "lazyMount",
+        "type": "boolean",
+        "required": false,
+        "default": null,
+        "description": "Do not mount the listbox until it is first opened."
+      },
+      {
+        "name": "unmountOnExit",
+        "type": "boolean",
+        "required": false,
+        "default": null,
+        "description": "Unmount the listbox once the closing animation finishes."
+      },
+      {
+        "name": "items",
+        "type": "readonly T[] | undefined",
+        "required": false,
+        "default": null,
+        "description": "Option list. For async sources, hand in the current page of results."
+      },
+      {
+        "name": "collection",
+        "type": "ComboboxCollection<T> | undefined",
+        "required": false,
+        "default": null,
+        "description": "Pre-built collection (grouped or server-driven); takes precedence over `items`."
+      },
+      {
+        "name": "filter",
+        "type": "((item: T, query: string) => boolean) | undefined",
+        "required": false,
+        "default": null,
+        "description": "Local predicate over `items`. Async consumers that already filtered server-side\nshould pass `() => true` so nothing is hidden twice."
+      },
+      {
+        "name": "label",
+        "type": "ReactNode | undefined",
+        "required": false,
+        "default": null,
+        "description": "Visible label. A combobox without a label is a DESIGN.md prohibition."
+      },
+      {
+        "name": "clearable",
+        "type": "boolean | undefined",
+        "required": false,
+        "default": null,
+        "description": "Render the clear button when a value is selected."
+      },
+      {
+        "name": "loading",
+        "type": "boolean | undefined",
+        "required": false,
+        "default": null,
+        "description": "Async request in flight: shows the loading row and spins the disclosure glyph."
+      },
+      {
+        "name": "loadingText",
+        "type": "ReactNode | undefined",
+        "required": false,
+        "default": null,
+        "description": "Copy for the loading row."
+      },
+      {
+        "name": "emptyText",
+        "type": "ReactNode | undefined",
+        "required": false,
+        "default": null,
+        "description": "Copy for the no-match row."
+      },
+      {
+        "name": "renderOption",
+        "type": "((item: T) => ReactNode) | undefined",
+        "required": false,
+        "default": null,
+        "description": "Custom option content; defaults to `item.label`."
+      },
+      {
+        "name": "className",
+        "type": "string | undefined",
+        "required": false,
+        "default": null,
+        "description": ""
+      },
+      {
+        "name": "style",
+        "type": "CSSProperties | undefined",
+        "required": false,
+        "default": null,
+        "description": ""
+      },
+      {
+        "name": "children",
+        "type": "ReactNode | undefined",
+        "required": false,
+        "default": null,
+        "description": ""
+      },
+      {
+        "name": "focusable",
+        "type": "boolean",
+        "required": false,
+        "default": null,
+        "description": "Make the trigger reachable with Tab in addition to the input."
+      }
+    ],
+    "source": "E:/personalwork/designharness/packages/ui/src/combobox.tsx"
+  },
+  "data-table": {
+    "props": [
+      {
+        "name": "caption",
+        "type": "ReactNode | undefined",
+        "required": false,
+        "default": null,
+        "description": "`<caption>` content for the table."
+      },
+      {
+        "name": "q",
+        "type": "string | undefined",
+        "required": false,
+        "default": null,
+        "description": "Controlled search text bound to `DataTable.SearchField`."
+      },
+      {
+        "name": "className",
+        "type": "string | undefined",
+        "required": false,
+        "default": null,
+        "description": ""
+      },
+      {
+        "name": "loading",
+        "type": "boolean | undefined",
+        "required": false,
+        "default": null,
+        "description": "Request in flight: sets `aria-busy` and renders the loading empty-state region."
+      },
+      {
+        "name": "rows",
+        "type": "readonly TRow[]",
+        "required": true,
+        "default": null,
+        "description": "The rows to render (client mode: every row; server mode: the current page)."
+      },
+      {
+        "name": "columns",
+        "type": "readonly DataTableColumn<TRow>[]",
+        "required": true,
+        "default": null,
+        "description": ""
+      },
+      {
+        "name": "total",
+        "type": "number | undefined",
+        "required": false,
+        "default": null,
+        "description": "Full result size when the origin already sliced the page. With `total` the\nrows are rendered as given; without it the machine paginates `rows` itself."
+      },
+      {
+        "name": "page",
+        "type": "number | undefined",
+        "required": false,
+        "default": null,
+        "description": "Controlled page number (1-based) handed to the pagination machine."
+      },
+      {
+        "name": "defaultPage",
+        "type": "number | undefined",
+        "required": false,
+        "default": null,
+        "description": "Initial page for uncontrolled pagination."
+      },
+      {
+        "name": "pageSize",
+        "type": "number | undefined",
+        "required": false,
+        "default": null,
+        "description": "Controlled page size handed to the pagination machine."
+      },
+      {
+        "name": "defaultPageSize",
+        "type": "number | undefined",
+        "required": false,
+        "default": null,
+        "description": "Initial page size for uncontrolled pagination."
+      },
+      {
+        "name": "sortBy",
+        "type": "string | undefined",
+        "required": false,
+        "default": null,
+        "description": "Controlled sort column (`undefined` = unsorted)."
+      },
+      {
+        "name": "sortOrder",
+        "type": "DataTableSortOrder | undefined",
+        "required": false,
+        "default": null,
+        "description": "Controlled sort direction (only meaningful with `sortBy`)."
+      },
+      {
+        "name": "defaultSortBy",
+        "type": "string | undefined",
+        "required": false,
+        "default": null,
+        "description": "Initial sort column for uncontrolled sorting."
+      },
+      {
+        "name": "defaultSortOrder",
+        "type": "DataTableSortOrder | undefined",
+        "required": false,
+        "default": null,
+        "description": "Initial sort direction for uncontrolled sorting."
+      },
+      {
+        "name": "selectedRowIds",
+        "type": "readonly string[] | undefined",
+        "required": false,
+        "default": null,
+        "description": "Controlled selection, keyed by `getRowId`."
+      },
+      {
+        "name": "defaultSelectedRowIds",
+        "type": "readonly string[] | undefined",
+        "required": false,
+        "default": null,
+        "description": "Initial selection for uncontrolled `selectedRowIds`."
+      },
+      {
+        "name": "getRowId",
+        "type": "((row: TRow, index: number) => string) | undefined",
+        "required": false,
+        "default": null,
+        "description": "Stable row identity. Defaults to a string/number `id` property, then the row index."
+      },
+      {
+        "name": "getRowLabel",
+        "type": "((row: TRow, index: number) => string) | undefined",
+        "required": false,
+        "default": null,
+        "description": "Human row name used for the row `aria-label` and the select checkbox label."
+      },
+      {
+        "name": "defaultQ",
+        "type": "string | undefined",
+        "required": false,
+        "default": null,
+        "description": "Initial search text for uncontrolled `q`."
+      },
+      {
+        "name": "error",
+        "type": "ReactNode | undefined",
+        "required": false,
+        "default": null,
+        "description": "Request failure surfaced through the `role=\"alert\"` empty-state region."
+      },
+      {
+        "name": "emptyText",
+        "type": "ReactNode | undefined",
+        "required": false,
+        "default": null,
+        "description": "Content for the `role=\"status\"` empty-state region when there are no rows."
+      },
+      {
+        "name": "loadingText",
+        "type": "ReactNode | undefined",
+        "required": false,
+        "default": null,
+        "description": "Content for the loading region while `loading` is true."
+      },
+      {
+        "name": "selectable",
+        "type": "boolean | undefined",
+        "required": false,
+        "default": null,
+        "description": "Enable the selection checkbox column."
+      },
+      {
+        "name": "searchPlaceholder",
+        "type": "string | undefined",
+        "required": false,
+        "default": null,
+        "description": "Placeholder for the filter control — an example, never an instruction."
+      },
+      {
+        "name": "toolbarActions",
+        "type": "ReactNode | undefined",
+        "required": false,
+        "default": null,
+        "description": "Extra controls rendered in the toolbar next to the filter (filters, export, …)."
+      },
+      {
+        "name": "showToolbar",
+        "type": "boolean | undefined",
+        "required": false,
+        "default": null,
+        "description": "Render the toolbar with the search field."
+      },
+      {
+        "name": "showPagination",
+        "type": "boolean | undefined",
+        "required": false,
+        "default": null,
+        "description": "Render the pagination nav, status and page text."
+      },
+      {
+        "name": "children",
+        "type": "ReactNode",
+        "required": true,
+        "default": null,
+        "description": ""
+      }
+    ],
+    "source": "E:/personalwork/designharness/packages/ui/src/data-table.tsx"
+  },
+  "dialog": {
+    "props": [
+      {
+        "name": "title",
+        "type": "string | undefined",
+        "required": false,
+        "default": null,
+        "description": ""
+      },
+      {
+        "name": "dir",
+        "type": "\"ltr\" | \"rtl\" | undefined",
+        "required": false,
+        "default": null,
+        "description": "The document's text/writing direction."
+      },
+      {
+        "name": "id",
+        "type": "string",
+        "required": true,
+        "default": null,
+        "description": "The unique identifier of the machine."
+      },
+      {
+        "name": "role",
+        "type": "\"dialog\" | \"alertdialog\" | undefined",
+        "required": false,
+        "default": null,
+        "description": "The dialog's role"
+      },
+      {
+        "name": "aria-label",
+        "type": "string | undefined",
+        "required": false,
+        "default": null,
+        "description": "Human readable label for the dialog, in event the dialog title is not rendered"
+      },
+      {
+        "name": "open",
+        "type": "boolean | undefined",
+        "required": false,
+        "default": null,
+        "description": "The controlled open state of the dialog"
+      },
+      {
+        "name": "defaultOpen",
+        "type": "boolean | undefined",
+        "required": false,
+        "default": null,
+        "description": "The initial open state of the dialog when rendered.\nUse when you don't need to control the open state of the dialog."
+      },
+      {
+        "name": "ids",
+        "type": "ElementIds | undefined",
+        "required": false,
+        "default": null,
+        "description": "The ids of the elements in the dialog. Useful for composition."
+      },
+      {
+        "name": "getRootNode",
+        "type": "(() => ShadowRoot | Document | Node) | undefined",
+        "required": false,
+        "default": null,
+        "description": "A root node to correctly resolve document in custom environments. E.x.: Iframes, Electron."
+      },
+      {
+        "name": "lazyMount",
+        "type": "boolean",
+        "required": false,
+        "default": null,
+        "description": "Do not mount the dialog content until it is first opened."
+      },
+      {
+        "name": "unmountOnExit",
+        "type": "boolean",
+        "required": false,
+        "default": null,
+        "description": "Unmount the dialog content once the closing animation finishes."
+      },
+      {
+        "name": "trapFocus",
+        "type": "boolean | undefined",
+        "required": false,
+        "default": null,
+        "description": "Whether to trap focus inside the dialog when it's opened"
+      },
+      {
+        "name": "preventScroll",
+        "type": "boolean | undefined",
+        "required": false,
+        "default": null,
+        "description": "Whether to prevent scrolling behind the dialog when it's opened"
+      },
+      {
+        "name": "modal",
+        "type": "boolean | undefined",
+        "required": false,
+        "default": null,
+        "description": "Whether to prevent pointer interaction outside the element and hide all content below it"
+      },
+      {
+        "name": "initialFocusEl",
+        "type": "(() => MaybeElement | false) | undefined",
+        "required": false,
+        "default": null,
+        "description": "Element to receive focus when the dialog is opened.\nReturn `false` to skip moving focus, or `null` to use the default."
+      },
+      {
+        "name": "finalFocusEl",
+        "type": "(() => MaybeElement) | undefined",
+        "required": false,
+        "default": null,
+        "description": "Element to receive focus when the dialog is closed"
+      },
+      {
+        "name": "restoreFocus",
+        "type": "boolean | undefined",
+        "required": false,
+        "default": null,
+        "description": "Whether to restore focus to the element that had focus before the dialog was opened"
+      },
+      {
+        "name": "closeOnInteractOutside",
+        "type": "boolean | undefined",
+        "required": false,
+        "default": null,
+        "description": "Whether to close the dialog when the outside is clicked"
+      },
+      {
+        "name": "closeOnEscape",
+        "type": "boolean | undefined",
+        "required": false,
+        "default": null,
+        "description": "Whether to close the dialog when the escape key is pressed"
+      },
+      {
+        "name": "triggerValue",
+        "type": "string | null | undefined",
+        "required": false,
+        "default": null,
+        "description": "The controlled active trigger value"
+      },
+      {
+        "name": "defaultTriggerValue",
+        "type": "string | null | undefined",
+        "required": false,
+        "default": null,
+        "description": "The initial active trigger value when rendered.\nUse when you don't need to control the active trigger value."
+      },
+      {
+        "name": "persistentElements",
+        "type": "Array<() => Element | null> | undefined",
+        "required": false,
+        "default": null,
+        "description": "Returns the persistent elements that:\n- should not have pointer-events disabled\n- should not trigger the dismiss event"
+      },
+      {
+        "name": "forceMount",
+        "type": "boolean",
+        "required": false,
+        "default": null,
+        "description": "Keep the content mounted even when closed (overrides `lazyMount`/`unmountOnExit`)."
+      },
+      {
+        "name": "size",
+        "type": "DialogSize | undefined",
+        "required": false,
+        "default": null,
+        "description": "Surface width step."
+      },
+      {
+        "name": "footer",
+        "type": "ReactNode | undefined",
+        "required": false,
+        "default": null,
+        "description": "Footer content, right-aligned on wide surfaces (DESIGN.md: action row)."
+      },
+      {
+        "name": "trigger",
+        "type": "ReactNode | undefined",
+        "required": false,
+        "default": null,
+        "description": "Trigger label. Omit it to drive the dialog with `open` instead."
+      },
+      {
+        "name": "triggerProps",
+        "type": "DialogTriggerProps | undefined",
+        "required": false,
+        "default": null,
+        "description": "Props for the rendered trigger (e.g. `variant`-styled `Button`)."
+      },
+      {
+        "name": "closable",
+        "type": "boolean | undefined",
+        "required": false,
+        "default": null,
+        "description": "Render the close trigger in the header."
+      },
+      {
+        "name": "children",
+        "type": "ReactNode",
+        "required": true,
+        "default": null,
+        "description": "Body content."
+      },
+      {
+        "name": "className",
+        "type": "string | undefined",
+        "required": false,
+        "default": null,
+        "description": ""
+      },
+      {
+        "name": "value",
+        "type": "string",
+        "required": false,
+        "default": null,
+        "description": "Identifies this trigger when several triggers open the same dialog."
+      },
+      {
+        "name": "level",
+        "type": "1 | 2 | 3 | 4 | 5 | 6",
+        "required": false,
+        "default": null,
+        "description": "Heading level rendered for the title."
+      }
+    ],
+    "source": "E:/personalwork/designharness/packages/ui/src/dialog.tsx"
+  },
+  "input": {
+    "props": [
+      {
+        "name": "value",
+        "type": "string | undefined",
+        "required": false,
+        "default": null,
+        "description": "Controlled input value."
+      },
+      {
+        "name": "defaultValue",
+        "type": "string | undefined",
+        "required": false,
+        "default": null,
+        "description": "Uncontrolled initial value."
+      },
+      {
+        "name": "name",
+        "type": "string | undefined",
+        "required": false,
+        "default": null,
+        "description": "The `name` attribute of the generated input control (form submission)."
+      },
+      {
+        "name": "disabled",
+        "type": "boolean | undefined",
+        "required": false,
+        "default": null,
+        "description": "Disables the control (`data-disabled` + native `disabled`)."
+      },
+      {
+        "name": "required",
+        "type": "boolean | undefined",
+        "required": false,
+        "default": null,
+        "description": "Marks the control as required (`aria-required` + native `required`)."
+      },
+      {
+        "name": "readOnly",
+        "type": "boolean | undefined",
+        "required": false,
+        "default": null,
+        "description": "Makes the control read-only."
+      },
+      {
+        "name": "invalid",
+        "type": "boolean | undefined",
+        "required": false,
+        "default": null,
+        "description": "Forces the invalid state. Defaults to `true` whenever an `Input.ErrorText` is\nrendered, so an error is never signalled by colour alone."
+      },
+      {
+        "name": "ids",
+        "type": "InputElementIds | undefined",
+        "required": false,
+        "default": null,
+        "description": "Ids of the field elements, for composition and server-side rendering."
+      },
+      {
+        "name": "label",
+        "type": "ReactNode",
+        "required": true,
+        "default": null,
+        "description": "Always-visible label text. Placeholder-only labels are a DESIGN.md prohibition."
+      },
+      {
+        "name": "description",
+        "type": "ReactNode | undefined",
+        "required": false,
+        "default": null,
+        "description": "Helper text rendered under the control and referenced by `aria-describedby`."
+      },
+      {
+        "name": "error",
+        "type": "ReactNode | undefined",
+        "required": false,
+        "default": null,
+        "description": "Error message. Rendering it drives the invalid state and `role=\"alert\"`."
+      },
+      {
+        "name": "placeholder",
+        "type": "string | undefined",
+        "required": false,
+        "default": null,
+        "description": "Placeholder copy — reserved for examples, never instructions."
+      },
+      {
+        "name": "type",
+        "type": "'text' | 'email' | 'number' | 'password' | 'search' | 'tel' | 'url' | 'date' | undefined",
+        "required": false,
+        "default": null,
+        "description": "Native input `type`."
+      },
+      {
+        "name": "inputProps",
+        "type": "InputInputProps | undefined",
+        "required": false,
+        "default": null,
+        "description": "Escape hatch for the remaining native `<input>` attributes."
+      }
+    ],
+    "source": "E:/personalwork/designharness/packages/ui/src/input.tsx"
+  }
+}

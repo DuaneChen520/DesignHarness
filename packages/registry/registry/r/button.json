@@ -1,0 +1,495 @@
+{
+  "name": "button",
+  "type": "registry:component",
+  "title": "Button",
+  "description": "Meridian Button — @designharness/ui source distributed verbatim from packages/ui/src/button.tsx (3473 bytes, sha256 13528d5c6aff59237d981b8d61e96f8469f59109cafa9ef7fad3bfaad9d94433). Depends on @designharness/primitives, react and shares packages/ui/src/internal/classnames.ts. Styled by packages/ui/src/styles/button.css (7064 bytes, 42 token references). Registry index barrel: packages/ui/src/styles.css.",
+  "homepage": "http://localhost:4870/r/button.json",
+  "dependencies": [
+    "@designharness/primitives",
+    "react"
+  ],
+  "registryDependencies": [
+    "meridian-base"
+  ],
+  "files": [
+    {
+      "path": "components/designharness/button.tsx",
+      "type": "registry:component",
+      "content": "import type { ButtonRootProps } from '@designharness/primitives';\nimport { Button as ButtonPrimitive } from '@designharness/primitives';\nimport { type ForwardedRef, type ReactNode, forwardRef } from 'react';\nimport { cx, element, modifier } from './internal/classnames.js';\n\n/**\n * Styled `Button`.\n *\n * The primitive owns behaviour and every accessibility signal (`type`, `disabled`,\n * `aria-disabled`, `aria-busy`, `aria-pressed`, `data-*`); this wrapper only adds the\n * `dh-button` class hooks that `styles/button.css` consumes, plus the two elements the\n * styled layer renders for the loading state. No ARIA attribute is read, rewritten or\n * defaulted here, and no inline style is produced.\n */\n\n/** Visual variants sanctioned by DESIGN.md (\"Components\") — no more, no fewer. */\nexport const BUTTON_VARIANTS = ['primary', 'secondary', 'danger', 'outline', 'icon'] as const;\nexport type ButtonVariant = (typeof BUTTON_VARIANTS)[number];\n\n/** Control heights, mapped onto `--control-height-sm|md|lg` (DESIGN: 36px minimum hit area). */\nexport const BUTTON_SIZES = ['sm', 'md', 'lg'] as const;\nexport type ButtonSize = (typeof BUTTON_SIZES)[number];\n\n/** Block class for every button selector in `styles/button.css`. */\nexport const BUTTON_BLOCK = 'dh-button';\n\nexport type UIButtonProps = ButtonRootProps & {\n  /** Visual variant. @default \"primary\" */\n  variant?: ButtonVariant | undefined;\n  /** Height/padding step. @default \"md\" */\n  size?: ButtonSize | undefined;\n  /** Stretch the control to its container's inline size. */\n  fullWidth?: boolean | undefined;\n};\n\n/**\n * Class list for a button. Exported so stories, tests and the registry metadata can\n * assert the prop → class mapping without rendering.\n */\nexport function buttonClassNames(props: {\n  variant?: ButtonVariant | undefined;\n  size?: ButtonSize | undefined;\n  fullWidth?: boolean | undefined;\n  loading?: boolean | undefined;\n  className?: string | undefined;\n}): string {\n  const { variant = 'primary', size = 'md', fullWidth = false, loading = false, className } = props;\n  return cx(\n    BUTTON_BLOCK,\n    modifier(BUTTON_BLOCK, variant),\n    modifier(BUTTON_BLOCK, size),\n    fullWidth ? modifier(BUTTON_BLOCK, 'full-width') : undefined,\n    loading ? modifier(BUTTON_BLOCK, 'loading') : undefined,\n    className,\n  );\n}\n\n/** Headless-primitive button with the Meridian token styling applied. */\nexport const ButtonRoot = forwardRef<HTMLButtonElement, UIButtonProps>(function ButtonRoot(props, ref: ForwardedRef<HTMLButtonElement>) {\n  const { variant, size, fullWidth = false, loading = false, children, className, ...restProps } = props;\n\n  return (\n    <ButtonPrimitive.Root\n      {...restProps}\n      ref={ref}\n      loading={loading}\n      className={buttonClassNames({ variant, size, fullWidth, loading, className })}\n    >\n      {loading ? <span className={element(BUTTON_BLOCK, 'spinner')} aria-hidden=\"true\" /> : null}\n      <span className={element(BUTTON_BLOCK, 'label')}>{children}</span>\n    </ButtonPrimitive.Root>\n  );\n});\n\n/** Callable component that also keeps the primitive's compound shape (`Button.Root`). */\nexport interface ButtonComponent {\n  (props: UIButtonProps): ReactNode;\n  Root: typeof ButtonRoot;\n}\n\n/** Explicit alias so every aggregate implementation shares the `UI*` naming (`UIButton` === `ButtonRoot`). */\nexport const UIButton: typeof ButtonRoot = ButtonRoot;\n\nexport const Button: ButtonComponent = Object.assign(ButtonRoot, { Root: ButtonRoot });\n"
+    },
+    {
+      "path": "styles/designharness/button.css",
+      "type": "registry:style",
+      "content": "/*\n * Button — styling for the frozen `button` anatomy (`data-scope=\"button\"`,\n * `data-part=\"root\"`), plus the two elements the styled layer renders for the loading\n * state. DESIGN.md \"Components\": minimum hit area 36×36, loading keeps the label's\n * width so the surrounding layout never jumps.\n *\n * Cascade order inside this file is deliberate: block → variants → sizes → modifiers →\n * machine states, so the state rules win on ties (specificity is capped at (0,2,0) and\n * `!important` is banned).\n */\n\n@layer components {\n  .dh-button {\n    position: relative;\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    gap: var(--space-xs);\n    box-sizing: border-box;\n    margin: 0rem;\n    min-block-size: var(--button-height);\n    min-inline-size: var(--target-size-min);\n    padding-block: var(--space-xxs);\n    padding-inline: var(--button-padding-inline);\n    border-width: var(--border-width-hairline);\n    border-style: solid;\n    border-color: var(--color-border-strong);\n    border-radius: var(--button-radius);\n    background-color: var(--color-surface);\n    color: var(--color-text-primary);\n    font-family: var(--font-family-body);\n    font-size: var(--font-size-body-md);\n    font-weight: var(--font-weight-body-md);\n    line-height: var(--line-height-body-md);\n    text-align: center;\n    transition:\n      background-color var(--duration-fast) var(--easing-standard),\n      border-color var(--duration-fast) var(--easing-standard),\n      color var(--duration-fast) var(--easing-standard),\n      box-shadow var(--duration-fast) var(--easing-standard);\n  }\n\n  /* --- variants --------------------------------------------------------------- */\n\n  .dh-button--primary {\n    background-color: var(--color-primary);\n    border-color: var(--color-primary);\n    color: var(--color-on-primary);\n  }\n\n  .dh-button--primary:hover {\n    background-color: var(--color-primary-hover);\n    border-color: var(--color-primary-hover);\n  }\n\n  .dh-button--primary:active {\n    background-color: var(--color-primary-pressed);\n    border-color: var(--color-primary-pressed);\n  }\n\n  .dh-button--secondary {\n    background-color: var(--color-surface);\n    border-color: var(--color-border-strong);\n    color: var(--color-text-primary);\n  }\n\n  .dh-button--secondary:hover {\n    background-color: var(--color-surface-sunken);\n  }\n\n  .dh-button--secondary:active {\n    border-color: var(--color-primary);\n    background-color: var(--color-surface-sunken);\n  }\n\n  .dh-button--danger {\n    background-color: var(--color-danger);\n    border-color: var(--color-danger);\n    color: var(--color-on-danger);\n  }\n\n  .dh-button--danger:hover {\n    box-shadow: var(--elevation-1);\n  }\n\n  .dh-button--danger:active {\n    border-color: var(--color-danger-subtle);\n    box-shadow: none;\n  }\n\n  /* Outline: the label carries the weight, the surface stays neutral (hover = subtle). */\n  .dh-button--outline {\n    background-color: var(--color-surface);\n    border-color: var(--color-primary);\n    color: var(--color-primary);\n    font-weight: var(--font-weight-label-caps);\n  }\n\n  .dh-button--outline:hover {\n    background-color: var(--color-primary-subtle);\n    color: var(--color-on-primary-subtle);\n  }\n\n  .dh-button--outline:active {\n    border-color: var(--color-primary-pressed);\n    background-color: var(--color-primary-subtle);\n    color: var(--color-primary);\n  }\n\n  /* Icon variant: square, sunken, secondary ink — never a coloured block. */\n  .dh-button--icon {\n    padding-inline: 0rem;\n    aspect-ratio: 1;\n    background-color: var(--color-surface-sunken);\n    border-color: var(--color-border-subtle);\n    color: var(--color-text-secondary);\n  }\n\n  .dh-button--icon:hover {\n    background-color: var(--color-primary-subtle);\n    border-color: var(--color-border-strong);\n    color: var(--color-on-primary-subtle);\n  }\n\n  .dh-button--icon:active {\n    background-color: var(--color-surface-sunken);\n    color: var(--color-text-primary);\n  }\n\n  /* --- sizes: the three sanctioned control heights ------------------------------\n     `md` is DESIGN.md's stated 36px button; `sm` drops to the 32px control height,\n     still comfortably above the WCAG 2.2 SC 2.5.8 24px floor the same document sets. */\n\n  .dh-button--sm {\n    min-block-size: var(--control-height-sm);\n    padding-inline: var(--space-xs);\n    font-size: var(--font-size-body-sm);\n    line-height: var(--line-height-body-sm);\n  }\n\n  .dh-button--md {\n    min-block-size: var(--control-height-md);\n  }\n\n  .dh-button--lg {\n    min-block-size: var(--control-height-lg);\n    padding-inline: var(--space-md);\n    font-size: var(--font-size-body-lg);\n    line-height: var(--line-height-body-lg);\n  }\n\n  /* --- modifiers -------------------------------------------------------------- */\n\n  .dh-button--full-width {\n    inline-size: 100%;\n  }\n\n  /* --- label + spinner -------------------------------------------------------- */\n\n  .dh-button__label {\n    display: inline-block;\n    max-inline-size: 100%;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n    transition: opacity var(--duration-fast) var(--easing-standard);\n  }\n\n  /*\n   * The label is hidden by opacity, never removed: the button keeps its measured width\n   * while the request is in flight, so the surrounding toolbar or form row does not move.\n   */\n  .dh-button--loading .dh-button__label {\n    opacity: 0;\n  }\n\n  .dh-button__spinner {\n    position: absolute;\n    inset: 0rem;\n    margin: auto;\n    inline-size: var(--space-md);\n    block-size: var(--space-md);\n    border-width: var(--border-width-strong);\n    border-style: solid;\n    border-color: var(--color-primary-subtle);\n    border-block-start-color: var(--color-primary);\n    border-radius: var(--radius-full);\n    animation: dh-button-spin var(--duration-slow) linear infinite;\n  }\n\n  .dh-button--secondary .dh-button__spinner,\n  .dh-button--outline .dh-button__spinner {\n    border-color: var(--color-border-subtle);\n    border-block-start-color: var(--color-primary);\n  }\n\n  .dh-button--danger .dh-button__spinner {\n    border-color: var(--color-on-danger);\n    border-block-start-color: var(--color-danger-subtle);\n  }\n\n  /* --- machine states (never signalled by colour alone) ------------------------ */\n\n  .dh-button[data-disabled] {\n    background-color: var(--color-surface-sunken);\n    border-color: var(--color-border-subtle);\n    color: var(--color-text-secondary);\n    box-shadow: none;\n    cursor: default;\n    opacity: 0.55;\n  }\n\n  .dh-button[data-loading] {\n    cursor: default;\n  }\n\n  /* Toggle mode: the machine's pressed state is a raised surface plus a selected seam. */\n  .dh-button[data-state=\"pressed\"] {\n    background-color: var(--color-primary-subtle);\n    border-color: var(--color-border-selected);\n    color: var(--color-on-primary-subtle);\n    font-weight: var(--font-weight-label-caps);\n  }\n\n  .dh-button[data-icon-only] {\n    padding-inline: 0rem;\n    aspect-ratio: 1;\n  }\n\n  @keyframes dh-button-spin {\n    from {\n      rotate: 0turn;\n    }\n\n    to {\n      rotate: 1turn;\n    }\n  }\n}\n"
+    },
+    {
+      "path": "components/designharness/internal/classnames.ts",
+      "type": "registry:lib",
+      "content": "/**\n * Class-name helpers for the styled layer.\n *\n * The styled layer's only DOM contribution is *class names*: every structural and\n * state signal (`data-scope`, `data-part`, `data-open`, `data-disabled`, `aria-*`)\n * is owned by `@designharness/primitives` and is never re-implemented, renamed or\n * overridden here (TOKEN-API.md §5). Component CSS is authored against those\n * attributes plus the `dh-<component>` block / `dh-<component>--<variant>` modifier\n * classes produced by these helpers.\n */\n\n/** Any value that a class list may legitimately contain. */\nexport type ClassValue = string | false | null | undefined;\n\n/** Join a class list, dropping empty entries and collapsing to a single string. */\nexport function cx(...values: readonly ClassValue[]): string {\n  const parts: string[] = [];\n  for (const value of values) {\n    if (typeof value === 'string' && value.length > 0) parts.push(value);\n  }\n  return parts.join(' ');\n}\n\n/**\n * BEM-ish modifier builder: `modifier('dh-button', 'primary')` → `dh-button--primary`.\n * A `false`/`undefined` modifier yields `undefined` so it can be passed to `cx` directly.\n */\nexport function modifier(block: string, value: string | false | null | undefined): string | undefined {\n  if (!value) return undefined;\n  return `${block}--${value}`;\n}\n\n/**\n * Element builder: `element('dh-button', 'spinner')` → `dh-button__spinner`.\n * Elements are markup *the styled layer itself renders* — never anatomy parts.\n */\nexport function element(block: string, name: string): string {\n  return `${block}__${name}`;\n}\n\n/**\n * Merge a consumer `className` after the styled-layer classes so a host app can add\n * utility classes without ever losing the tokenized base (source order, no `!important`).\n */\nexport function withConsumerClass(styled: string, className: ClassValue): string {\n  return cx(styled, className);\n}\n"
+    }
+  ],
+  "meta": {
+    "tier": "component",
+    "componentId": "button",
+    "displayName": "Button",
+    "entry": {
+      "path": "packages/ui/src/button.tsx",
+      "sha256": "13528d5c6aff59237d981b8d61e96f8469f59109cafa9ef7fad3bfaad9d94433",
+      "bytes": 3473
+    },
+    "stylesheet": {
+      "path": "packages/ui/src/styles/button.css",
+      "sha256": "843bc759b8cfd52ec8e88457c07769d44e2bb8304ac8a19f9c716c124f1d85cb",
+      "bytes": 7064
+    },
+    "shared": [
+      {
+        "path": "packages/ui/src/internal/classnames.ts",
+        "sha256": "4ffd9f0b3117c43ef927aa237c5f54813d8acf11d781474da4f89b4e596cabb2",
+        "bytes": 1872
+      }
+    ],
+    "npmDependencies": [
+      "@designharness/primitives",
+      "react"
+    ],
+    "interComponentDependencies": [],
+    "stories": {
+      "path": "packages/ui/src/button.stories.tsx"
+    },
+    "tokenReferences": [
+      "--border-width-hairline",
+      "--border-width-strong",
+      "--button-height",
+      "--button-padding-inline",
+      "--button-radius",
+      "--color-border-selected",
+      "--color-border-strong",
+      "--color-border-subtle",
+      "--color-danger",
+      "--color-danger-subtle",
+      "--color-on-danger",
+      "--color-on-primary",
+      "--color-on-primary-subtle",
+      "--color-primary",
+      "--color-primary-hover",
+      "--color-primary-pressed",
+      "--color-primary-subtle",
+      "--color-surface",
+      "--color-surface-sunken",
+      "--color-text-primary",
+      "--color-text-secondary",
+      "--control-height-lg",
+      "--control-height-md",
+      "--control-height-sm",
+      "--duration-fast",
+      "--duration-slow",
+      "--easing-standard",
+      "--elevation-1",
+      "--font-family-body",
+      "--font-size-body-lg",
+      "--font-size-body-md",
+      "--font-size-body-sm",
+      "--font-weight-body-md",
+      "--font-weight-label-caps",
+      "--line-height-body-lg",
+      "--line-height-body-md",
+      "--line-height-body-sm",
+      "--radius-full",
+      "--space-md",
+      "--space-xs",
+      "--space-xxs",
+      "--target-size-min"
+    ],
+    "tokensReferenced": 42,
+    "props": [
+      {
+        "name": "aria-label",
+        "type": "string | undefined",
+        "required": false,
+        "description": "Defines a string value that labels the current element."
+      },
+      {
+        "name": "aria-labelledby",
+        "type": "string | undefined",
+        "required": false,
+        "description": "Identifies the element (or elements) that labels the current element."
+      },
+      {
+        "name": "type",
+        "type": "'button' | 'submit' | 'reset' | undefined",
+        "required": false,
+        "description": "The native `type` attribute. Never rely on the implicit `submit` default."
+      },
+      {
+        "name": "loading",
+        "type": "boolean | undefined",
+        "required": false,
+        "description": "Async action in progress: sets `aria-busy`, disables the button and swallows activation."
+      },
+      {
+        "name": "toggle",
+        "type": "boolean | undefined",
+        "required": false,
+        "description": "Toggle mode: the `@zag-js/toggle` state machine owns `aria-pressed` and `data-state`."
+      },
+      {
+        "name": "pressed",
+        "type": "boolean | undefined",
+        "required": false,
+        "description": "Controlled pressed state — only meaningful with `toggle`."
+      },
+      {
+        "name": "defaultPressed",
+        "type": "boolean | undefined",
+        "required": false,
+        "description": "Uncontrolled initial pressed state — only meaningful with `toggle`."
+      },
+      {
+        "name": "iconOnly",
+        "type": "boolean | undefined",
+        "required": false,
+        "description": "Marks the button as icon-only. An accessible name becomes a hard requirement\n(`aria-label` or `aria-labelledby`), enforced by the type and at runtime."
+      },
+      {
+        "name": "variant",
+        "type": "ButtonVariant | undefined",
+        "required": false,
+        "description": "Visual variant."
+      },
+      {
+        "name": "size",
+        "type": "ButtonSize | undefined",
+        "required": false,
+        "description": "Height/padding step."
+      },
+      {
+        "name": "fullWidth",
+        "type": "boolean | undefined",
+        "required": false,
+        "description": "Stretch the control to its container's inline size."
+      }
+    ],
+    "propCount": 11,
+    "contractPropCount": 11,
+    "requiredPropCount": 0,
+    "documentedPropCount": 11,
+    "events": [],
+    "metadataProvenance": "contracts-metadata",
+    "metadataSource": "packages/contracts/generated/component-metadata.json",
+    "a11y": {
+      "status": "provisional",
+      "standard": "WCAG 2.2 AA",
+      "gate": 3,
+      "axe": {
+        "status": "not-run",
+        "report": "no axe-core report found in: apps/showcase/reports/a11y.json, apps/showcase/test-results/a11y.json, packages/ui/reports/a11y.json",
+        "violations": 0,
+        "incomplete": 0
+      },
+      "contrast": {
+        "audited": 29,
+        "failures": 0,
+        "pairs": [
+          {
+            "id": "light/border-selected-on-surface-ui",
+            "mode": "light",
+            "pair": "color.semantic.border-selected on color.semantic.surface",
+            "kind": "ui",
+            "required": 3,
+            "ratio": 5.847,
+            "pass": true,
+            "lc": 78.57
+          },
+          {
+            "id": "light/border-strong-on-canvas-ui",
+            "mode": "light",
+            "pair": "color.semantic.border-strong on color.semantic.canvas",
+            "kind": "ui",
+            "required": 3,
+            "ratio": 4.43,
+            "pass": true,
+            "lc": 69.17
+          },
+          {
+            "id": "light/border-strong-on-surface-ui",
+            "mode": "light",
+            "pair": "color.semantic.border-strong on color.semantic.surface",
+            "kind": "ui",
+            "required": 3,
+            "ratio": 4.621,
+            "pass": true,
+            "lc": 72.12
+          },
+          {
+            "id": "light/danger-on-surface-text",
+            "mode": "light",
+            "pair": "color.semantic.danger on color.semantic.surface",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 6.574,
+            "pass": true,
+            "lc": 80.88
+          },
+          {
+            "id": "light/focus-on-surface-ui",
+            "mode": "light",
+            "pair": "color.semantic.focus on color.semantic.surface",
+            "kind": "ui",
+            "required": 3,
+            "ratio": 5.847,
+            "pass": true,
+            "lc": 78.57
+          },
+          {
+            "id": "light/on-danger-on-danger-text",
+            "mode": "light",
+            "pair": "color.semantic.on-danger on color.semantic.danger",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 6.574,
+            "pass": true,
+            "lc": -86.02
+          },
+          {
+            "id": "light/on-danger-subtle-on-danger-subtle-text",
+            "mode": "light",
+            "pair": "color.semantic.on-danger-subtle on color.semantic.danger-subtle",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 10.575,
+            "pass": true,
+            "lc": 84.63
+          },
+          {
+            "id": "light/on-primary-on-primary-hover-text",
+            "mode": "light",
+            "pair": "color.semantic.on-primary on color.semantic.primary-hover",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 7.858,
+            "pass": true,
+            "lc": -91.45
+          },
+          {
+            "id": "light/on-primary-on-primary-pressed-text",
+            "mode": "light",
+            "pair": "color.semantic.on-primary on color.semantic.primary-pressed",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 10.503,
+            "pass": true,
+            "lc": -97.9
+          },
+          {
+            "id": "light/on-primary-on-primary-text",
+            "mode": "light",
+            "pair": "color.semantic.on-primary on color.semantic.primary",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 5.847,
+            "pass": true,
+            "lc": -83.82
+          },
+          {
+            "id": "light/on-primary-subtle-on-primary-subtle-text",
+            "mode": "light",
+            "pair": "color.semantic.on-primary-subtle on color.semantic.primary-subtle",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 5.151,
+            "pass": true,
+            "lc": 69.9
+          },
+          {
+            "id": "light/primary-on-canvas-text",
+            "mode": "light",
+            "pair": "color.semantic.primary on color.semantic.canvas",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 5.605,
+            "pass": true,
+            "lc": 75.61
+          },
+          {
+            "id": "light/primary-on-surface-text",
+            "mode": "light",
+            "pair": "color.semantic.primary on color.semantic.surface",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 5.847,
+            "pass": true,
+            "lc": 78.57
+          },
+          {
+            "id": "light/success-on-surface-text",
+            "mode": "light",
+            "pair": "color.semantic.success on color.semantic.surface",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 5.373,
+            "pass": true,
+            "lc": 76.3
+          },
+          {
+            "id": "light/text-primary-on-canvas-text",
+            "mode": "light",
+            "pair": "color.semantic.text-primary on color.semantic.canvas",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 17.221,
+            "pass": true,
+            "lc": 101.76
+          },
+          {
+            "id": "light/text-primary-on-surface-large-text",
+            "mode": "light",
+            "pair": "color.semantic.text-primary on color.semantic.surface",
+            "kind": "large-text",
+            "required": 3,
+            "ratio": 17.963,
+            "pass": true,
+            "lc": 104.71
+          },
+          {
+            "id": "light/text-primary-on-surface-raised-text",
+            "mode": "light",
+            "pair": "color.semantic.text-primary on color.semantic.surface-raised",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 17.963,
+            "pass": true,
+            "lc": 104.71
+          },
+          {
+            "id": "light/text-primary-on-surface-sunken-text",
+            "mode": "light",
+            "pair": "color.semantic.text-primary on color.semantic.surface-sunken",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 16.036,
+            "pass": true,
+            "lc": 96.93
+          },
+          {
+            "id": "light/text-primary-on-surface-text",
+            "mode": "light",
+            "pair": "color.semantic.text-primary on color.semantic.surface",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 17.963,
+            "pass": true,
+            "lc": 104.71
+          },
+          {
+            "id": "light/text-secondary-on-canvas-text",
+            "mode": "light",
+            "pair": "color.semantic.text-secondary on color.semantic.canvas",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 7.634,
+            "pass": true,
+            "lc": 84.67
+          },
+          {
+            "id": "light/text-secondary-on-surface-sunken-text",
+            "mode": "light",
+            "pair": "color.semantic.text-secondary on color.semantic.surface-sunken",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 7.109,
+            "pass": true,
+            "lc": 79.84
+          },
+          {
+            "id": "light/text-secondary-on-surface-text",
+            "mode": "light",
+            "pair": "color.semantic.text-secondary on color.semantic.surface",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 7.963,
+            "pass": true,
+            "lc": 87.62
+          },
+          {
+            "id": "light/text.link",
+            "mode": "light",
+            "pair": "color.semantic.primary on color.semantic.surface",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 5.847,
+            "pass": true,
+            "lc": 78.57
+          },
+          {
+            "id": "light/text.on-primary",
+            "mode": "light",
+            "pair": "color.semantic.on-primary on color.semantic.primary",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 5.847,
+            "pass": true,
+            "lc": -83.82
+          },
+          {
+            "id": "light/text.secondary",
+            "mode": "light",
+            "pair": "color.semantic.text-secondary on color.semantic.surface",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 7.963,
+            "pass": true,
+            "lc": 87.62
+          },
+          {
+            "id": "light/ui.border-selected",
+            "mode": "light",
+            "pair": "color.semantic.border-selected on color.semantic.surface",
+            "kind": "ui",
+            "required": 3,
+            "ratio": 5.847,
+            "pass": true,
+            "lc": 78.57
+          },
+          {
+            "id": "light/ui.border-strong",
+            "mode": "light",
+            "pair": "color.semantic.border-strong on color.semantic.surface",
+            "kind": "ui",
+            "required": 3,
+            "ratio": 4.621,
+            "pass": true,
+            "lc": 72.12
+          },
+          {
+            "id": "light/ui.focus",
+            "mode": "light",
+            "pair": "color.semantic.focus on color.semantic.surface",
+            "kind": "ui",
+            "required": 3,
+            "ratio": 5.847,
+            "pass": true,
+            "lc": 78.57
+          },
+          {
+            "id": "light/warning-on-surface-text",
+            "mode": "light",
+            "pair": "color.semantic.warning on color.semantic.surface",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 6.388,
+            "pass": true,
+            "lc": 81.38
+          }
+        ]
+      },
+      "reasons": [
+        "the Tier-3 axe-core run has not produced a report for this component"
+      ]
+    },
+    "intent": {
+      "file": "DESIGN.md",
+      "sha256": "036bbfc393f294dd8d7ec0b2f00b73c848d4104f5f7404579c2245a329b74218"
+    }
+  }
+}

@@ -1,0 +1,429 @@
+{
+  "name": "input",
+  "type": "registry:component",
+  "title": "Input",
+  "description": "Meridian Input — @designharness/ui source distributed verbatim from packages/ui/src/input.tsx (3816 bytes, sha256 323b6c1b7df8efdb5711a3482886167e8397551707b83f843b3a491e3492372c). Depends on @designharness/primitives, react and shares packages/ui/src/internal/classnames.ts. Styled by packages/ui/src/styles/input.css (4920 bytes, 28 token references). Registry index barrel: packages/ui/src/styles.css.",
+  "homepage": "http://localhost:4870/r/input.json",
+  "dependencies": [
+    "@designharness/primitives",
+    "react"
+  ],
+  "registryDependencies": [
+    "meridian-base"
+  ],
+  "files": [
+    {
+      "path": "components/designharness/input.tsx",
+      "type": "registry:component",
+      "content": "import type { InputInputProps, InputRootProps } from '@designharness/primitives';\nimport { Input as InputPrimitive } from '@designharness/primitives';\nimport { type ReactNode, forwardRef } from 'react';\nimport { cx, element } from './internal/classnames.js';\n\n/**\n * Styled `Input` field.\n *\n * The primitive owns the whole accessibility story: label association (`htmlFor`),\n * `aria-required`, `aria-invalid`, the `aria-describedby` chain that joins the\n * description and the error text, and `role=\"alert\"` on the error. This wrapper adds\n * classes and composition only — it never re-declares an `aria-*` attribute.\n */\n\n/** Block class for every input selector in `styles/input.css`. */\nexport const INPUT_BLOCK = 'dh-input';\n\n/** Modifier applied by the styled layer when the field carries an error message. */\nexport const INPUT_ERROR_MODIFIER = `${INPUT_BLOCK}--error`;\n\nexport type UIInputProps = InputRootProps & {\n  /** Always-visible label text. Placeholder-only labels are a DESIGN.md prohibition. */\n  label: ReactNode;\n  /** Helper text rendered under the control and referenced by `aria-describedby`. */\n  description?: ReactNode | undefined;\n  /** Error message. Rendering it drives the invalid state and `role=\"alert\"`. */\n  error?: ReactNode | undefined;\n  /** Placeholder copy — reserved for examples, never instructions. */\n  placeholder?: string | undefined;\n  /** Native input `type`. @default \"text\" */\n  type?: 'text' | 'email' | 'number' | 'password' | 'search' | 'tel' | 'url' | 'date' | undefined;\n  /** Escape hatch for the remaining native `<input>` attributes. */\n  inputProps?: InputInputProps | undefined;\n};\n\nconst isPresent = (value: ReactNode): boolean => value !== undefined && value !== null && value !== false && value !== '';\n\n/** Field root. Adds the `dh-input` block class and nothing else. */\nexport const InputRoot = forwardRef<HTMLDivElement, InputRootProps>(function InputRoot(props, ref) {\n  const { children, className, ...restProps } = props;\n  return (\n    <InputPrimitive.Root {...restProps} ref={ref} className={cx(INPUT_BLOCK, className)}>\n      {children}\n    </InputPrimitive.Root>\n  );\n});\n\n/**\n * Convenience field: label + control + description + error, composed from the frozen\n * `input` anatomy parts. `required`, `disabled`, `readOnly`, `invalid`, `value` and\n * `onChange` keep the primitive's exact names and semantics.\n */\nexport function UIInput(props: UIInputProps): ReactNode {\n  const { label, description, error, placeholder, type, inputProps, className, ...restProps } = props;\n  const hasError = isPresent(error);\n\n  return (\n    <InputPrimitive.Root\n      {...restProps}\n      className={cx(INPUT_BLOCK, hasError ? INPUT_ERROR_MODIFIER : undefined, className)}\n    >\n      <InputPrimitive.Label>{label}</InputPrimitive.Label>\n      <InputPrimitive.Input {...inputProps} placeholder={placeholder} type={type} />\n      {isPresent(description) ? <InputPrimitive.Description>{description}</InputPrimitive.Description> : null}\n      {hasError ? (\n        <InputPrimitive.ErrorText icon={<span className={element(INPUT_BLOCK, 'error-glyph')}>!</span>}>\n          {error}\n        </InputPrimitive.ErrorText>\n      ) : null}\n    </InputPrimitive.Root>\n  );\n}\n\n/** Callable field component plus the frozen compound parts for custom composition. */\nexport interface InputComponent {\n  (props: UIInputProps): ReactNode;\n  Root: typeof InputRoot;\n  Label: typeof InputPrimitive.Label;\n  Input: typeof InputPrimitive.Input;\n  Description: typeof InputPrimitive.Description;\n  ErrorText: typeof InputPrimitive.ErrorText;\n}\n\nexport const Input: InputComponent = Object.assign(UIInput, {\n  Root: InputRoot,\n  Label: InputPrimitive.Label,\n  Input: InputPrimitive.Input,\n  Description: InputPrimitive.Description,\n  ErrorText: InputPrimitive.ErrorText,\n});\n"
+    },
+    {
+      "path": "styles/designharness/input.css",
+      "type": "registry:style",
+      "content": "/*\n * Input — styling for the frozen `input` anatomy: `root`, `label`, `input`,\n * `description`, `error-text`. DESIGN.md \"Components\": the label is always visible, the\n * placeholder carries examples only, and the error message is an icon *plus* wording —\n * colour is never the error signal.\n */\n\n@layer components {\n  [data-part=\"root\"]:where([data-scope=\"input\"]) {\n    display: flex;\n    flex-direction: column;\n    gap: var(--space-xxs);\n    box-sizing: border-box;\n    inline-size: 100%;\n    font-family: var(--font-family-body);\n    font-size: var(--font-size-body-md);\n    color: var(--color-text-primary);\n  }\n\n  /* `label-caps` is the only uppercase style and is reserved for exactly this and headers. */\n  [data-part=\"label\"]:where([data-scope=\"input\"]) {\n    font-family: var(--font-family-body);\n    font-size: var(--font-size-label-caps);\n    font-weight: var(--font-weight-label-caps);\n    line-height: var(--line-height-label-caps);\n    letter-spacing: var(--letter-spacing-label-caps);\n    text-transform: uppercase;\n    color: var(--color-text-secondary);\n    transition: color var(--duration-fast) var(--easing-standard);\n  }\n\n  /* Required fields are marked with a real glyph, so the requirement is not a colour. */\n  [data-part=\"label\"][data-required]:where([data-scope=\"input\"])::after {\n    content: \"*\";\n    margin-inline-start: var(--space-xxs);\n    color: var(--color-danger);\n  }\n\n  [data-part=\"input\"]:where([data-scope=\"input\"]) {\n    box-sizing: border-box;\n    inline-size: 100%;\n    min-block-size: var(--input-height);\n    padding-block: var(--space-xxs);\n    padding-inline: var(--input-padding-inline);\n    border-width: var(--border-width-hairline);\n    border-style: solid;\n    /* `--color-border-strong` clears WCAG 2.2 SC 1.4.11 against every surface. */\n    border-color: var(--color-border-strong);\n    border-radius: var(--radius-sm);\n    background-color: var(--color-surface);\n    color: var(--color-text-primary);\n    font-family: inherit;\n    font-size: var(--font-size-body-md);\n    line-height: var(--line-height-body-md);\n    appearance: textfield;\n    transition:\n      border-color var(--duration-fast) var(--easing-standard),\n      background-color var(--duration-fast) var(--easing-standard);\n  }\n\n  [data-part=\"input\"]:where([data-scope=\"input\"])::placeholder {\n    color: var(--color-text-secondary);\n    opacity: 1;\n  }\n\n  [data-part=\"input\"]:where([data-scope=\"input\"]):hover {\n    border-color: var(--color-border-strong);\n    background-color: var(--color-surface-sunken);\n  }\n\n  /* --- states, each with a non-colour cue -------------------------------------- */\n\n  [data-part=\"input\"][data-invalid]:where([data-scope=\"input\"]) {\n    border-width: var(--border-width-strong);\n    border-color: var(--color-danger);\n  }\n\n  [data-part=\"input\"][data-disabled]:where([data-scope=\"input\"]) {\n    background-color: var(--color-surface-sunken);\n    border-color: var(--color-border-subtle);\n    color: var(--color-text-secondary);\n    cursor: default;\n    opacity: 0.55;\n  }\n\n  [data-part=\"input\"][data-readonly]:where([data-scope=\"input\"]) {\n    background-color: var(--color-surface-sunken);\n    border-style: dashed;\n    color: var(--color-text-primary);\n  }\n\n  [data-part=\"label\"][data-focus]:where([data-scope=\"input\"]) {\n    color: var(--color-text-primary);\n  }\n\n  /* A field in error names itself in the label too, before the message is reached. */\n  .dh-input--error [data-part=\"label\"] {\n    color: var(--color-danger);\n    text-decoration: underline;\n    text-underline-offset: var(--space-xxs);\n  }\n\n  /* --- help + error text -------------------------------------------------------- */\n\n  [data-part=\"description\"]:where([data-scope=\"input\"]) {\n    /* Fluid helper copy: a field in a 300px rail and one in an 800px stage both stay\n       readable with no breakpoint jump (DESIGN.md \"Typography\"). */\n    font-size: clamp(\n      var(--font-size-body-sm),\n      calc(var(--font-size-body-sm) + 0.25cqi),\n      var(--font-size-body-md)\n    );\n    line-height: var(--line-height-body-sm);\n    color: var(--color-text-secondary);\n  }\n\n  [data-part=\"error-text\"]:where([data-scope=\"input\"]) {\n    display: flex;\n    align-items: center;\n    gap: var(--space-xxs);\n    font-size: var(--font-size-body-sm);\n    line-height: var(--line-height-body-sm);\n    font-weight: var(--font-weight-body-md);\n    color: var(--color-danger);\n  }\n\n  .dh-input__error-glyph {\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    flex: none;\n    box-sizing: border-box;\n    inline-size: var(--space-md);\n    block-size: var(--space-md);\n    border-radius: var(--radius-full);\n    background-color: var(--color-danger);\n    color: var(--color-on-danger);\n    font-family: var(--font-family-body);\n    font-size: var(--font-size-label-caps);\n    font-weight: var(--font-weight-label-caps);\n    line-height: var(--line-height-label-caps);\n  }\n}\n"
+    },
+    {
+      "path": "components/designharness/internal/classnames.ts",
+      "type": "registry:lib",
+      "content": "/**\n * Class-name helpers for the styled layer.\n *\n * The styled layer's only DOM contribution is *class names*: every structural and\n * state signal (`data-scope`, `data-part`, `data-open`, `data-disabled`, `aria-*`)\n * is owned by `@designharness/primitives` and is never re-implemented, renamed or\n * overridden here (TOKEN-API.md §5). Component CSS is authored against those\n * attributes plus the `dh-<component>` block / `dh-<component>--<variant>` modifier\n * classes produced by these helpers.\n */\n\n/** Any value that a class list may legitimately contain. */\nexport type ClassValue = string | false | null | undefined;\n\n/** Join a class list, dropping empty entries and collapsing to a single string. */\nexport function cx(...values: readonly ClassValue[]): string {\n  const parts: string[] = [];\n  for (const value of values) {\n    if (typeof value === 'string' && value.length > 0) parts.push(value);\n  }\n  return parts.join(' ');\n}\n\n/**\n * BEM-ish modifier builder: `modifier('dh-button', 'primary')` → `dh-button--primary`.\n * A `false`/`undefined` modifier yields `undefined` so it can be passed to `cx` directly.\n */\nexport function modifier(block: string, value: string | false | null | undefined): string | undefined {\n  if (!value) return undefined;\n  return `${block}--${value}`;\n}\n\n/**\n * Element builder: `element('dh-button', 'spinner')` → `dh-button__spinner`.\n * Elements are markup *the styled layer itself renders* — never anatomy parts.\n */\nexport function element(block: string, name: string): string {\n  return `${block}__${name}`;\n}\n\n/**\n * Merge a consumer `className` after the styled-layer classes so a host app can add\n * utility classes without ever losing the tokenized base (source order, no `!important`).\n */\nexport function withConsumerClass(styled: string, className: ClassValue): string {\n  return cx(styled, className);\n}\n"
+    }
+  ],
+  "meta": {
+    "tier": "component",
+    "componentId": "input",
+    "displayName": "Input",
+    "entry": {
+      "path": "packages/ui/src/input.tsx",
+      "sha256": "323b6c1b7df8efdb5711a3482886167e8397551707b83f843b3a491e3492372c",
+      "bytes": 3816
+    },
+    "stylesheet": {
+      "path": "packages/ui/src/styles/input.css",
+      "sha256": "e153408b2ceab40661d0ed9680126bc97d846b966c4486f8d40abcdcb8bee421",
+      "bytes": 4920
+    },
+    "shared": [
+      {
+        "path": "packages/ui/src/internal/classnames.ts",
+        "sha256": "4ffd9f0b3117c43ef927aa237c5f54813d8acf11d781474da4f89b4e596cabb2",
+        "bytes": 1872
+      }
+    ],
+    "npmDependencies": [
+      "@designharness/primitives",
+      "react"
+    ],
+    "interComponentDependencies": [],
+    "stories": {
+      "path": "packages/ui/src/input.stories.tsx"
+    },
+    "tokenReferences": [
+      "--border-width-hairline",
+      "--border-width-strong",
+      "--color-border-strong",
+      "--color-border-subtle",
+      "--color-danger",
+      "--color-on-danger",
+      "--color-surface",
+      "--color-surface-sunken",
+      "--color-text-primary",
+      "--color-text-secondary",
+      "--duration-fast",
+      "--easing-standard",
+      "--font-family-body",
+      "--font-size-body-md",
+      "--font-size-body-sm",
+      "--font-size-label-caps",
+      "--font-weight-body-md",
+      "--font-weight-label-caps",
+      "--input-height",
+      "--input-padding-inline",
+      "--letter-spacing-label-caps",
+      "--line-height-body-md",
+      "--line-height-body-sm",
+      "--line-height-label-caps",
+      "--radius-full",
+      "--radius-sm",
+      "--space-md",
+      "--space-xxs"
+    ],
+    "tokensReferenced": 28,
+    "props": [
+      {
+        "name": "value",
+        "type": "string | undefined",
+        "required": false,
+        "description": "Controlled input value."
+      },
+      {
+        "name": "defaultValue",
+        "type": "string | undefined",
+        "required": false,
+        "description": "Uncontrolled initial value."
+      },
+      {
+        "name": "name",
+        "type": "string | undefined",
+        "required": false,
+        "description": "The `name` attribute of the generated input control (form submission)."
+      },
+      {
+        "name": "disabled",
+        "type": "boolean | undefined",
+        "required": false,
+        "description": "Disables the control (`data-disabled` + native `disabled`)."
+      },
+      {
+        "name": "required",
+        "type": "boolean | undefined",
+        "required": false,
+        "description": "Marks the control as required (`aria-required` + native `required`)."
+      },
+      {
+        "name": "readOnly",
+        "type": "boolean | undefined",
+        "required": false,
+        "description": "Makes the control read-only."
+      },
+      {
+        "name": "invalid",
+        "type": "boolean | undefined",
+        "required": false,
+        "description": "Forces the invalid state. Defaults to `true` whenever an `Input.ErrorText` is\nrendered, so an error is never signalled by colour alone."
+      },
+      {
+        "name": "ids",
+        "type": "InputElementIds | undefined",
+        "required": false,
+        "description": "Ids of the field elements, for composition and server-side rendering."
+      },
+      {
+        "name": "label",
+        "type": "ReactNode",
+        "required": true,
+        "description": "Always-visible label text. Placeholder-only labels are a DESIGN.md prohibition."
+      },
+      {
+        "name": "description",
+        "type": "ReactNode | undefined",
+        "required": false,
+        "description": "Helper text rendered under the control and referenced by `aria-describedby`."
+      },
+      {
+        "name": "error",
+        "type": "ReactNode | undefined",
+        "required": false,
+        "description": "Error message. Rendering it drives the invalid state and `role=\"alert\"`."
+      },
+      {
+        "name": "placeholder",
+        "type": "string | undefined",
+        "required": false,
+        "description": "Placeholder copy — reserved for examples, never instructions."
+      },
+      {
+        "name": "type",
+        "type": "'text' | 'email' | 'number' | 'password' | 'search' | 'tel' | 'url' | 'date' | undefined",
+        "required": false,
+        "description": "Native input `type`."
+      },
+      {
+        "name": "inputProps",
+        "type": "InputInputProps | undefined",
+        "required": false,
+        "description": "Escape hatch for the remaining native `<input>` attributes."
+      }
+    ],
+    "propCount": 14,
+    "contractPropCount": 14,
+    "requiredPropCount": 1,
+    "documentedPropCount": 14,
+    "events": [],
+    "metadataProvenance": "contracts-metadata",
+    "metadataSource": "packages/contracts/generated/component-metadata.json",
+    "a11y": {
+      "status": "provisional",
+      "standard": "WCAG 2.2 AA",
+      "gate": 3,
+      "axe": {
+        "status": "not-run",
+        "report": "no axe-core report found in: apps/showcase/reports/a11y.json, apps/showcase/test-results/a11y.json, packages/ui/reports/a11y.json",
+        "violations": 0,
+        "incomplete": 0
+      },
+      "contrast": {
+        "audited": 22,
+        "failures": 0,
+        "pairs": [
+          {
+            "id": "light/border-selected-on-surface-ui",
+            "mode": "light",
+            "pair": "color.semantic.border-selected on color.semantic.surface",
+            "kind": "ui",
+            "required": 3,
+            "ratio": 5.847,
+            "pass": true,
+            "lc": 78.57
+          },
+          {
+            "id": "light/border-strong-on-canvas-ui",
+            "mode": "light",
+            "pair": "color.semantic.border-strong on color.semantic.canvas",
+            "kind": "ui",
+            "required": 3,
+            "ratio": 4.43,
+            "pass": true,
+            "lc": 69.17
+          },
+          {
+            "id": "light/border-strong-on-surface-ui",
+            "mode": "light",
+            "pair": "color.semantic.border-strong on color.semantic.surface",
+            "kind": "ui",
+            "required": 3,
+            "ratio": 4.621,
+            "pass": true,
+            "lc": 72.12
+          },
+          {
+            "id": "light/danger-on-surface-text",
+            "mode": "light",
+            "pair": "color.semantic.danger on color.semantic.surface",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 6.574,
+            "pass": true,
+            "lc": 80.88
+          },
+          {
+            "id": "light/focus-on-surface-ui",
+            "mode": "light",
+            "pair": "color.semantic.focus on color.semantic.surface",
+            "kind": "ui",
+            "required": 3,
+            "ratio": 5.847,
+            "pass": true,
+            "lc": 78.57
+          },
+          {
+            "id": "light/on-danger-on-danger-text",
+            "mode": "light",
+            "pair": "color.semantic.on-danger on color.semantic.danger",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 6.574,
+            "pass": true,
+            "lc": -86.02
+          },
+          {
+            "id": "light/primary-on-surface-text",
+            "mode": "light",
+            "pair": "color.semantic.primary on color.semantic.surface",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 5.847,
+            "pass": true,
+            "lc": 78.57
+          },
+          {
+            "id": "light/success-on-surface-text",
+            "mode": "light",
+            "pair": "color.semantic.success on color.semantic.surface",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 5.373,
+            "pass": true,
+            "lc": 76.3
+          },
+          {
+            "id": "light/text-primary-on-canvas-text",
+            "mode": "light",
+            "pair": "color.semantic.text-primary on color.semantic.canvas",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 17.221,
+            "pass": true,
+            "lc": 101.76
+          },
+          {
+            "id": "light/text-primary-on-surface-large-text",
+            "mode": "light",
+            "pair": "color.semantic.text-primary on color.semantic.surface",
+            "kind": "large-text",
+            "required": 3,
+            "ratio": 17.963,
+            "pass": true,
+            "lc": 104.71
+          },
+          {
+            "id": "light/text-primary-on-surface-raised-text",
+            "mode": "light",
+            "pair": "color.semantic.text-primary on color.semantic.surface-raised",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 17.963,
+            "pass": true,
+            "lc": 104.71
+          },
+          {
+            "id": "light/text-primary-on-surface-sunken-text",
+            "mode": "light",
+            "pair": "color.semantic.text-primary on color.semantic.surface-sunken",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 16.036,
+            "pass": true,
+            "lc": 96.93
+          },
+          {
+            "id": "light/text-primary-on-surface-text",
+            "mode": "light",
+            "pair": "color.semantic.text-primary on color.semantic.surface",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 17.963,
+            "pass": true,
+            "lc": 104.71
+          },
+          {
+            "id": "light/text-secondary-on-canvas-text",
+            "mode": "light",
+            "pair": "color.semantic.text-secondary on color.semantic.canvas",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 7.634,
+            "pass": true,
+            "lc": 84.67
+          },
+          {
+            "id": "light/text-secondary-on-surface-sunken-text",
+            "mode": "light",
+            "pair": "color.semantic.text-secondary on color.semantic.surface-sunken",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 7.109,
+            "pass": true,
+            "lc": 79.84
+          },
+          {
+            "id": "light/text-secondary-on-surface-text",
+            "mode": "light",
+            "pair": "color.semantic.text-secondary on color.semantic.surface",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 7.963,
+            "pass": true,
+            "lc": 87.62
+          },
+          {
+            "id": "light/text.link",
+            "mode": "light",
+            "pair": "color.semantic.primary on color.semantic.surface",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 5.847,
+            "pass": true,
+            "lc": 78.57
+          },
+          {
+            "id": "light/text.secondary",
+            "mode": "light",
+            "pair": "color.semantic.text-secondary on color.semantic.surface",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 7.963,
+            "pass": true,
+            "lc": 87.62
+          },
+          {
+            "id": "light/ui.border-selected",
+            "mode": "light",
+            "pair": "color.semantic.border-selected on color.semantic.surface",
+            "kind": "ui",
+            "required": 3,
+            "ratio": 5.847,
+            "pass": true,
+            "lc": 78.57
+          },
+          {
+            "id": "light/ui.border-strong",
+            "mode": "light",
+            "pair": "color.semantic.border-strong on color.semantic.surface",
+            "kind": "ui",
+            "required": 3,
+            "ratio": 4.621,
+            "pass": true,
+            "lc": 72.12
+          },
+          {
+            "id": "light/ui.focus",
+            "mode": "light",
+            "pair": "color.semantic.focus on color.semantic.surface",
+            "kind": "ui",
+            "required": 3,
+            "ratio": 5.847,
+            "pass": true,
+            "lc": 78.57
+          },
+          {
+            "id": "light/warning-on-surface-text",
+            "mode": "light",
+            "pair": "color.semantic.warning on color.semantic.surface",
+            "kind": "text",
+            "required": 4.5,
+            "ratio": 6.388,
+            "pass": true,
+            "lc": 81.38
+          }
+        ]
+      },
+      "reasons": [
+        "the Tier-3 axe-core run has not produced a report for this component"
+      ]
+    },
+    "intent": {
+      "file": "DESIGN.md",
+      "sha256": "036bbfc393f294dd8d7ec0b2f00b73c848d4104f5f7404579c2245a329b74218"
+    }
+  }
+}

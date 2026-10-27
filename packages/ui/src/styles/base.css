@@ -1,0 +1,69 @@
+/*
+ * Meridian base styles — shared across every `@designharness/ui` component.
+ *
+ * Selectivity budget (TOKEN-API.md §5): no selector may exceed (0,2,0). The frozen
+ * anatomy contract gives us `data-scope` + `data-part` on every part, which is already
+ * (0,2,0), so the scope is always asserted through `:where([data-scope="…"])`, which
+ * contributes zero specificity and leaves the full budget for state attributes and
+ * pseudo-classes. `!important` is banned by the harness sensor, so cascade order is
+ * managed with source order and layer order instead (see `styles.css`).
+ *
+ * Every colour, space, radius, shadow, duration and type declaration below is a
+ * `var(--…)` reference into the compiled token artifact (TOKEN-API.md §3).
+ */
+
+@layer components {
+  /*
+   * `color-scheme` is declared per component root, not on `:root` (the token artifact
+   * owns that): native scrollbars, the text caret and the selection checkbox then follow
+   * the same mode the semantic tokens flipped to (RESEARCH.md §6.3).
+   */
+  [data-part="root"]:where([data-scope="button"]),
+  [data-part="root"]:where([data-scope="input"]),
+  [data-part="root"]:where([data-scope="combobox"]),
+  [data-part="root"]:where([data-scope="table"]),
+  [data-part="content"]:where([data-scope="dialog"]) {
+    color-scheme: light dark;
+  }
+
+  /*
+   * One focus ring for every interactive part. `--color-focus` is a semantic role, so the
+   * ring is dark-blue in light mode, light-blue in dark mode and pure black/white in high
+   * contrast without a single mode-specific selector; `--border-width-strong` keeps it
+   * above the WCAG 2.2 SC 1.4.11 non-text threshold.
+   */
+  [data-part="root"]:where([data-scope="button"]):focus-visible,
+  [data-part="input"]:where([data-scope="input"]):focus-visible,
+  [data-part="input"]:where([data-scope="combobox"]):focus-visible,
+  [data-part="search-field"]:focus-visible,
+  [data-part="select"]:focus-visible,
+  [data-part="item"]:focus-visible,
+  [data-part="first-trigger"]:focus-visible,
+  [data-part="prev-trigger"]:focus-visible,
+  [data-part="next-trigger"]:focus-visible,
+  [data-part="last-trigger"]:focus-visible,
+  [data-part="trigger"]:where([data-scope="dialog"]):focus-visible,
+  [data-part="close-trigger"]:focus-visible,
+  .dh-combobox__trigger:focus-visible,
+  .dh-combobox__clear:focus-visible,
+  [data-part="columnheader"] button:focus-visible {
+    outline: var(--border-width-strong) solid var(--color-focus);
+    outline-offset: calc(var(--space-xxs) / 2);
+    border-radius: var(--radius-sm);
+  }
+
+  /*
+   * Focus rings are the *only* ring in the system: a hairline `--color-border-selected`
+   * seam marks the currently selected control so state is never carried by colour alone
+   * (DESIGN.md "Colors").
+   */
+  [data-part="option"][aria-selected="true"]:where([data-scope="combobox"]) {
+    border-inline-start-color: var(--color-border-selected);
+  }
+
+  /* Text selection stays inside the neutral scale — colour is a state, not an ornament. */
+  [data-part="root"]:where([data-scope="table"]) ::selection {
+    background-color: var(--color-primary-subtle);
+    color: var(--color-on-primary-subtle);
+  }
+}

@@ -1,0 +1,250 @@
+/*
+ * Combobox — styling for the frozen `combobox` anatomy: `root`, `label`, `control`,
+ * `trigger`, `input`, `clear`, `positioner`, `content`, `list`, `option` (kebab-cased
+ * `data-part` values), plus the glyph/loading/empty elements this layer renders.
+ *
+ * The `@zag-js/combobox` machine supplies the inline positioning styles on the
+ * positioner, so nothing here sets `position` or `inset` for the floating surface.
+ */
+
+@layer components {
+  [data-part="root"]:where([data-scope="combobox"]) {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xxs);
+    box-sizing: border-box;
+    inline-size: 100%;
+    font-family: var(--font-family-body);
+    color: var(--color-text-primary);
+  }
+
+  /* `label-caps` again for the field label — same reserved uppercase style as `input`. */
+  [data-part="label"]:where([data-scope="combobox"]) {
+    font-size: var(--font-size-label-caps);
+    font-weight: var(--font-weight-label-caps);
+    line-height: var(--line-height-label-caps);
+    letter-spacing: var(--letter-spacing-label-caps);
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+  }
+
+  /* --- the field box ------------------------------------------------------------ */
+
+  [data-part="control"]:where([data-scope="combobox"]) {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xxs);
+    box-sizing: border-box;
+    min-block-size: var(--input-height);
+    padding-inline-start: var(--input-padding-inline);
+    border-width: var(--border-width-hairline);
+    border-style: solid;
+    border-color: var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    background-color: var(--color-surface);
+    transition:
+      border-color var(--duration-fast) var(--easing-standard),
+      background-color var(--duration-fast) var(--easing-standard);
+  }
+
+  [data-part="control"]:where([data-scope="combobox"]):hover {
+    background-color: var(--color-surface-sunken);
+  }
+
+  /* The disclosure seam is the open cue; the listbox surface is the second signal. */
+  [data-part="control"][data-open]:where([data-scope="combobox"]) {
+    border-color: var(--color-border-selected);
+  }
+
+  [data-part="control"][data-disabled]:where([data-scope="combobox"]) {
+    background-color: var(--color-surface-sunken);
+    border-color: var(--color-border-subtle);
+    cursor: default;
+    opacity: 0.55;
+  }
+
+  /* Async in flight: a dashed seam reads as "waiting", never as an error. */
+  .dh-combobox--loading [data-part="control"] {
+    border-style: dashed;
+  }
+
+  [data-part="input"]:where([data-scope="combobox"]) {
+    flex: 1;
+    box-sizing: border-box;
+    min-inline-size: 0;
+    block-size: 100%;
+    padding-block: var(--space-xxs);
+    padding-inline-end: var(--space-xxs);
+    border: none;
+    background-color: transparent;
+    color: var(--color-text-primary);
+    font-family: inherit;
+    font-size: var(--font-size-body-md);
+    line-height: var(--line-height-body-md);
+  }
+
+  [data-part="input"]:where([data-scope="combobox"])::placeholder {
+    color: var(--color-text-secondary);
+    opacity: 1;
+  }
+
+  [data-part="input"][data-invalid]:where([data-scope="combobox"]) {
+    color: var(--color-danger);
+    font-weight: var(--font-weight-label-caps);
+  }
+
+  /* --- buttons inside the field -------------------------------------------------- */
+
+  .dh-combobox__trigger,
+  .dh-combobox__clear {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    box-sizing: border-box;
+    margin: 0rem;
+    min-inline-size: var(--target-size-min);
+    block-size: 100%;
+    min-block-size: var(--control-height-md);
+    padding-inline: var(--space-xs);
+    border: none;
+    border-radius: var(--radius-sm);
+    background-color: transparent;
+    color: var(--color-text-secondary);
+    cursor: default;
+    transition:
+      background-color var(--duration-fast) var(--easing-standard),
+      color var(--duration-fast) var(--easing-standard);
+  }
+
+  .dh-combobox__trigger:hover,
+  .dh-combobox__clear:hover {
+    background-color: var(--color-primary-subtle);
+    color: var(--color-on-primary-subtle);
+  }
+
+  .dh-combobox__chevron {
+    inline-size: var(--space-xs);
+    block-size: var(--space-xs);
+    border-inline-end: var(--border-width-strong) solid var(--color-text-secondary);
+    border-block-end: var(--border-width-strong) solid var(--color-text-secondary);
+    rotate: 45deg;
+  }
+
+  .dh-combobox__clear-glyph {
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body-md);
+    line-height: var(--line-height-body-md);
+  }
+
+  .dh-combobox__spinner {
+    box-sizing: border-box;
+    inline-size: var(--space-md);
+    block-size: var(--space-md);
+    border-width: var(--border-width-strong);
+    border-style: solid;
+    border-color: var(--color-border-subtle);
+    border-block-start-color: var(--color-primary);
+    border-radius: var(--radius-full);
+    animation: dh-combobox-spin var(--duration-slow) linear infinite;
+  }
+
+  /* --- the floating listbox ------------------------------------------------------ */
+
+  [data-part="positioner"]:where([data-scope="combobox"]) {
+    z-index: 1;
+    inline-size: 100%;
+  }
+
+  [data-part="content"]:where([data-scope="combobox"]) {
+    box-sizing: border-box;
+    inline-size: 100%;
+    /* 256px of scrollable option surface, derived from the grid rather than authored. */
+    max-block-size: calc(var(--space-xxxl) * 4);
+    overflow-y: auto;
+    padding-block: var(--space-xxs);
+    border-width: var(--border-width-hairline);
+    border-style: solid;
+    border-color: var(--color-border-subtle);
+    border-radius: var(--radius-sm);
+    background-color: var(--color-surface-raised);
+    /* Elevation is never shadow alone: the hairline border above survives dark mode. */
+    box-shadow: var(--elevation-1);
+    opacity: 0;
+    /* Enter on the entry curve, leave on the exit curve (RESEARCH.md §6.2). */
+    transition: opacity var(--duration-moderate) var(--easing-entry);
+  }
+
+  [data-part="content"][data-state="open"]:where([data-scope="combobox"]) {
+    opacity: 1;
+  }
+
+  [data-part="content"][data-state="closed"]:where([data-scope="combobox"]) {
+    transition-timing-function: var(--easing-exit);
+  }
+
+  [data-part="list"]:where([data-scope="combobox"]) {
+    margin: 0rem;
+    padding: 0rem;
+    list-style: none;
+  }
+
+  [data-part="option"]:where([data-scope="combobox"]) {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding-block: var(--space-xxs);
+    padding-inline: var(--input-padding-inline);
+    border-inline-start: var(--border-width-strong) solid transparent;
+    border-radius: var(--radius-sm);
+    color: var(--color-text-primary);
+    font-size: var(--font-size-body-md);
+    line-height: var(--line-height-body-md);
+    cursor: default;
+    transition:
+      background-color var(--duration-fast) var(--easing-standard),
+      color var(--duration-fast) var(--easing-standard);
+  }
+
+  [data-part="option"][data-highlighted]:where([data-scope="combobox"]) {
+    background-color: var(--color-primary-subtle);
+    color: var(--color-on-primary-subtle);
+  }
+
+  /* The committed option is heavier and carries the selected seam — never colour alone. */
+  [data-part="option"][aria-selected="true"]:where([data-scope="combobox"]) {
+    border-inline-start-color: var(--color-border-selected);
+    font-weight: var(--font-weight-label-caps);
+  }
+
+  [data-part="option"][aria-disabled="true"]:where([data-scope="combobox"]) {
+    color: var(--color-text-secondary);
+    cursor: default;
+    opacity: 0.55;
+  }
+
+  .dh-combobox__loading,
+  .dh-combobox__empty {
+    padding-block: var(--space-xs);
+    padding-inline: var(--input-padding-inline);
+    font-size: var(--font-size-body-sm);
+    line-height: var(--line-height-body-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .dh-combobox__loading {
+    border-block-end: var(--border-width-hairline) solid var(--color-border-subtle);
+    font-style: italic;
+  }
+
+  @keyframes dh-combobox-spin {
+    from {
+      rotate: 0turn;
+    }
+
+    to {
+      rotate: 1turn;
+    }
+  }
+}

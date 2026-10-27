@@ -1,0 +1,34 @@
+/*
+ * Tier-1 sensor fixture — deliberately NON-compliant.
+ *
+ * This file exists so `test/stylelint.test.ts` can prove the harness rules actually
+ * fire (a sensor that never reports anything is indistinguishable from a sensor that
+ * never runs). It trips all four Stylelint rules:
+ *   harness/no-hardcoded-color      (#hex, rgb(), a named colour)
+ *   harness/no-hardcoded-length     (raw px)
+ *   harness/no-important            (!important)
+ *   harness/prefer-token-reference  (tokenised properties authored as literals)
+ *
+ * It is excluded from the "authored CSS is clean" sweep on purpose.
+ */
+
+.dh-sensor-bad {
+  color: #14171c;
+  background-color: rgb(255 255 255);
+  border: 1px solid red;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  box-shadow: 0 2px 4px rgba(11, 15, 22, 0.16);
+  transition-duration: 200ms;
+}
+
+.dh-sensor-bad:hover {
+  margin-block-end: 8px !important;
+  outline-color: hsl(220 60% 45%);
+}
+
+.dh-sensor-bad .dh-sensor-bad-nested {
+  /* A second specificity-war escape hatch: the rule must not depend on one hit. */
+  gap: 8px !important;
+}

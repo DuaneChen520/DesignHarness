@@ -1,0 +1,72 @@
+{
+  "name": "meridian",
+  "homepage": "http://localhost:4870/registry.json",
+  "items": [
+    {
+      "name": "button",
+      "type": "registry:component",
+      "title": "Button",
+      "description": "Meridian Button — @designharness/ui source distributed verbatim from packages/ui/src/button.tsx (3473 bytes, sha256 13528d5c6aff59237d981b8d61e96f8469f59109cafa9ef7fad3bfaad9d94433). Depends on @designharness/primitives, react and shares packages/ui/src/internal/classnames.ts. Styled by packages/ui/src/styles/button.css (7064 bytes, 42 token references). Registry index barrel: packages/ui/src/styles.css.",
+      "registryDependencies": [
+        "meridian-base"
+      ]
+    },
+    {
+      "name": "combobox",
+      "type": "registry:component",
+      "title": "Combobox",
+      "description": "Meridian Combobox — @designharness/ui source distributed verbatim from packages/ui/src/combobox.tsx (8589 bytes, sha256 bb6a23d67e7944c26ca19318c510ca5f4198af9c5799b4aa7e5987f3fd04104e). Depends on @designharness/primitives, react and shares packages/ui/src/internal/classnames.ts. Styled by packages/ui/src/styles/combobox.css (8104 bytes, 40 token references). Registry index barrel: packages/ui/src/styles.css.",
+      "registryDependencies": [
+        "meridian-base"
+      ]
+    },
+    {
+      "name": "data-table",
+      "type": "registry:component",
+      "title": "DataTable",
+      "description": "Meridian DataTable — @designharness/ui source distributed verbatim from packages/ui/src/data-table.tsx (5404 bytes, sha256 e0db7368e1d556370514ffd0b640e286f9e348da15d75a095f33c0868f5b2153). Depends on @designharness/primitives, react and shares packages/ui/src/internal/classnames.ts. Styled by packages/ui/src/styles/data-table.css (12698 bytes, 42 token references). Registry index barrel: packages/ui/src/styles.css.",
+      "registryDependencies": [
+        "meridian-base"
+      ]
+    },
+    {
+      "name": "dialog",
+      "type": "registry:component",
+      "title": "Dialog",
+      "description": "Meridian Dialog — @designharness/ui source distributed verbatim from packages/ui/src/dialog.tsx (6024 bytes, sha256 c26ce18756744a5856247115f1d4eac8fbb0051016bff5cb68846cda9dd438ac). Depends on @designharness/primitives, react and shares packages/ui/src/internal/classnames.ts. Styled by packages/ui/src/styles/dialog.css (6515 bytes, 37 token references). Registry index barrel: packages/ui/src/styles.css.",
+      "registryDependencies": [
+        "meridian-base"
+      ]
+    },
+    {
+      "name": "input",
+      "type": "registry:component",
+      "title": "Input",
+      "description": "Meridian Input — @designharness/ui source distributed verbatim from packages/ui/src/input.tsx (3816 bytes, sha256 323b6c1b7df8efdb5711a3482886167e8397551707b83f843b3a491e3492372c). Depends on @designharness/primitives, react and shares packages/ui/src/internal/classnames.ts. Styled by packages/ui/src/styles/input.css (4920 bytes, 28 token references). Registry index barrel: packages/ui/src/styles.css.",
+      "registryDependencies": [
+        "meridian-base"
+      ]
+    },
+    {
+      "name": "meridian-base",
+      "type": "registry:base",
+      "title": "Meridian base",
+      "description": "The whole design-system foundation in one item: the compiled DTCG token artifact as CSS custom properties (all four colour modes), the Tailwind v4 @theme, the shared component stylesheet and the class-name helper every Meridian component imports. Every component in this registry declares it as a registry dependency."
+    },
+    {
+      "name": "meridian-style",
+      "type": "registry:style",
+      "title": "Meridian styled layer",
+      "description": "The aggregate Meridian stylesheet: imports the token artifact, the Tailwind theme, the shared component CSS, every component sheet and the reduced-motion layer, in the cascade order the authored barrel declares. Adding this item installs the base and every component in this registry.",
+      "registryDependencies": [
+        "button",
+        "combobox",
+        "data-table",
+        "dialog",
+        "input",
+        "meridian-base"
+      ]
+    }
+  ],
+  "totalItems": 7
+}

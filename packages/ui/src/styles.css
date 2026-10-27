@@ -1,0 +1,23 @@
+/*
+ * `@designharness/ui/styles.css` — the token-only component stylesheet.
+ *
+ * Nothing here is a value: every declaration inside the imported files resolves to a
+ * `var(--…)` from `@designharness/tokens` (TOKEN-API.md §3). Import the token artifact
+ * first, then this file:
+ *
+ *   import '@designharness/tokens/css';
+ *   import '@designharness/ui/styles.css';
+ *
+ * Layer order is declared up front so `motion` outranks `components` by layer, which is
+ * how the reduced-motion contract wins without `!important` (STYLE: TOKEN-API.md §5).
+ */
+
+@layer components, motion;
+
+@import './styles/base.css';
+@import './styles/button.css';
+@import './styles/input.css';
+@import './styles/combobox.css';
+@import './styles/dialog.css';
+@import './styles/data-table.css';
+@import './styles/motion.css';

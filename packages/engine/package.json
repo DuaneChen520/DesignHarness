@@ -1,0 +1,45 @@
+{
+  "name": "@designharness/engine",
+  "version": "0.1.0",
+  "description": "Harness synthesis core: DESIGN.md parsing, DTCG export, OKLCH/WCAG/APCA colour math, Style Dictionary pipeline, ts-morph prop extraction, registry generation.",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json --watch",
+    "lint": "eslint src test",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@google/design.md": "catalog:",
+    "style-dictionary": "catalog:",
+    "ts-morph": "catalog:",
+    "yaml": "catalog:",
+    "zod": "catalog:",
+    "apca-w3": "catalog:",
+    "@adobe/leonardo-contrast-colors": "catalog:"
+  },
+  "devDependencies": {
+    "vitest": "catalog:",
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "eslint": "catalog:",
+    "@eslint/js": "catalog:",
+    "typescript-eslint": "catalog:",
+    "eslint-plugin-jsx-a11y": "catalog:",
+    "eslint-plugin-react-hooks": "catalog:",
+    "globals": "catalog:"
+  }
+}

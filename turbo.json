@@ -1,0 +1,52 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": [
+    "tsconfig.base.json",
+    "eslint.config.mjs",
+    "stylelint.config.mjs",
+    "DESIGN.md"
+  ],
+  "globalEnv": ["CI", "NODE_ENV", "DESIGNHARNESS_REGISTRY_URL", "HTTPS_PROXY"],
+  "tasks": {
+    "compile:designmd": {
+      "dependsOn": [],
+      "inputs": ["DESIGN.md", "packages/engine/dist/**"],
+      "outputs": ["packages/tokens/tokens.json"]
+    },
+    "^build": {
+      "dependsOn": ["build"]
+    },
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": ["src/**", "tsconfig.json", "package.json"],
+      "outputs": ["dist/**"]
+    },
+    "@designharness/tokens#build": {
+      "dependsOn": ["@designharness/engine#build"],
+      "inputs": ["DESIGN.md", "packages/engine/dist/**", "packages/tokens/tokens.json"],
+      "outputs": ["dist/**", "tokens.json"]
+    },
+    "lint": {
+      "dependsOn": ["^build"]
+    },
+    "typecheck": {
+      "dependsOn": ["^build"]
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "outputs": ["coverage/**"]
+    },
+    "metadata": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
+    },
+    "test:e2e": {
+      "dependsOn": ["build"],
+      "cache": false
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    }
+  }
+}

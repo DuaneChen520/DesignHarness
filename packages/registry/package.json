@@ -1,0 +1,41 @@
+{
+  "name": "@designharness/registry",
+  "version": "0.1.0",
+  "description": "shadcn-compatible registry.json source distribution service.",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "registry"
+  ],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "serve": "node dist/server.js",
+    "lint": "eslint src scripts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@designharness/engine": "workspace:*",
+    "@designharness/tokens": "workspace:*"
+  },
+  "devDependencies": {
+    "vitest": "catalog:",
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "eslint": "catalog:",
+    "@eslint/js": "catalog:",
+    "typescript-eslint": "catalog:",
+    "eslint-plugin-jsx-a11y": "catalog:",
+    "eslint-plugin-react-hooks": "catalog:",
+    "globals": "catalog:"
+  }
+}

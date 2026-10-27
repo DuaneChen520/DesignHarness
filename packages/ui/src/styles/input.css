@@ -1,0 +1,143 @@
+/*
+ * Input — styling for the frozen `input` anatomy: `root`, `label`, `input`,
+ * `description`, `error-text`. DESIGN.md "Components": the label is always visible, the
+ * placeholder carries examples only, and the error message is an icon *plus* wording —
+ * colour is never the error signal.
+ */
+
+@layer components {
+  [data-part="root"]:where([data-scope="input"]) {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xxs);
+    box-sizing: border-box;
+    inline-size: 100%;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body-md);
+    color: var(--color-text-primary);
+  }
+
+  /* `label-caps` is the only uppercase style and is reserved for exactly this and headers. */
+  [data-part="label"]:where([data-scope="input"]) {
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-label-caps);
+    font-weight: var(--font-weight-label-caps);
+    line-height: var(--line-height-label-caps);
+    letter-spacing: var(--letter-spacing-label-caps);
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+    transition: color var(--duration-fast) var(--easing-standard);
+  }
+
+  /* Required fields are marked with a real glyph, so the requirement is not a colour. */
+  [data-part="label"][data-required]:where([data-scope="input"])::after {
+    content: "*";
+    margin-inline-start: var(--space-xxs);
+    color: var(--color-danger);
+  }
+
+  [data-part="input"]:where([data-scope="input"]) {
+    box-sizing: border-box;
+    inline-size: 100%;
+    min-block-size: var(--input-height);
+    padding-block: var(--space-xxs);
+    padding-inline: var(--input-padding-inline);
+    border-width: var(--border-width-hairline);
+    border-style: solid;
+    /* `--color-border-strong` clears WCAG 2.2 SC 1.4.11 against every surface. */
+    border-color: var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    background-color: var(--color-surface);
+    color: var(--color-text-primary);
+    font-family: inherit;
+    font-size: var(--font-size-body-md);
+    line-height: var(--line-height-body-md);
+    appearance: textfield;
+    transition:
+      border-color var(--duration-fast) var(--easing-standard),
+      background-color var(--duration-fast) var(--easing-standard);
+  }
+
+  [data-part="input"]:where([data-scope="input"])::placeholder {
+    color: var(--color-text-secondary);
+    opacity: 1;
+  }
+
+  [data-part="input"]:where([data-scope="input"]):hover {
+    border-color: var(--color-border-strong);
+    background-color: var(--color-surface-sunken);
+  }
+
+  /* --- states, each with a non-colour cue -------------------------------------- */
+
+  [data-part="input"][data-invalid]:where([data-scope="input"]) {
+    border-width: var(--border-width-strong);
+    border-color: var(--color-danger);
+  }
+
+  [data-part="input"][data-disabled]:where([data-scope="input"]) {
+    background-color: var(--color-surface-sunken);
+    border-color: var(--color-border-subtle);
+    color: var(--color-text-secondary);
+    cursor: default;
+    opacity: 0.55;
+  }
+
+  [data-part="input"][data-readonly]:where([data-scope="input"]) {
+    background-color: var(--color-surface-sunken);
+    border-style: dashed;
+    color: var(--color-text-primary);
+  }
+
+  [data-part="label"][data-focus]:where([data-scope="input"]) {
+    color: var(--color-text-primary);
+  }
+
+  /* A field in error names itself in the label too, before the message is reached. */
+  .dh-input--error [data-part="label"] {
+    color: var(--color-danger);
+    text-decoration: underline;
+    text-underline-offset: var(--space-xxs);
+  }
+
+  /* --- help + error text -------------------------------------------------------- */
+
+  [data-part="description"]:where([data-scope="input"]) {
+    /* Fluid helper copy: a field in a 300px rail and one in an 800px stage both stay
+       readable with no breakpoint jump (DESIGN.md "Typography"). */
+    font-size: clamp(
+      var(--font-size-body-sm),
+      calc(var(--font-size-body-sm) + 0.25cqi),
+      var(--font-size-body-md)
+    );
+    line-height: var(--line-height-body-sm);
+    color: var(--color-text-secondary);
+  }
+
+  [data-part="error-text"]:where([data-scope="input"]) {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xxs);
+    font-size: var(--font-size-body-sm);
+    line-height: var(--line-height-body-sm);
+    font-weight: var(--font-weight-body-md);
+    color: var(--color-danger);
+  }
+
+  .dh-input__error-glyph {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    box-sizing: border-box;
+    inline-size: var(--space-md);
+    block-size: var(--space-md);
+    border-radius: var(--radius-full);
+    background-color: var(--color-danger);
+    color: var(--color-on-danger);
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-label-caps);
+    font-weight: var(--font-weight-label-caps);
+    line-height: var(--line-height-label-caps);
+  }
+}

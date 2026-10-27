@@ -1,0 +1,40 @@
+/*
+ * Reduced-motion contract (WCAG 2.2 SC 2.3.3, DESIGN.md "Don'ts").
+ *
+ * This lives in its own cascade layer declared *after* `components`, so it wins by layer
+ * order rather than by specificity or `!important` (both banned by the harness sensor).
+ * Motion degrades to an instant opacity change: durations collapse to
+ * `--duration-instant` and the only transforms this layer authors (the spinners) are
+ * switched off. The machine's own inline popper transform is positioning, not motion, and
+ * is deliberately left alone.
+ */
+
+@layer motion {
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      transition-duration: var(--duration-instant);
+      animation-duration: var(--duration-instant);
+      animation-delay: var(--duration-instant);
+      animation-iteration-count: 1;
+      scroll-behavior: auto;
+    }
+
+    .dh-button__spinner,
+    .dh-combobox__spinner {
+      animation-name: none;
+      transform: none;
+      rotate: none;
+    }
+
+    [data-part="content"]:where([data-scope="combobox"]),
+    [data-part="content"]:where([data-scope="dialog"]) {
+      transform: none;
+    }
+
+    [data-part="row"]:where([data-scope="table"]) {
+      transition-property: opacity;
+    }
+  }
+}

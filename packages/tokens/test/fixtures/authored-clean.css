@@ -1,0 +1,36 @@
+/*
+ * Tier-1 sensor fixture — the pattern authored CSS is *required* to look like.
+ *
+ * Every declaration resolves through a custom property from the compiled artifact
+ * (TOKEN-API §5), so the Stylelint harness rules stay green. `test/stylelint.test.ts`
+ * lints this file and expects zero problems; it is the counter-example that keeps the
+ * "sensor actually runs" claim honest.
+ */
+
+.dh-sensor-clean {
+  color: var(--color-text-primary);
+  background-color: var(--color-surface);
+  border: var(--border-width-hairline) solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  margin-block: var(--space-sm);
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-body-md);
+  line-height: var(--line-height-body-md);
+  letter-spacing: var(--letter-spacing-label-caps);
+  box-shadow: var(--elevation-1);
+  min-height: var(--control-height-md);
+  transition: color var(--duration-fast) var(--easing-standard);
+  transition-duration: var(--duration-fast);
+}
+
+.dh-sensor-clean:focus-visible {
+  outline: var(--border-width-strong) solid var(--color-focus);
+  outline-offset: var(--space-xxs);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dh-sensor-clean {
+    transition-duration: var(--duration-instant);
+  }
+}

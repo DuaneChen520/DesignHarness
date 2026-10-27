@@ -1,0 +1,52 @@
+{
+  "name": "@designharness/tokens",
+  "version": "0.1.0",
+  "description": "Compiled design token artifact: DTCG 2025.10 tokens.json plus CSS custom properties, Tailwind v4 @theme, TypeScript and JSON outputs.",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./css": "./dist/css/index.css",
+    "./css/light": "./dist/css/light.css",
+    "./css/dark": "./dist/css/dark.css",
+    "./css/high-contrast": "./dist/css/high-contrast.css",
+    "./css/high-contrast-dark": "./dist/css/high-contrast-dark.css",
+    "./tailwind": "./tailwind/theme.css",
+    "./tokens.json": "./tokens.json",
+    "./json": "./dist/json/tokens.json",
+    "./recipe": "./dist/recipe/index.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "tokens.json",
+    "tailwind"
+  ],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "lint": "eslint scripts src",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@designharness/engine": "workspace:*"
+  },
+  "devDependencies": {
+    "vitest": "catalog:",
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "tailwindcss": "catalog:",
+    "@tailwindcss/cli": "catalog:",
+    "eslint": "catalog:",
+    "@eslint/js": "catalog:",
+    "typescript-eslint": "catalog:",
+    "eslint-plugin-jsx-a11y": "catalog:",
+    "eslint-plugin-react-hooks": "catalog:",
+    "globals": "catalog:"
+  }
+}

@@ -1,0 +1,348 @@
+/*
+ * apps/showcase — page chrome for the fixture host.
+ *
+ * This file is read by the Tier-1 Stylelint sensor (`harness/no-hardcoded-color`,
+ * `harness/no-hardcoded-length`, `harness/no-important`, `harness/prefer-token-reference`),
+ * so it contains no hex, no `rgb()`, no `px` and no `!important`: every colour, space,
+ * radius, border width, duration and type step is a `var(--…)` out of the compiled token
+ * artifact (TOKEN-API.md §3). Anything the token scale cannot express is a relative unit
+ * (`rem`, `%`, `ch`, `vh`) or a structural keyword, which is what the sensor accepts.
+ *
+ * Import order is load-bearing:
+ *   1. `@designharness/tokens/css`  — the custom properties + the `[data-theme]` cascade
+ *      (RESEARCH.md §6.3), including `color-scheme` per mode.
+ *   2. `@designharness/ui/styles.css` — the component layer + the reduced-motion layer.
+ *   3. this file's own rules — the gallery chrome, which is *not* part of the design system.
+ *
+ * Route chosen: plain CSS custom properties, no Tailwind. `@tailwindcss/vite` is installed
+ * but deliberately not wired in: Tailwind's preflight would restyle every primitive-owned
+ * part and make the visual snapshots measure Tailwind rather than the design system.
+ */
+
+@import '@designharness/tokens/css';
+@import '@designharness/ui/styles.css';
+
+/* --- page shell ------------------------------------------------------------------ */
+
+/*
+ * RESEARCH.md §6.3: `color-scheme: light dark` belongs on the root. The artifact already
+ * declares a single mode for every pinned `[data-theme]` value, so this rule only covers
+ * the unpinned root (system preference) and never competes with a pinned mode.
+ */
+:root:not([data-theme]) {
+  color-scheme: light dark;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-canvas);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-body-md);
+  line-height: var(--line-height-body-md);
+}
+
+.showcase {
+  box-sizing: border-box;
+  min-block-size: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.showcase__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  border-block-end: var(--border-width-hairline) solid var(--color-border-subtle);
+  background-color: var(--color-surface);
+}
+
+.showcase__title {
+  margin: 0;
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-heading-2);
+  font-weight: var(--font-weight-heading-2);
+  line-height: var(--line-height-heading-2);
+  letter-spacing: var(--letter-spacing-heading-2);
+}
+
+.showcase__subtitle {
+  margin: 0;
+  max-inline-size: 72ch;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-body-sm);
+  line-height: var(--line-height-body-sm);
+}
+
+.showcase__nav {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.showcase__nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xxs);
+  min-block-size: var(--control-height-md);
+  padding-inline: var(--space-sm);
+  border-radius: var(--radius-sm);
+  border: var(--border-width-hairline) solid transparent;
+  /*
+   * `--color-primary`, not `--color-link-foreground`: the link colour is a component-tier
+   * token the artifact does not re-theme per mode, so it stays the light-mode blue on a dark
+   * surface and measured 2.98:1 under the axe gate. The semantic role is mode-correct by
+   * construction (DESIGN.md "Colors": the accent lightens in dark because a 5.8:1-on-white
+   * blue is 2:1 on a dark canvas).
+   */
+  color: var(--color-primary);
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-label-caps);
+  text-decoration: none;
+  transition-duration: var(--duration-fast);
+  transition-property: background-color, border-color;
+  transition-timing-function: var(--easing-standard);
+}
+
+.showcase__nav-link[aria-current='page'] {
+  border-color: var(--color-border-selected);
+  background-color: var(--color-primary-subtle);
+  color: var(--color-on-primary-subtle);
+}
+
+.showcase__nav-link:hover {
+  background-color: var(--color-surface-sunken);
+}
+
+.showcase__nav-link:focus-visible {
+  outline: var(--border-width-strong) solid var(--color-focus);
+  outline-offset: var(--space-xxs);
+}
+
+/* --- theme control ------------------------------------------------------------------ */
+
+.showcase__theme {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  margin-inline-start: auto;
+}
+
+.showcase__theme-label {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-label-caps);
+  font-weight: var(--font-weight-label-caps);
+  letter-spacing: var(--letter-spacing-label-caps);
+  line-height: var(--line-height-label-caps);
+}
+
+.showcase__select {
+  min-block-size: var(--control-height-md);
+  min-inline-size: 12rem;
+  padding-inline: var(--space-sm);
+  border-radius: var(--radius-sm);
+  border: var(--border-width-hairline) solid var(--color-border-strong);
+  background-color: var(--color-input-background);
+  color: var(--color-input-foreground);
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-body-sm);
+}
+
+.showcase__select:focus-visible {
+  outline: var(--border-width-strong) solid var(--color-focus);
+  outline-offset: var(--space-xxs);
+}
+
+/* --- main region -------------------------------------------------------------------- */
+
+.showcase__main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  padding: var(--space-lg);
+}
+
+.showcase__legend {
+  margin: 0;
+  max-inline-size: 72ch;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-body-sm);
+}
+
+.showcase-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.showcase-group__title {
+  margin: 0;
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-heading-3);
+  font-weight: var(--font-weight-heading-3);
+  line-height: var(--line-height-heading-3);
+}
+
+.showcase-group__count {
+  color: var(--color-text-secondary);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-body-sm);
+}
+
+.showcase-group__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(24rem, 1fr));
+  gap: var(--space-md);
+}
+
+/*
+ * The table needs the width it is actually measured at (its intrinsic 45rem), or every
+ * table section would spend its life horizontally scrolled and the sensor would be
+ * looking at a crop. This is layout for the fixture host, not a component state.
+ */
+.showcase-group--data-table .showcase-group__grid {
+  grid-template-columns: repeat(auto-fit, minmax(46rem, 1fr));
+}
+
+/* An open dialog is centred inside its section, so the section has to be taller than it. */
+.showcase-group--dialog .showcase-story {
+  min-block-size: 26rem;
+}
+
+/* --- one story section --------------------------------------------------------------- */
+
+/*
+ * The gallery hosts every story of every component at once, so a story's floating
+ * surface must be measured *inside* its own section rather than over the viewport:
+ * the artifact's dialog `positioner`/`backdrop` are `position: fixed`, and five
+ * simultaneously fixed overlays would paint on top of each other and of every other
+ * section. Re-scoping them to the section frame is fixture-host styling, not a new
+ * component state — the real fixed overlay, scrim and focus trap are asserted on the
+ * `/story` route and in `e2e/keyboard.spec.ts`, where exactly one dialog is open.
+ *
+ * These are the only declarations in this file that target component parts.
+ */
+.showcase-gallery .showcase-story [data-part='positioner']:where([data-scope='dialog']),
+.showcase-gallery .showcase-story [data-part='backdrop']:where([data-scope='dialog']) {
+  position: absolute;
+}
+
+.showcase-story {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  min-block-size: 14rem;
+  /*
+   * A mode is a closed surface: a wide table must not be able to spill out of the section
+   * that pins it and land on the page canvas, where its dark-mode ink would sit on a light
+   * background (the axe gate measured exactly that as a `color-contrast` failure). Scrolling
+   * inside the section keeps every state on the surface its tokens were chosen for.
+   */
+  overflow: auto;
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  border: var(--border-width-hairline) solid var(--color-border-subtle);
+  background-color: var(--color-canvas);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-body);
+  transition-duration: var(--duration-fast);
+  transition-property: background-color, border-color;
+  transition-timing-function: var(--easing-standard);
+}
+
+/*
+ * A mode is a pair: the theme root that flips the inks also paints the canvas under them.
+ * The CSF `withDarkTheme` decorator pins `data-theme` on an element that owns no surface, so
+ * inside a light section its dark inks would sit on the light canvas around them — axe-core
+ * measures that as a real `color-contrast` failure, and it is one: nothing in the design
+ * system is allowed to put `--color-text-secondary` (dark) on `--color-canvas` (light).
+ * The fixture host completes the pair for any mode-pinning island.
+ */
+.showcase-story [data-theme] {
+  box-sizing: border-box;
+  inline-size: 100%;
+  background-color: var(--color-canvas);
+  color: var(--color-text-primary);
+}
+
+.showcase-story__header {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-xs);
+}
+
+.showcase-story__title {
+  margin: 0;
+  font-size: var(--font-size-body-lg);
+  font-weight: var(--font-weight-body-lg);
+  line-height: var(--line-height-body-lg);
+}
+
+.showcase-story__mode {
+  padding-inline: var(--space-xs);
+  padding-block: var(--space-xxs);
+  border-radius: var(--radius-full);
+  border: var(--border-width-hairline) solid var(--color-border-strong);
+  color: var(--color-text-secondary);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-label-caps);
+  letter-spacing: var(--letter-spacing-label-caps);
+}
+
+.showcase-story__frame {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--space-sm);
+}
+
+/* --- data table view ----------------------------------------------------------------- */
+
+.showcase-view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.showcase-view__title {
+  margin: 0;
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-heading-3);
+  font-weight: var(--font-weight-heading-3);
+  line-height: var(--line-height-heading-3);
+}
+
+.showcase-view__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  color: var(--color-text-secondary);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-body-sm);
+}
+
+.showcase-view__chip {
+  padding-inline: var(--space-xs);
+  padding-block: var(--space-xxs);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface-sunken);
+}
+
+/* --- motion ------------------------------------------------------------------------ */
+
+/*
+ * WCAG 2.2 SC 2.3.3 / DESIGN.md "Don'ts": the component layer already neutralises
+ * transform motion through `@layer motion`; this is the same contract for the chrome.
+ * Declarations inside `@media` are outside the token sensor's remit by design, but they
+ * still use `--duration-instant` rather than a literal.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .showcase__nav-link,
+  .showcase-story {
+    transition-property: none;
+    transition-duration: var(--duration-instant);
+  }
+}

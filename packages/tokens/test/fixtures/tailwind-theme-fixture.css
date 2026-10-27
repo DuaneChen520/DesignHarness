@@ -1,0 +1,59 @@
+/*
+ * Proof fixture for the Tailwind v4 compile target.
+ *
+ * It consumes the generated `@theme` exactly the way an application does
+ * (`@designharness/tokens/tailwind`) and asks Tailwind to build utilities out of it.
+ * The utilities below are asserted in `test/tailwind-theme.test.ts`, which compiles
+ * this file with `@tailwindcss/cli` and reads the emitted CSS — if the theme were
+ * decorative text rather than a real Tailwind contract, `@apply` would fail to build.
+ */
+@import "tailwindcss";
+@import "../../tailwind/theme.css";
+
+.dh-proof-bg {
+  @apply bg-primary;
+}
+
+.dh-proof-ink {
+  @apply text-on-primary;
+}
+
+.dh-proof-type {
+  @apply text-body-md;
+}
+
+.dh-proof-heading {
+  @apply text-heading-2;
+}
+
+.dh-proof-pad {
+  @apply p-md;
+}
+
+.dh-proof-gap {
+  @apply gap-lg;
+}
+
+.dh-proof-round {
+  @apply rounded-md;
+}
+
+.dh-proof-radius-full {
+  @apply rounded-full;
+}
+
+.dh-proof-shadow {
+  @apply shadow-elevation-1;
+}
+
+.dh-proof-ease {
+  @apply ease-standard;
+}
+
+.dh-proof-font {
+  @apply font-mono;
+}
+
+.dh-proof-surface {
+  @apply bg-surface text-text-primary;
+}

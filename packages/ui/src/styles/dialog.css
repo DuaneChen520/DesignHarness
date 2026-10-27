@@ -1,0 +1,198 @@
+/*
+ * Dialog — styling for the frozen `dialog` anatomy: `root`, `trigger`, `backdrop`,
+ * `positioner`, `content`, `header`, `title`, `body`, `close-trigger`, plus the footer
+ * row DESIGN.md requires (a styled-layer element: `footer` is not a frozen anatomy part,
+ * so it carries a class and never a `data-part`).
+ *
+ * The surface declares `container-type: inline-size`, so the header/body/footer
+ * arrangement responds to the *dialog's own width* — a 24rem dialog in a drawer and a
+ * 48rem dialog on a stage each self-arrange (RESEARCH.md §6.1).
+ */
+
+@layer components {
+  [data-part="backdrop"]:where([data-scope="dialog"]) {
+    position: fixed;
+    inset: 0rem;
+    /* DESIGN.md "Elevation & Depth": overlay elevation pairs a scrim with the shadow.
+       The scrim token is a flat ink, so alpha is expressed as element opacity — the
+       token gate forbids authored colour functions like `color-mix()`. The machine
+       toggles `hidden`, so the scrim never intercepts pointer events while closed. */
+    background-color: var(--color-scrim);
+    opacity: 0.6;
+    transition: opacity var(--duration-moderate) var(--easing-standard);
+  }
+
+  [data-part="positioner"]:where([data-scope="dialog"]) {
+    position: fixed;
+    inset: 0rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    padding: var(--space-md);
+  }
+
+  /* --- the surface -------------------------------------------------------------- */
+
+  [data-part="content"]:where([data-scope="dialog"]) {
+    container-type: inline-size;
+    box-sizing: border-box;
+    inline-size: 100%;
+    max-block-size: calc(100vb - var(--space-xxl));
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    padding: var(--dialog-padding);
+    border-width: var(--border-width-hairline);
+    border-style: solid;
+    border-color: var(--color-border-strong);
+    border-radius: var(--dialog-radius);
+    background-color: var(--color-surface);
+    color: var(--color-text-primary);
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body-md);
+    line-height: var(--line-height-body-md);
+    box-shadow: var(--elevation-2);
+    opacity: 0;
+    transition: opacity var(--duration-moderate) var(--easing-entry);
+  }
+
+  [data-part="content"][data-state="open"]:where([data-scope="dialog"]) {
+    opacity: 1;
+  }
+
+  [data-part="content"][data-state="closed"]:where([data-scope="dialog"]) {
+    transition-timing-function: var(--easing-exit);
+  }
+
+  /* The machine marks the surface `hidden` while it is closed. An authored `display`
+     declaration outranks the UA `[hidden] { display: none }`, so honour it explicitly:
+     a closed dialog must be neither painted nor hit-testable, and assistive technology
+     must not be able to walk into it (WCAG 2.2 SC 4.1.2). */
+  [data-part="content"][hidden]:where([data-scope="dialog"]) {
+    display: none;
+  }
+
+  /* Width ladder from `--dialog-max-width-*`; the modifiers follow the block so the
+     single-class specificity budget stays intact. */
+  .dh-dialog {
+    max-inline-size: var(--dialog-max-width-md);
+  }
+
+  .dh-dialog--sm {
+    max-inline-size: var(--dialog-max-width-sm);
+  }
+
+  .dh-dialog--md {
+    max-inline-size: var(--dialog-max-width-md);
+  }
+
+  .dh-dialog--lg {
+    max-inline-size: var(--dialog-max-width-lg);
+  }
+
+  /* --- header, title, close ------------------------------------------------------ */
+
+  .dh-dialog__header {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-sm);
+  }
+
+  [data-part="title"]:where([data-scope="dialog"]) {
+    /* Fluid heading: no breakpoint jump between a rail and a stage (DESIGN.md
+       "Typography"), still clamped inside the declared type scale. */
+    font-size: clamp(
+      var(--font-size-heading-3),
+      calc(var(--font-size-body-md) + 1.5cqi),
+      var(--font-size-heading-2)
+    );
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-heading-2);
+    line-height: var(--line-height-heading-2);
+    letter-spacing: var(--letter-spacing-heading-2);
+    color: var(--color-text-primary);
+    margin: 0rem;
+    inline-size: 100%;
+  }
+
+  [data-part="close-trigger"]:where([data-scope="dialog"]) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    box-sizing: border-box;
+    margin: 0rem;
+    inline-size: var(--control-height-md);
+    min-block-size: var(--control-height-md);
+    padding: 0rem;
+    border-width: var(--border-width-hairline);
+    border-style: solid;
+    border-color: transparent;
+    border-radius: var(--radius-sm);
+    background-color: transparent;
+    color: var(--color-text-secondary);
+    cursor: default;
+    transition:
+      background-color var(--duration-fast) var(--easing-standard),
+      border-color var(--duration-fast) var(--easing-standard),
+      color var(--duration-fast) var(--easing-standard);
+  }
+
+  [data-part="close-trigger"]:where([data-scope="dialog"]):hover {
+    background-color: var(--color-surface-sunken);
+    border-color: var(--color-border-strong);
+    color: var(--color-text-primary);
+  }
+
+  .dh-dialog__close-glyph {
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-body-lg);
+    line-height: var(--line-height-body-lg);
+  }
+
+  /* --- body ---------------------------------------------------------------------- */
+
+  [data-part="body"]:where([data-scope="dialog"]) {
+    /* Prose measure is 72ch (DESIGN.md "Layout"). */
+    max-inline-size: 72ch;
+    margin: 0rem;
+    color: var(--color-text-primary);
+    font-size: var(--font-size-body-md);
+    line-height: var(--line-height-body-md);
+    overflow-y: auto;
+  }
+
+  /* --- footer (styled-layer element, not an anatomy part) ------------------------ */
+
+  .dh-dialog__footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    /* Never put two interactive targets closer than 8px (DESIGN.md "Don'ts"). */
+    gap: var(--space-xs);
+    justify-content: flex-end;
+    border-block-start: var(--border-width-hairline) solid var(--color-border-subtle);
+    padding-block-start: var(--space-sm);
+  }
+
+  .dh-dialog__footer > * {
+    inline-size: 100%;
+  }
+
+  /* Wide surfaces: the action row right-aligns and sizes to its content. */
+  @container (min-width: 40rem) {
+    .dh-dialog__header {
+      gap: var(--space-lg);
+    }
+
+    .dh-dialog__footer {
+      flex-wrap: nowrap;
+      padding-block-start: var(--space-md);
+    }
+
+    .dh-dialog__footer > * {
+      inline-size: auto;
+    }
+  }
+}
