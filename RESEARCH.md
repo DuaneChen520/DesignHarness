@@ -77,16 +77,24 @@
 
 ## 二、分层架构设计与理论依据
 
-整个 Harness 体系严格划分为 5+1 层工程结构，每一层均有独立的行业标准作为理论支撑：
+整个 Harness 体系严格划分为 **4 层物理拓扑结构**（`packages/primitives`, `packages/ui`, `packages/contracts`, `apps/showcase`）与 **5+1 逻辑工程体系**，每一层均有独立的行业标准作为理论支撑：
+
+### 2.1 权威 4 层物理拓扑（Decoupled Physical Topology）
+1. **Layer 1: Headless Primitives (`packages/primitives`)**：纯属性、无样式的原子行为组件，直接绑定 Zag.js 1.46 状态机 (`@zag-js/*`)，无 Ark UI 组件层二次包装，保留原生 DOM 语义与 WAI-ARIA APG 交互骨架。
+2. **Layer 2: Tokenized UI (`packages/ui`)**：消费设计令牌的生产就绪 React 组件（完全杜绝硬编码颜色与像素），同级配齐 CSF 3.0 Stories。
+3. **Layer 3: Delivery Contracts (`packages/contracts`)**：包含 OpenAPI 3.1 规格契约、基于 `@msw/source` 的零维护同源 Mock、ts-morph 生成的 React Props AST 元数据 (`component-metadata.json`)，以及开箱即用的 TanStack Query 异步数据状态管理 Hooks (`useDataTableQuery`, `useComboboxSearchQuery`)。
+4. **Layer 4: Verification Showcase (`apps/showcase`)**：运行全量故事与多模式（Light/Dark/High-Contrast）切换的演练舞台，作为 axe-core (WCAG 2.2 AA) 与 Playwright 视觉回归的集中验证靶场。
+
+### 2.2 逻辑规范分层对照
 
 | 架构层级 | 核心职责 | 遵循的行业标准 / 规范 | 核心参考实现 / 开源库 |
 | :--- | :--- | :--- | :--- |
 | **Layer 0: Intent & North Star** | 品牌意图声明、自然语言设计哲学、AI 指导 | Google Labs DESIGN.md Specification<br>Apache 2.0 Open Standard | [google-labs-code/design.md](https://github.com/google-labs-code/design.md)<br>[VoltAgent/awesome-design-md](https://github.com/VoltAgent/awesome-design-md) |
-| **Layer 1: Tokens Foundation** | 动态令牌生成、语义分层、跨端编译 | W3C DTCG Format Specification<br>W3C CSS Color Module Level 4 & 5 | [style-dictionary](https://github.com/style-dictionary/style-dictionary)<br>[adobe/leonardo](https://github.com/adobe/leonardo) |
-| **Layer 2: Headless Components** | 交互状态解耦、键盘焦点管理、无障碍骨架 | W3C WAI-ARIA 1.2 / 1.3 APG<br>W3C Open UI Initiative | [chakra-ui/zag](https://github.com/chakra-ui/zag)<br>[chakra-ui/ark](https://github.com/chakra-ui/ark)<br>[adobe/react-spectrum](https://github.com/adobe/react-spectrum) |
-| **Layer 3: Interface & API** | 组件 Props 契约、数据端点定义、本地 Mock | OpenAPI Specification 3.1<br>JSON Schema 2020-12<br>Component Story Format (CSF 3.0) | [mswjs/msw](https://github.com/mswjs/msw)<br>[dsherret/ts-morph](https://github.com/dsherret/ts-morph)<br>[ComponentDriven/csf](https://github.com/ComponentDriven/csf) |
+| **Layer 1: Tokens Foundation** | 意图算法推导（DTCG Expansion）、多端编译（SCSS, Compose, Swift, CSS, Tailwind） | W3C DTCG Format Specification v2025.10<br>W3C CSS Color Module Level 4 & 5 | [style-dictionary](https://github.com/style-dictionary/style-dictionary)<br>[adobe/leonardo](https://github.com/adobe/leonardo) |
+| **Layer 2: Headless Components** | 交互状态解耦、键盘焦点管理、无障碍骨架（直接绑定 Zag.js 1.46 FSM） | W3C WAI-ARIA 1.2 / 1.3 APG<br>W3C Open UI Initiative | [chakra-ui/zag](https://github.com/chakra-ui/zag)<br>[adobe/react-spectrum](https://github.com/adobe/react-spectrum) |
+| **Layer 3: Interface & API** | React Props AST 契约、数据端点定义、本地 Mock、TanStack Query 集成 | OpenAPI Specification 3.1<br>JSON Schema 2020-12<br>TanStack Query v5<br>Component Story Format (CSF 3.0) | [mswjs/msw](https://github.com/mswjs/msw)<br>[dsherret/ts-morph](https://github.com/dsherret/ts-morph)<br>[TanStack/query](https://github.com/TanStack/query) |
 | **Layer 4: UI/UX & Ergonomics** | 空间网格、响应式容器、流体排版、动效可访问 | W3C CSS Containment Module Level 1-3<br>WCAG 2.2 SC 2.3.3 Reduced Motion | [primer/primitives](https://github.com/primer/primitives)<br>[carbon-design-system/carbon](https://github.com/carbon-design-system/carbon) |
-| **Layer 5: Verification Sensors** | 静态合规检查、像素级回归、无障碍断言 | WCAG 2.2 AA/AAA 规范<br>Martin Fowler Harness Engineering<br>DESIGN.md Linter / Diff | [dequelabs/axe-core](https://github.com/dequelabs/axe-core)<br>[microsoft/playwright](https://github.com/microsoft/playwright)<br>[stylelint/stylelint](https://github.com/stylelint/stylelint)<br>[@google/design.md](https://github.com/google-labs-code/design.md) |
+| **Layer 5: Verification Sensors** | 静态合规检查、像素级回归、无障碍断言 | WCAG 2.2 AA 规范（唯一定律门禁）<br>Martin Fowler Harness Engineering<br>DESIGN.md Linter / Diff | [dequelabs/axe-core](https://github.com/dequelabs/axe-core)<br>[microsoft/playwright](https://github.com/microsoft/playwright)<br>[stylelint/stylelint](https://github.com/stylelint/stylelint)<br>[@google/design.md](https://github.com/google-labs-code/design.md) |
 | **Layer 6: AI & Delivery Protocol** | 注册表协议分发、AI 智能体上下文对接 | shadcn Registry Specification<br>Anthropic Model Context Protocol (MCP)<br>DESIGN.md Downstream Export | [shadcn-ui/ui](https://github.com/shadcn-ui/ui)<br>[primer/react (@primer/mcp)](https://github.com/primer/react)<br>[google-labs-code/design.md](https://github.com/google-labs-code/design.md) |
 
 ---
@@ -194,14 +202,24 @@ Harness 废弃传统的 RGB / HSL 色彩计算，完全基于现代化色彩科�
 4. **算法生成引擎实现**：
    * 采用 Adobe 开源调色板引擎 [adobe/leonardo](https://github.com/adobe/leonardo)，默认以 `wcag2` 公式驱动语义映射与门禁，将现代算法作为旁路诊断通道。
 
-### 3.4 跨平台编译引擎
+### 3.4 算法性 DTCG 扩展层与跨平台编译引擎
 
+#### 3.4.1 @designharness/engine 中的算法性 DTCG 扩展能力
+`DESIGN.md` 中的 Frontmatter 承载核心品牌意图（如 Primary 色相、基准圆角与字阶）。然而，工业级组件体系需要完备的语义与组件代币树（包含浅色、深色、高对比度模式下的背景、文字、边框、交互悬停/按压态变体）。
+Harness 在 `@designharness/engine` 中构建了**算法性 DTCG 扩展层（Algorithmic DTCG Expansion Layer）**，作为设计意图（Intent）向具体机器可执行代币（Artifact）的确定性转译枢纽：
+1. **OKLCH 色阶算法展开**：从单个意图色相与明度起点，自动生成均匀的明度阶梯（Lightness Ladder）与交互反馈态（Hover / Pressed），完全基于人眼感知均匀的 OKLCH 色彩空间计算。
+2. **多模式语义系统映射**：根据 WCAG 2.2 对比度矩阵，自动映射生成 Default Light、Dark 以及 High-Contrast 语义令牌字典。
+3. **W3C DTCG 2025.10 单向输出**：将算法计算结果格式化为符合 W3C DTCG 规范的 `tokens.json` 结构，严禁人工手写或逆向编辑。
+
+#### 3.4.2 跨平台编译引擎（Style Dictionary v5）
 * **核心编译器**：[style-dictionary/style-dictionary](https://github.com/style-dictionary/style-dictionary)（v5.7.1）。
 * **处理管线**：`Parsers -> Preprocessors -> Transforms -> Formats -> Actions`。
-* **输出目标**：
-  * Web：CSS Custom Properties（带 `:root` 与 `[data-theme]` 级联）、SCSS 变量、Tailwind CSS v4 `@theme` 扩展配置、TypeScript 常量类型定义。
-  * Mobile：Android Jetpack Compose `Color.kt` / XML values、iOS SwiftUI `ColorAsset.swift`。
-  * 插件联动：[tokens-studio/sd-transforms](https://github.com/tokens-studio/sd-transforms)。
+* **输出目标（Web Preprocessors & Native Mobile）**：
+  * **Web 现代目标**：CSS Custom Properties（带 `:root`、`[data-theme]` 级联与高对比度适配）、Tailwind CSS v4 `@theme` 扩展配置、TypeScript 常量与 Recipe。
+  * **Web 预处理器目标 (SCSS)**：输出 `dist/scss/_tokens.scss`，包含平铺的 `$color-*` / `$space-*` SCSS 变量与结构化的 `$tokens` 嵌套 Map，供传统 Sass 项目无缝引用。
+  * **Android Jetpack Compose 目标**：输出 `dist/compose/Color.kt`，声明 `package com.designharness.tokens` 下的单例 `object Color`，采用 `androidx.compose.ui.graphics.Color(0xFF...)` 语法封装全部语义与基础色彩。
+  * **iOS SwiftUI 目标**：输出 `dist/swift/ColorAsset.swift`，通过 `public extension Color` 注入静态颜色属性，输出高精度 sRGB 归一化浮点数值。
+  * **插件联动**：[tokens-studio/sd-transforms](https://github.com/tokens-studio/sd-transforms)。
 
 ---
 
@@ -215,20 +233,26 @@ Harness 遵循 **“逻辑状态机化，表现无头化（Headless），样式�
 * **W3C WAI-ARIA 1.2 / 1.3 Authoring Practices Guide (APG)**（来源：[w3.org/WAI/ARIA/apg/](https://www.w3.org/WAI/ARIA/apg/)）：对 Accordion, Combobox, Dialog, Menu, Tabs 等定义了严格的键盘语义（Tab, Arrow keys, Home, End, Escape）和焦点陷阱规范。
 * **W3C Open UI Initiative**（来源：[openui/open-ui](https://github.com/openui/open-ui)）：倡导浏览器原生组件解构与组件解剖学规范（Anatomy Specs）。
 
-### 4.2 核心底座实现：Zag.js 与 Ark UI
+### 4.2 核心底座实现：直接绑定 Zag.js 1.46 状态机（架构决策 ADR）
 
-* **Zag.js**（官方仓库：[chakra-ui/zag](https://github.com/chakra-ui/zag)）：
+#### 4.2.1 ADR：直接绑定 Zag.js 1.46 状态机（避免 Ark UI 组件二次包装）
+在设计系统无头底座选型中，Harness 形成明确的**架构决策记录（ADR）**：
+* **选型结果**：`packages/primitives` **直接且原生绑定 Zag.js 1.46 有限状态机（`@zag-js/*`）**，Ark UI 仅作为退出动画钩子（`usePresence`）的辅助依赖，**彻底杜绝引入 Ark UI 解剖学组件包装层**。
+* **决策动因**：
+  1. **消除多层间接性（Zero Unnecessary Indirection）**：Ark UI 组件本身只是对 Zag.js FSM 的 React 封装。如果 Harness 再封装一层 Ark UI，会导致“业务组件 $\rightarrow$ Harness Primitive $\rightarrow$ Ark UI $\rightarrow$ Zag.js Machine”的四层深度调用链，徒增 React Tree 嵌套与渲染开销。
+  2. **绝对透明的 DOM 与无障碍控制**：直接使用 `@zag-js/combobox`、`@zag-js/dialog` 等提供的 `api.*Props` 属性展开器，可以在 Harness Primitives 中 100% 精确控制渲染的 HTML 原生标签、`data-*` 状态属性与 WAI-ARIA APG 键盘交互。
+  3. **标准原生标签优先**：Button 默认退化为纯原生 `<button>`（避免空转 Toggle 状态机），仅在 `toggle: true` 时启用 Zag Toggle 机器；Input 纯净管理 `aria-invalid` 与 `aria-describedby` 链条，保持最纯粹的 APG 语义。
+
+* **Zag.js 核心能力**（官方仓库：[chakra-ui/zag](https://github.com/chakra-ui/zag)）：
   * 基于有限状态机（Finite State Machines, FSM）与状态图（Statecharts）实现。
-  * **完全框架无关**（Framework-agnostic）：同一个状态机核心（如 `@zag-js/combobox`）通过轻量适配器同时驱动 React、Vue、Solid、Svelte。
-  * 状态机接管所有键盘事件监听、DOM 属性注入（`aria-*`、`id`、`tabindex`）和生命周期过渡，彻底免除人手编写易出错的可访问性代码。
-* **Ark UI**（官方仓库：[chakra-ui/ark](https://github.com/chakra-ui/ark)）：
-  * 基于 Zag.js 封装的无样式、符合 WAI-ARIA 标准的解剖型组件库。
-  * 组件严格遵循解剖学结构输出（例如 `Dialog.Root`, `Dialog.Trigger`, `Dialog.Backdrop`, `Dialog.Positioner`, `Dialog.Content`, `Dialog.CloseTrigger`）。
+  * **完全框架无关**（Framework-agnostic）：状态机核心接管所有键盘事件监听、DOM 属性注入（`aria-*`、`id`、`tabindex`）和生命周期过渡。
+* **Ark UI 的真实定位**（官方仓库：[chakra-ui/ark](https://github.com/chakra-ui/ark)）：
+  * Harness 仅引入其 `@ark-ui/react` 提供的 `usePresence` hook，用于处理 Dialog 模态窗口在淡出/缩放退出动画完成后的安全卸载（Unmount），不使用其任何预设 JSX 标签。
 
 ### 4.3 交付路径收敛与跨框架转译定位（v1 务实原则）
 
 * **v1 核心交付路径**：
-  * **Zag.js + Ark UI + 单一主框架（React）+ shadcn Registry 源码分发**。
+  * **原生 Zag.js 1.46 FSM + 单一主框架（React 19）+ shadcn Registry 源码分发**。
   * 交互逻辑的跨框架一致性已经由 Zag.js FSM 在底层解决，v1 集中交付最通用的主框架产物，避免在未验证真实需求前过早铺开。
 * **Mitosis 的定位调整（Exploratory / Deferred Track）**：
   * [BuilderIO/mitosis](https://github.com/BuilderIO/mitosis) 能够实现单一 JSX AST 编译多框架，但在组件核心路径上叠加 Mitosis 会引入“FSM 状态机抽象 + 模板转译抽象”的双重抽象损耗，劣化生成代码的可调试性与阅读性。
@@ -243,22 +267,20 @@ Harness 遵循 **“逻辑状态机化，表现无头化（Headless），样式�
 ### 5.1 组件接口契约（Component Prop Contract）
 
 组件自身的类型签名与元数据必须被机器完全读取与验证：
-1. **静态 AST 元数据提取**：
+1. **静态 AST 元数据提取（React Props AST SSOT）**：
    * 采用 [dsherret/ts-morph](https://github.com/dsherret/ts-morph)（TypeScript 编译器 API 包装器，v28.0.0）。
-   * 自动从组件 `.tsx` 源码中提取 Props 类型、可选性、JSDoc 描述、默认值、事件签名，生成机器可读的 `component-metadata.json`。
+   * 自动从组件 `.tsx` 源码中静态解析 AST，提取真实 React Props 类型名称、类型字面量、必填/可选状态、JSDoc 描述文本、默认值以及事件签名，生成精准的 `packages/contracts/generated/component-metadata.json`。
+   * **明确拒绝 Web Components CEM 虚假宣传**：系统诚实标记该元数据为针对 React 真实代码库的 TypeScript Props AST 架构，而非 Web Components 规范下的 Custom Elements Manifest (CEM)，彻底杜绝脱离实际架构的规范幻觉。
 2. **Component Story Format (CSF 3.0)**：
    * 规范来源：[ComponentDriven/csf](https://github.com/ComponentDriven/csf)。
    * 以 ES 模块语法标准化组件的状态用例（Default, Active, Disabled, Loading, WithError），既作为 Storybook 视觉呈现源，又作为自动化测试的 Fixture 夹具。
-3. **Custom Elements Manifest (CEM)**：
-   * 规范来源：[webcomponents/custom-elements-manifest](https://github.com/webcomponents/custom-elements-manifest)（v2.1.0）。
-   * 针对标准 Web Components 产物提供通用的 JSON 描述清单。
 
 ### 5.2 数据与服务集成契约（Data Delivery & Service API）
 
 复合组件（如带分页与筛选的高级表格 `DataTable`、异步搜索选择器 `AsyncCombobox`、文件上传组件 `FileUploader`）在交付时必须包含对应的服务端交互规范：
 1. **OpenAPI 3.1 / 3.2 契约**（来源：[OAI/OpenAPI-Specification](https://github.com/OAI/OpenAPI-Specification)）：
    * OpenAPI 3.1 完全对齐 JSON Schema 2020-12 标准。
-   * 每个复杂数据组件目录内，配套提供其数据接口的 OpenAPI 片段（例如 `DataTable.api.json`）。明确声明端点路径、Query 参数、Request Body 模式与 Response 数据结构。
+   * 每个复杂数据组件目录内，配套提供其数据接口的 OpenAPI 片段（例如 `DataTable.api.json`、`Combobox.api.json`）。明确声明端点路径、Query 参数、Request Body 模式与 Response 数据结构。
 2. **基于 `@msw/source` 单向自动生成 Mock Handler（杜绝 Mock 漂移）**：
    * 官方生态库：[`mswjs/source`](https://github.com/mswjs/source)（MSW 官方数据源生成器，提供 `fromOpenApi`）。
    * **版本与规范支持实测核验**：
@@ -266,9 +288,13 @@ Harness 遵循 **“逻辑状态机化，表现无头化（Headless），样式�
      * 因此，Harness **无需**进行 3.1 $\rightarrow$ 3.0 的降级转译，可原生直接消费 OpenAPI 3.1 契约。
    * **消除双重维护负担**：传统手工维护 `mocks/handlers.ts` 必然导致 Mock 与后端 OpenAPI 产生“Mock 漂移（Mock Drift）”。
    * **工程方案**：Harness 在运行时或轻量构建期，直接调用 `@msw/source/open-api` 从 OpenAPI 3.1 单向自动推导 MSW 3.x 网络请求处理器，禁止手工编写并维护重复的 Mock 数据逻辑。
-3. **端到端类型安全与运行时校验**：
-   * **运行时验证**：[colinhacks/zod](https://github.com/colinhacks/zod)（v4.6.7）或 [fabian-hiller/valibot](https://github.com/fabian-hiller/valibot)，确保组件在接收 API 响应与表单提交时拥有刚性类型守卫。
-   * **异步数据状态管理**：交付与 [TanStack/query](https://github.com/TanStack/query)（React Query）集成的标准 Hooks 模式。
+3. **类型安全的 TanStack Query Hooks 交付（开箱即用状态管理）**：
+   * 在 `@designharness/contracts` 中直接导出对齐 OpenAPI 契约的标准 React Query Hooks：
+     * `useDataTableQuery`: 封装当前分页（`page`, `pageSize`）、列排序列与升降序（`sortBy`, `sortOrder`）、全文模糊搜索（`q`）及分类筛选，具备规范的 Query Key 归一化序列化。
+     * `useComboboxSearchQuery`: 封装异步标的/选项实时检索，内置可配置的防抖（`debounceMs`）支持与自动重试策略。
+   * 钩子在单元测试与本地开发环境中无缝接入 `@msw/source` Mock 拦截器，在生产环境中直接命中后端 OpenAPI 服务。
+4. **端到端类型安全与运行时校验**：
+   * **运行时验证**：[colinhacks/zod](https://github.com/colinhacks/zod)（v4.6.7），确保组件在接收 API 响应与表单提交时拥有刚性类型守卫。
 
 ### 5.3 探索性能力：服务端驱动 UI（SDUI 模式储备，v1 暂不纳入核心路径）
 
@@ -404,7 +430,7 @@ Harness 遵循 **“逻辑状态机化，表现无头化（Headless），样式�
 | **Color.js** | [color-js/color.js](https://github.com/color-js/color.js) | 2.3k+ | Active | W3C CSS 规范编辑者（Lea Verou）维护的 OKLCH/色彩空间库 |
 | **APCA-W3** | [Myndex/apca-w3](https://github.com/Myndex/apca-w3) | 210+ | Active | 实验性感知对比度算法（非 W3C 现行规范，仅作诊断与优化参考） |
 | **Zag.js** | [chakra-ui/zag](https://github.com/chakra-ui/zag) | 5.2k+ | `1.46.x (stable)` | 框架无关的 UI 组件有限状态机引擎（1.46 为稳定线，2.0 处于 pre-release） |
-| **Ark UI** | [chakra-ui/ark](https://github.com/chakra-ui/ark) | 5.4k+ | `@ark-ui/vue@5.39.3` | 基于 Zag.js 的跨框架无样式解剖型组件库 |
+| **Ark UI** | [chakra-ui/ark](https://github.com/chakra-ui/ark) | 5.4k+ | `@ark-ui/react@5.39.3` | 仅在 Harness 中提供 `usePresence` 退出动画过渡钩子 |
 | **React Aria** | [adobe/react-spectrum](https://github.com/adobe/react-spectrum) | 15.9k+ | `react-aria-components@1.22.0` | Adobe 工业级可访问性交互与国际化底座 |
 | **@msw/source** | [mswjs/source](https://github.com/mswjs/source) | 220+ | `v0.7.0` | 从 OpenAPI 单向动态生成 Mock（v0.5.0 起原生支持 OpenAPI 3.1，杜绝 Mock 漂移） |
 | **OpenAPI Spec** | [OAI/OpenAPI-Specification](https://github.com/OAI/OpenAPI-Specification) | 31.2k+ | `OAS 3.2.1` | 工业界标准数据接口定义与 Schema 契约 |
@@ -435,8 +461,10 @@ design-harness/
 │   ├── tokens/                 # 编译产出的设计令牌包
 │   │   ├── schema/             # brand.config.json (用户品牌与产品输入模式)
 │   │   ├── dist/               # css, scss, js, ts, compose, swift
-│   ├── primitives/             # 基于 Zag.js / Ark UI 的无头组件实现
-│   ├── components/             # 注入了设计令牌的生产就绪组件 (React / Vue)
+│   ├── primitives/             # 基于 Zag.js 1.46 状态机的无头组件实现（无 Ark UI 组件包装）
+│   ├── ui/                     # 注入了设计令牌的生产就绪组件 (React 19)
+│   ├── contracts/              # OpenAPI 3.1、@msw/source 自动 Mock、TanStack Query Hooks 与 React Props AST
+│   ├── showcase/               # (apps/showcase) 验证展示与 a11y 门禁演练场
 │   │   ├── DataTable/
 │   │   │   ├── DataTable.tsx
 │   │   │   ├── DataTable.stories.tsx   # CSF 3.0 故事
@@ -460,12 +488,13 @@ design-harness/
    * 自动调用 `@google/design.md export --format dtcg` 导出为稳定版 `tokens.json`（DTCG 2025.10 Artifact SSOT）。
    * Style Dictionary v5 自动编译为 CSS Variables、Tailwind v4 主题配置与 TypeScript 类型。
 2. **Phase 2: 核心无头组件底座（无障碍与状态机就绪）**
-   * 基于 Zag.js / Ark UI 封装第一批无头组件（Button, Input, Combobox, Dialog），注入生成的 CSS 令牌。
-   * **单一主框架交付**：v1 聚焦于 React + Tailwind/CSS Variables 交付，建立 shadcn 兼容的 Registry 源码分发格式。
-3. **Phase 3: API 契约与同源 Mock 交付（零后端运行体系）**
-   * 为数据密集型组件（DataTable、AsyncCombobox）编写 OpenAPI 3.1 规格片段。
+   * 基于 Zag.js 1.46 状态机封装第一批无头组件（Button, Input, Combobox, Dialog），注入生成的 CSS 令牌，消除 Ark UI 组件包装间接性。
+   * **单一主框架交付**：v1 聚焦于 React 19 + Tailwind/CSS Variables 交付，建立 shadcn 兼容的 Registry 源码分发格式。
+3. **Phase 3: API 契约与同源 Mock / Query Hooks 交付（零后端运行体系）**
+   * 为数据密集型组件（DataTable、Combobox）编写 OpenAPI 3.1 规格片段。
    * **接入 `@msw/source` (`fromOpenApi`)**：单向从 OpenAPI 动态推导 MSW 3.x 网络请求处理器，禁止手工编写 Mock，彻底消除 Mock 漂移。
-   * 利用 `ts-morph` 自动提取 Props 元数据与生成 CSF 3.0 Stories。
+   * **交付开箱即用的 TanStack Query 5 Hooks**：导出 `useDataTableQuery` 与 `useComboboxSearchQuery`。
+   * 利用 `ts-morph` 自动提取真实的 React Props AST 元数据 (`component-metadata.json`) 与生成 CSF 3.0 Stories。
 4. **Phase 4: 分级验证闭环（刚性传感器门禁部署）**
    * 配置 Pre-commit 门禁（Stylelint AST 禁硬编码）、PR 门禁（`tsc` + axe-core WCAG 2.2 AA 零违规硬阻断；APCA 作为 warning 输出）。
    * 配置 Nightly/Release 门禁（Playwright 视觉快照对比 + OpenAPI 契约测试）。
