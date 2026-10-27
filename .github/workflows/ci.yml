@@ -108,8 +108,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @designharness/tokens build
-      - run: pnpm --filter @designharness/registry build
+      - run: pnpm turbo run build --filter=@designharness/registry...
       - name: Assert the registry is shadcn-consumable
         run: node -e "const i=JSON.parse(require('fs').readFileSync('packages/registry/registry/registry.json','utf8'));if(!Array.isArray(i.items)||i.items.length<5)throw new Error('registry index too small');console.log('registry items:',i.items.map(x=>x.name).join(', '))"
       - uses: actions/upload-artifact@v4

@@ -50,8 +50,12 @@ test.describe('@a11y WCAG 2.2 AA gate', () => {
 
     // The gallery deliberately mounts dialogs non-modally (a modal would aria-hide the other
     // 104 sections); the modal contract is scanned on its own route in the next test.
-    await page.locator(`#${String(combobox?.sectionId)} [data-part="trigger"]`).first().click();
-    await expect(page.locator(`#${String(combobox?.sectionId)} [data-part="content"]`)).toBeVisible();
+    const trigger = page.locator(`#${String(combobox?.sectionId)} [data-part="trigger"]`).first();
+    const content = page.locator(`#${String(combobox?.sectionId)} [data-part="content"]`);
+    if ((await trigger.getAttribute('aria-expanded')) !== 'true' || !(await content.isVisible())) {
+      await trigger.click();
+    }
+    await expect(content).toBeVisible();
 
     await scanAndAssert({
       page,

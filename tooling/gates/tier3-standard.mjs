@@ -28,12 +28,12 @@ function run(command, args, cwd) {
 
 const pnpm = (args, cwd) => run('pnpm', args, cwd);
 
-/** Node 22.11+ is a hard contract: Style Dictionary 5 and @changesets/cli@3 both require it. */
+/** Node 22.13+ is a hard contract: Style Dictionary 5, @changesets/cli@3 and pnpm graph dependencies require it. */
 export function assertNodeVersion() {
   const [major, minor] = process.versions.node.split('.').map(Number);
-  const supported = major >= 26 || major === 24 || (major === 22 && minor >= 11);
+  const supported = major >= 26 || major === 24 || (major === 22 && minor >= 13);
   if (!supported) {
-    console.error(`[tier3] BLOCKED: Node ${process.versions.node} does not satisfy the engines contract "^22.11 || ^24 || >=26".`);
+    console.error(`[tier3] BLOCKED: Node ${process.versions.node} does not satisfy the engines contract "^22.13 || ^24 || >=26".`);
     return 1;
   }
   console.log(`[tier3] Node ${process.versions.node} satisfies the engines contract.`);
