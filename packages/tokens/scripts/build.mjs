@@ -289,6 +289,9 @@ const SD_TARGETS = [
   ['dist/json/tokens.json', 'dist/json/tokens.json'],
   ['dist/recipe/index.js', 'dist/recipe/index.js'],
   ['dist/recipe/index.d.ts', 'dist/recipe/index.d.ts'],
+  ['dist/scss/_tokens.scss', 'dist/scss/_tokens.scss'],
+  ['dist/compose/Color.kt', 'dist/compose/Color.kt'],
+  ['dist/swift/ColorAsset.swift', 'dist/swift/ColorAsset.swift'],
   ['tailwind/theme.css', 'tailwind/theme.css'],
 ];
 

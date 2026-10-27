@@ -33,6 +33,9 @@ const TARGETS = [
   'dist/json/tokens.json',
   'dist/recipe/index.js',
   'dist/recipe/index.d.ts',
+  'dist/scss/_tokens.scss',
+  'dist/compose/Color.kt',
+  'dist/swift/ColorAsset.swift',
   'tailwind/theme.css',
   'src/generated/token-data.ts',
 ];

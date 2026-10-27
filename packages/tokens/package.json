@@ -20,6 +20,9 @@
     "./tokens.json": "./tokens.json",
     "./json": "./dist/json/tokens.json",
     "./recipe": "./dist/recipe/index.js",
+    "./scss": "./dist/scss/_tokens.scss",
+    "./compose": "./dist/compose/Color.kt",
+    "./swift": "./dist/swift/ColorAsset.swift",
     "./package.json": "./package.json"
   },
   "files": [

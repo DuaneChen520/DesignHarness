@@ -12,6 +12,9 @@ let indexCss = '';
 let darkCss = '';
 let tailwindCss = '';
 let recipeJs = '';
+let tokensScss = '';
+let composeColorKt = '';
+let swiftColorAsset = '';
 
 beforeAll(async () => {
   dir = await mkdtemp(join(tmpdir(), 'engine-sd-'));
@@ -21,6 +24,9 @@ beforeAll(async () => {
   darkCss = await readFile(join(dir, 'dist/css/dark.css'), 'utf8');
   tailwindCss = await readFile(join(dir, 'tailwind/theme.css'), 'utf8');
   recipeJs = await readFile(join(dir, 'dist/recipe/index.js'), 'utf8');
+  tokensScss = await readFile(join(dir, 'dist/scss/_tokens.scss'), 'utf8');
+  composeColorKt = await readFile(join(dir, 'dist/compose/Color.kt'), 'utf8');
+  swiftColorAsset = await readFile(join(dir, 'dist/swift/ColorAsset.swift'), 'utf8');
 });
 
 afterAll(async () => {
@@ -84,5 +90,28 @@ describe('Style Dictionary output', () => {
     expect(recipeJs).toContain('export const modes =');
     expect(recipeJs).toContain('export const semanticRoles =');
     expect(recipeJs).toContain('"color-text-primary"');
+  });
+
+  it('emits SCSS platform variables and structured $tokens map', () => {
+    expect(tokensScss).toContain('$color-primary:');
+    expect(tokensScss).toContain('$color-canvas:');
+    expect(tokensScss).toContain('$tokens: (');
+    expect(tokensScss).toContain('"color-primary": $color-primary');
+    expect(tokensScss).toContain('"space-md": $space-md');
+  });
+
+  it('emits Kotlin Compose Color singleton object', () => {
+    expect(composeColorKt).toContain('package com.designharness.tokens');
+    expect(composeColorKt).toContain('import androidx.compose.ui.graphics.Color');
+    expect(composeColorKt).toContain('object Color {');
+    expect(composeColorKt).toContain('val Primary = Color(0xFF1A5FD0)');
+    expect(composeColorKt).toContain('val PrimitiveCanvas = Color(');
+  });
+
+  it('emits SwiftUI.Color extension with static properties', () => {
+    expect(swiftColorAsset).toContain('import SwiftUI');
+    expect(swiftColorAsset).toContain('public extension Color {');
+    expect(swiftColorAsset).toContain('static let primary = Color(');
+    expect(swiftColorAsset).toContain('static let primitiveCanvas = Color(');
   });
 });

@@ -11,11 +11,14 @@ import type { DesignTokens, Format, TransformedToken } from 'style-dictionary/ty
 import { computeSets, type ResolvedSets } from './sets.js';
 import { publicName } from './values.js';
 import {
+  renderComposeColor,
   renderCssIndex,
   renderCssMode,
   renderFlatJson,
   renderRecipe,
   renderRecipeTypes,
+  renderScssTokens,
+  renderSwiftColorAsset,
   renderTailwindTheme,
 } from './formats.js';
 import type { Mode } from './values.js';
@@ -55,6 +58,21 @@ const recipeTypesFormat: Format = {
   format: ({ dictionary }) => renderRecipeTypes(setsFrom(dictionary.allTokens)),
 };
 
+const scssFormat: Format = {
+  name: 'harness/scss',
+  format: ({ dictionary }) => renderScssTokens(setsFrom(dictionary.allTokens)),
+};
+
+const composeFormat: Format = {
+  name: 'harness/compose',
+  format: ({ dictionary }) => renderComposeColor(setsFrom(dictionary.allTokens)),
+};
+
+const swiftFormat: Format = {
+  name: 'harness/swift',
+  format: ({ dictionary }) => renderSwiftColorAsset(setsFrom(dictionary.allTokens)),
+};
+
 /** The `harness/name` transform: public (tier/mode-stripped) CSS variable name. */
 const harnessNameTransform = {
   name: 'harness/name',
@@ -90,6 +108,9 @@ export async function runStyleDictionary(artifact: JsonObject, dirs: StyleDictio
         'harness/json-flat': jsonFlatFormat.format,
         'harness/recipe': recipeFormat.format,
         'harness/recipe-types': recipeTypesFormat.format,
+        'harness/scss': scssFormat.format,
+        'harness/compose': composeFormat.format,
+        'harness/swift': swiftFormat.format,
       },
     },
     platforms: {
@@ -126,6 +147,24 @@ export async function runStyleDictionary(artifact: JsonObject, dirs: StyleDictio
           { destination: 'index.js', format: 'harness/recipe' },
           { destination: 'index.d.ts', format: 'harness/recipe-types' },
         ],
+      },
+      scss: {
+        transformGroup: 'scss',
+        transforms: ['harness/name'],
+        buildPath: `${tokensDir}/dist/scss/`,
+        files: [{ destination: '_tokens.scss', format: 'harness/scss' }],
+      },
+      compose: {
+        transformGroup: 'js',
+        transforms: ['harness/name'],
+        buildPath: `${tokensDir}/dist/compose/`,
+        files: [{ destination: 'Color.kt', format: 'harness/compose' }],
+      },
+      swift: {
+        transformGroup: 'js',
+        transforms: ['harness/name'],
+        buildPath: `${tokensDir}/dist/swift/`,
+        files: [{ destination: 'ColorAsset.swift', format: 'harness/swift' }],
       },
     },
   });
