@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@designharness/contracts": "workspace:*",
+    "@designharness/engine": "workspace:*",
     "@designharness/tokens": "workspace:*",
     "@designharness/ui": "workspace:*",
     "react": "catalog:",

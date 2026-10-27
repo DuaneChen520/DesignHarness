@@ -32,17 +32,28 @@ export interface MockWorkerOptions {
   readonly logger?: ContractLogger;
   /** Forwarded to `worker.start`. Defaults to bypassing unhandled requests. */
   readonly start?: StartOptions;
+  /**
+   * Origin the mock should bind to. When omitted, defaults to `window.location.origin`
+   * in browser contexts so the mock matches the actual serving port.
+   */
+  readonly origin?: string;
 }
 
 /** Generate the handlers and wrap them in an MSW worker, without starting it. */
-export async function createMockWorker(documents: readonly JsonObject[], logger?: ContractLogger): Promise<SetupWorker> {
-  const handlers = await createMockHandlers({ documents, logger });
+export async function createMockWorker(
+  documents: readonly JsonObject[],
+  logger?: ContractLogger,
+  origin?: string,
+): Promise<SetupWorker> {
+  const runtimeOrigin =
+    origin ?? (typeof window !== 'undefined' && window.location?.origin ? window.location.origin : undefined);
+  const handlers = await createMockHandlers({ documents, logger, origin: runtimeOrigin });
   return setupWorker(...handlers);
 }
 
 /** Generate, wrap and start the worker in one call. */
 export async function startMockWorker(options: MockWorkerOptions): Promise<SetupWorker> {
-  const worker = await createMockWorker(options.documents, options.logger);
+  const worker = await createMockWorker(options.documents, options.logger, options.origin);
   await worker.start({ onUnhandledFrame: 'bypass', ...options.start });
   return worker;
 }

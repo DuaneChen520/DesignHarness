@@ -13,10 +13,18 @@ import { InteractionView } from './views/InteractionView.js';
 import { TOKEN_MODES, type TokenMode } from './story-registry.js';
 import { Gallery } from './views/Gallery.js';
 import { PositionsView } from './views/PositionsView.js';
+import { DashboardView } from './views/DashboardView.js';
 
-export const ROUTES = { gallery: '/', dataTable: '/data-table', story: '/story', interaction: '/interaction' } as const;
+export const ROUTES = {
+  dashboard: '/dashboard',
+  gallery: '/',
+  dataTable: '/data-table',
+  story: '/story',
+  interaction: '/interaction',
+} as const;
 
 const TITLES: Record<keyof typeof ROUTES, string> = {
+  dashboard: 'Engineering Cockpit',
   gallery: 'Component gallery',
   dataTable: 'Data table (contract mock)',
   story: 'Isolated story',
@@ -25,6 +33,7 @@ const TITLES: Record<keyof typeof ROUTES, string> = {
 
 /** The nav hrefs; the isolated route needs its story selector in the query. */
 const HREFS: Record<keyof typeof ROUTES, string> = {
+  dashboard: ROUTES.dashboard,
   gallery: ROUTES.gallery,
   dataTable: ROUTES.dataTable,
   story: `${ROUTES.story}?story=ui-dialog--open`,
@@ -33,6 +42,9 @@ const HREFS: Record<keyof typeof ROUTES, string> = {
 
 function routeOf(pathname: string): keyof typeof ROUTES {
   const trimmed = pathname.replace(/\/+$/, '');
+  if (trimmed === ROUTES.dashboard) {
+    return 'dashboard';
+  }
   if (trimmed === ROUTES.dataTable) {
     return 'dataTable';
   }
@@ -117,7 +129,9 @@ export function App(): ReactNode {
       </header>
 
       <main className="showcase__main">
-        {route === 'dataTable' ? (
+        {route === 'dashboard' ? (
+          <DashboardView />
+        ) : route === 'dataTable' ? (
           <PositionsView />
         ) : route === 'story' ? (
           <IsolatedStoryView />

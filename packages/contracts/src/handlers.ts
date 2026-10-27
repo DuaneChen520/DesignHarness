@@ -46,6 +46,12 @@ export interface MockHandlerOptions {
    * wants the untouched `fromOpenApi` output switches it off to compare the two.
    */
   readonly behaviour?: boolean;
+  /**
+   * Runtime origin the mock binds to (e.g. `http://localhost:8788`).
+   * When provided, documents are dynamically adapted so `@msw/source` and the
+   * harness models match requests from this origin rather than the authored static default.
+   */
+  readonly origin?: string;
 }
 
 /** Raw `fromOpenApi` output for the given documents, with no harness layering. */
@@ -71,12 +77,25 @@ export async function loadContractModels(documents?: readonly JsonObject[]): Pro
   return source.map((document) => analyzeContract(document));
 }
 
+function adaptDocumentsForOrigin(documents: readonly JsonObject[], origin?: string): readonly JsonObject[] {
+  if (!origin) {
+    return documents;
+  }
+  const cleanOrigin = origin.replace(/\/+$/, '');
+  return documents.map((doc) => {
+    const clone = structuredClone(doc) as JsonObject;
+    clone['servers'] = [{ url: cleanOrigin, description: 'Runtime host' }];
+    return clone;
+  });
+}
+
 /**
  * Generate the MSW handlers for the harness contracts. This is the whole mock:
  * hand this list to `msw/node`'s `setupServer` or `msw/browser`'s `setupWorker`.
  */
 export async function createMockHandlers(options: MockHandlerOptions = {}): Promise<RequestHandler[]> {
-  const documents = options.documents ?? (await loadDefaultDocuments());
+  const rawDocuments = options.documents ?? (await loadDefaultDocuments());
+  const documents = adaptDocumentsForOrigin(rawDocuments, options.origin);
   const models = documents.map((document) => analyzeContract(document));
   const generated = await generateHandlers(documents);
   const applyBehaviour = options.behaviour ?? true;

@@ -49,11 +49,61 @@ export interface GateOptions {
 export interface DoctorOptions {
   readonly json: boolean;
 }
+export interface GuiOptions {
+  readonly port?: string;
+  readonly force?: boolean;
+}
 
 /** Spawn a child and inherit stdio; returns its exit code. */
-function forward(command: string, args: readonly string[], cwd = workspaceRoot): number {
-  const result = spawnSync(command, [...args], { cwd, stdio: 'inherit', shell: IS_WINDOWS });
+function forward(
+  command: string,
+  args: readonly string[],
+  cwd = workspaceRoot,
+  env: NodeJS.ProcessEnv = process.env,
+): number {
+  if (IS_WINDOWS) {
+    if (command === 'pnpm') {
+      const result = spawnSync('cmd.exe', ['/d', '/s', '/c', 'pnpm', ...args], { cwd, stdio: 'inherit', env });
+      return result.status ?? 1;
+    }
+    const result = spawnSync(command, [...args], { cwd, stdio: 'inherit', env });
+    return result.status ?? 1;
+  }
+  const result = spawnSync(command, [...args], { cwd, stdio: 'inherit', env });
   return result.status ?? 1;
+}
+
+function killProcessOnPort(port: number): void {
+  try {
+    if (IS_WINDOWS) {
+      const output = spawnSync('cmd.exe', ['/d', '/s', '/c', `netstat -ano -p tcp | findstr :${port}`], { encoding: 'utf8' }).stdout ?? '';
+      const lines = output.trim().split(/\r?\n/);
+      const pids = new Set<string>();
+      for (const line of lines) {
+        const parts = line.trim().split(/\s+/);
+        const localAddr = parts[1] ?? '';
+        if (localAddr.endsWith(`:${port}`)) {
+          const pid = parts[parts.length - 1];
+          if (pid && /^\d+$/.test(pid) && pid !== '0' && pid !== String(process.pid)) {
+            pids.add(pid);
+          }
+        }
+      }
+      for (const pid of pids) {
+        console.log(`designharness: terminating process ${pid} occupying port ${port} ...`);
+        spawnSync('taskkill', ['/F', '/PID', pid], { stdio: 'ignore' });
+      }
+    } else {
+      const output = spawnSync('lsof', ['-ti', `tcp:${port}`], { encoding: 'utf8' }).stdout ?? '';
+      const pids = output.trim().split(/\s+/).filter((pid) => pid && pid !== String(process.pid));
+      for (const pid of pids) {
+        console.log(`designharness: terminating process ${pid} occupying port ${port} ...`);
+        spawnSync('kill', ['-9', pid], { stdio: 'ignore' });
+      }
+    }
+  } catch {
+    // Best-effort cleanup
+  }
 }
 
 function rel(path: string): string {
@@ -253,7 +303,24 @@ export async function runGates(options: GateOptions): Promise<void> {
   process.exitCode = forward(process.execPath, [script]);
 }
 
-export async function startGui(): Promise<void> {
-  console.log('designharness: starting Web GUI (Showcase & Component Studio) at http://localhost:8787 ...');
-  process.exitCode = forward('pnpm', ['--filter', '@designharness/showcase', 'dev']);
+export async function startGui(options: GuiOptions = {}): Promise<void> {
+  const port = options.port ? parseInt(options.port, 10) : 8787;
+  if (isNaN(port) || port <= 0 || port > 65535) {
+    console.error(`designharness: invalid port "${String(options.port)}" (must be 1-65535)`);
+    process.exitCode = 2;
+    return;
+  }
+
+  if (options.force) {
+    killProcessOnPort(port);
+  }
+
+  console.log(`designharness: starting Web GUI (Showcase & Component Studio) at http://localhost:${port} ...`);
+  const env = { ...process.env, PORT: String(port) };
+  process.exitCode = forward(
+    'pnpm',
+    ['--filter', '@designharness/showcase', 'dev', '--', '--port', String(port)],
+    workspaceRoot,
+    env,
+  );
 }

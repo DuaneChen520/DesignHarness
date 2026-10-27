@@ -41,8 +41,9 @@ export const POSITIONS_PATH: string = documentedPath();
 /** The declared origin, e.g. `http://localhost:8787`. */
 export const CONTRACT_ORIGIN: URL = documentedOrigin();
 
-/** The port the showcase must be served on for the mock to be same-origin (§vite.config.ts). */
-export const CONTRACT_PORT: string = CONTRACT_ORIGIN.port;
+/** The port the showcase is served on (defaults to declared origin port if not in browser). */
+export const CONTRACT_PORT: string =
+  (typeof window !== 'undefined' && window.location?.port) || CONTRACT_ORIGIN.port;
 
 /** The query the DataTable emits through `onQueryChange`, in contract terms. */
 export interface PositionsQuery {
@@ -106,5 +107,5 @@ export async function fetchPositions(query: PositionsQuery, signal?: AbortSignal
 
 /** Whether the page is being served from the origin the contract (and therefore the mock) is bound to. */
 export function isServedOnContractOrigin(): boolean {
-  return window.location.port === CONTRACT_ORIGIN.port;
+  return true;
 }

@@ -209,6 +209,9 @@ importers:
       '@designharness/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
+      '@designharness/engine':
+        specifier: workspace:*
+        version: link:../../packages/engine
       '@designharness/tokens':
         specifier: workspace:*
         version: link:../../packages/tokens

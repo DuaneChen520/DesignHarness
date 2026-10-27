@@ -31,9 +31,13 @@ describe('command surface', () => {
   it('prints the full command tree', () => {
     const help = cli('--help');
     expect(help.status).toBe(0);
-    for (const command of ['tokens', 'metadata', 'registry', 'mcp', 'doctor', 'gates']) {
+    for (const command of ['tokens', 'metadata', 'registry', 'mcp', 'doctor', 'gates', 'gui']) {
       expect(help.stdout).toContain(command);
     }
+    const gui = cli('gui', '--help');
+    expect(gui.status).toBe(0);
+    expect(gui.stdout).toContain('--port');
+    expect(gui.stdout).toContain('--force');
     const tokens = cli('tokens', '--help');
     expect(tokens.status).toBe(0);
     for (const sub of ['build', 'lint', 'diff', 'audit-contrast']) {

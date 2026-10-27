@@ -88,8 +88,10 @@ export function buildProgram(): Command {
   program
     .command('gui')
     .alias('studio')
-    .description('Start the local Web GUI (Showcase & Component Studio) at http://localhost:8787.')
-    .action(async () => startGui());
+    .description('Start the local Web GUI (Showcase & Component Studio).')
+    .option('-p, --port <number>', 'port to listen on (default: 8787)')
+    .option('-f, --force', 'terminate any process currently occupying the port before starting')
+    .action(async (options: { port?: string; force?: boolean }) => startGui(options));
 
   return program;
 }
