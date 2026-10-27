@@ -9,3 +9,5 @@ packages/tokens/reports/
 .eslintcache
 .stylelintcache
 .DS_Store
+.scratch/
+specs/
