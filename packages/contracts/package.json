@@ -46,20 +46,35 @@
     "@designharness/ui": "workspace:*",
     "@msw/source": "catalog:",
     "msw": "catalog:",
-    "zod": "catalog:",
-    "openapi-types": "catalog:"
+    "openapi-types": "catalog:",
+    "zod": "catalog:"
+  },
+  "peerDependencies": {
+    "@tanstack/react-query": "^5.0.0",
+    "react": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
   },
   "devDependencies": {
-    "vitest": "catalog:",
-    "@types/node": "catalog:",
-    "typescript": "catalog:",
-    "openapi-types": "catalog:",
-    "jsdom": "catalog:",
-    "eslint": "catalog:",
     "@eslint/js": "catalog:",
-    "typescript-eslint": "catalog:",
+    "@tanstack/react-query": "^5.67.3",
+    "@testing-library/react": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "eslint": "catalog:",
     "eslint-plugin-jsx-a11y": "catalog:",
     "eslint-plugin-react-hooks": "catalog:",
-    "globals": "catalog:"
+    "globals": "catalog:",
+    "jsdom": "catalog:",
+    "openapi-types": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "typescript": "catalog:",
+    "typescript-eslint": "catalog:",
+    "vitest": "catalog:"
   }
 }

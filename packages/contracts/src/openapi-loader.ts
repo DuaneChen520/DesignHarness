@@ -8,12 +8,10 @@
  * `@designharness/contracts/openapi/*` themselves.
  */
 import { readFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import type { JsonObject } from './openapi-document.js';
-
-/** Every location the contracts can live in, from `src/`, `dist/` and a pack. */
-const CONTRACT_LOCATIONS: readonly URL[] = [new URL('../openapi/', import.meta.url), new URL('./openapi/', import.meta.url)];
 
 export interface LoadedDocument {
   readonly fileName: string;
@@ -24,16 +22,41 @@ export interface LoadedDocument {
 /** Resolve one authored contract file to an absolute path. */
 export function resolveContractPath(fileName: string): string {
   const tried: string[] = [];
-  for (const location of CONTRACT_LOCATIONS) {
-    const candidate = fileURLToPath(new URL(fileName, location));
+  
+  // Try relative to import.meta.url
+  if (typeof import.meta.url === 'string' && import.meta.url.startsWith('file:')) {
+    const currentDir = dirname(fileURLToPath(import.meta.url));
+    const locations = [
+      resolve(currentDir, '..', 'openapi', fileName),
+      resolve(currentDir, 'openapi', fileName),
+    ];
+    for (const candidate of locations) {
+      tried.push(candidate);
+      try {
+        readFileSync(candidate, 'utf8');
+        return candidate;
+      } catch {
+        // try next
+      }
+    }
+  }
+
+  // Fallback checking process.cwd() or known repo locations
+  const cwdCandidates = [
+    resolve(process.cwd(), 'openapi', fileName),
+    resolve(process.cwd(), 'packages', 'contracts', 'openapi', fileName),
+    resolve(process.cwd(), '..', 'openapi', fileName),
+  ];
+  for (const candidate of cwdCandidates) {
     tried.push(candidate);
     try {
       readFileSync(candidate, 'utf8');
       return candidate;
     } catch {
-      // try the next location
+      // try next
     }
   }
+
   throw new Error(`contracts: "${fileName}" was not found. Looked in:\n${tried.map((path) => `  - ${path}`).join('\n')}`);
 }
 
