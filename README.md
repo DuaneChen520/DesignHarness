@@ -43,7 +43,7 @@ DESIGN.md (Intent SSOT)
 ### Quick Start
 
 ```bash
-# Requirements: Node.js ^22.11 || ^24, pnpm 9.15.9
+# Requirements: Node.js ^22.13 || ^24, pnpm 9.15.9
 pnpm install
 pnpm build          # Turbo build across all 10 packages
 pnpm test           # Run unit & integration test suites

@@ -70,7 +70,7 @@ describe('doctor', () => {
       artifacts: Array<{ name: string; path: string; exists: boolean }>;
     };
     expect(report.node).toBe(process.versions.node);
-    expect(report.enginesContract).toBe('^22.11 || ^24 || >=26');
+    expect(report.enginesContract).toBe('^22.13 || ^24 || >=26');
     expect(report.nodeCompatible).toBe(true);
     expect(report.packages).toEqual(['engine', 'tokens', 'primitives', 'ui', 'contracts', 'registry', 'mcp-server', 'cli']);
     const names = report.artifacts.map((artifact) => artifact.name);

@@ -6,7 +6,7 @@
   "description": "Design System Harness — token-driven, headless, contract-verified design system engineering base.",
   "packageManager": "pnpm@9.15.9",
   "engines": {
-    "node": "^22.11 || ^24 || >=26"
+    "node": "^22.13 || ^24 || >=26"
   },
   "scripts": {
     "build": "turbo run build",

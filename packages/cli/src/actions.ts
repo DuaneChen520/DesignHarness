@@ -245,7 +245,7 @@ export function doctorReport(options: DoctorOptions): void {
   const rootManifest = JSON.parse(readFileSync(join(workspaceRoot, 'package.json'), 'utf8')) as { engines?: Record<string, string> };
   const major = Number(process.versions.node.split('.')[0] ?? '0');
   const minor = Number(process.versions.node.split('.')[1] ?? '0');
-  const nodeOk = major >= 26 || (major === 24 && minor >= 11) || (major === 22 && minor >= 11);
+  const nodeOk = major >= 26 || (major === 24 && minor >= 11) || (major === 22 && minor >= 13);
 
   const artifacts = [
     ['Intent SSOT', 'DESIGN.md'],

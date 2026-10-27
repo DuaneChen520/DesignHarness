@@ -19,7 +19,7 @@ permissions:
 
 env:
   TURBO_TEAM: design-harness
-  NODE_VERSION: '22.11.0'
+  NODE_VERSION: '22.x'
 
 jobs:
   # Tier 1 + Tier 2 — the fast gates: AST sensors and the intent/drift audit.

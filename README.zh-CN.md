@@ -43,7 +43,7 @@ DESIGN.md (设计意图单一信源)
 ### 快速开始
 
 ```bash
-# 环境要求：Node.js ^22.11 || ^24, pnpm 9.15.9
+# 环境要求：Node.js ^22.13 || ^24, pnpm 9.15.9
 pnpm install
 pnpm build          # Turbo 全量构建
 pnpm test           # 运行全工作区单元与集成测试
