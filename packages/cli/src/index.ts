@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /**
  * `designharness` — the unified CLI (RESEARCH.md §10, objective item 6).
  *

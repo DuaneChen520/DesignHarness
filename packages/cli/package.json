@@ -6,6 +6,7 @@
   "private": true,
   "type": "module",
   "bin": {
+    "dh": "dist/index.js",
     "designharness": "dist/index.js"
   },
   "exports": {

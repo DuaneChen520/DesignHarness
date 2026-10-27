@@ -20,9 +20,11 @@
     "gate:tier4": "node tooling/gates/tier4-release.mjs",
     "verify": "node tooling/gates/verify-all.mjs",
     "tokens": "pnpm --filter @designharness/tokens build",
+    "dh": "node packages/cli/dist/index.js",
     "designharness": "node packages/cli/dist/index.js"
   },
   "devDependencies": {
+    "designharness": "workspace:*",
     "@changesets/cli": "catalog:",
     "@designharness/stylelint-plugin": "workspace:*",
     "@eslint/js": "catalog:",
