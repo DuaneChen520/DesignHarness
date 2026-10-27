@@ -95,6 +95,17 @@ describe('Button composition', () => {
     expect(resting?.textContent).toBe('Save');
   });
 
+  it('supports toggle mode explicitly on the styled Button', async () => {
+    const { container } = render(<Button toggle>Pin</Button>);
+    const button = container.querySelector('button');
+    expect(button?.getAttribute('aria-pressed')).toBe('false');
+    expect(button?.getAttribute('data-state')).toBe('off');
+
+    await userEvent.click(button as HTMLButtonElement);
+    expect(button?.getAttribute('aria-pressed')).toBe('true');
+    expect(button?.getAttribute('data-state')).toBe('on');
+  });
+
   it('keeps the label mounted while loading so the width cannot jump', () => {
     const { container } = render(<Button loading>Submitting order</Button>);
     const label = container.querySelector('.dh-button__label');
@@ -132,6 +143,24 @@ describe('Input composition', () => {
     expect(input.getAttribute('aria-labelledby')).toBeNull();
     expect(root.getAttribute('aria-invalid')).toBeNull();
     expect(input.getAttribute('aria-invalid')).toBeNull();
+  });
+
+  it('manages disabled, readOnly, and invalid props on the styled Input', () => {
+    const { container, rerender } = render(<Input label="Status" disabled readOnly />);
+    const input = container.querySelector('input') as HTMLInputElement;
+    const root = container.querySelector('[data-part="root"]') as HTMLElement;
+
+    expect(input.disabled).toBe(true);
+    expect(input.readOnly).toBe(true);
+    expect(input.getAttribute('data-disabled')).toBe('');
+    expect(input.getAttribute('data-readonly')).toBe('');
+    expect(root.getAttribute('data-disabled')).toBe('');
+    expect(root.getAttribute('data-readonly')).toBe('');
+
+    rerender(<Input label="Status" invalid />);
+    expect(input.getAttribute('aria-invalid')).toBe('true');
+    expect(input.getAttribute('data-invalid')).toBe('');
+    expect(root.getAttribute('data-invalid')).toBe('');
   });
 });
 

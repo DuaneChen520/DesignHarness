@@ -26,7 +26,7 @@ export interface InputBehaviorProps {
   disabled?: boolean | undefined;
   /** Marks the control as required (`aria-required` + native `required`). */
   required?: boolean | undefined;
-  /** Makes the control read-only. */
+  /** Makes the control read-only (`data-readonly` + native `readOnly`). */
   readOnly?: boolean | undefined;
   /**
    * Forces the invalid state. Defaults to `true` whenever an `Input.ErrorText` is
@@ -182,14 +182,20 @@ export type InputInputProps = Omit<
   ComponentPropsWithRef<'input'>,
   'value' | 'defaultValue' | 'id' | 'disabled' | 'readOnly' | 'required' | 'name'
 > &
-  Pick<InputBehaviorProps, 'disabled' | 'readOnly' | 'required' | 'name'>;
+  Pick<InputBehaviorProps, 'disabled' | 'readOnly' | 'required' | 'name' | 'invalid'>;
 
 /** The `<input>` control: owns `aria-invalid`, `aria-required` and `aria-describedby`. */
 export const InputInput = forwardRef<HTMLInputElement, InputInputProps>(function InputInput(props, ref) {
-  const { 'aria-describedby': describedByProp, onFocus, onBlur, onChange, ...domProps } = props;
+  const { 'aria-describedby': describedByProp, onFocus, onBlur, onChange, disabled: disabledProp, readOnly: readOnlyProp, required: requiredProp, invalid: invalidProp, name: nameProp, ...domProps } = props;
   const context = useInputContext();
   const describedBy = useRegistrySnapshot(context.registry, DESCRIBED_BY_SLOTS);
-  const { ids, invalid, required, disabled, readOnly, value } = context;
+  const { ids, required: contextRequired, value } = context;
+
+  const disabled = disabledProp ?? context.disabled;
+  const readOnly = readOnlyProp ?? context.readOnly;
+  const required = requiredProp ?? contextRequired;
+  const invalid = invalidProp ?? context.invalid;
+  const name = nameProp ?? context.name;
 
   return (
     <input
@@ -198,10 +204,10 @@ export const InputInput = forwardRef<HTMLInputElement, InputInputProps>(function
       id={ids.input}
       {...inputAnatomy.input.attrs}
       value={value}
-      name={props.name ?? context.name}
-      disabled={props.disabled ?? disabled}
-      readOnly={props.readOnly ?? readOnly}
-      required={props.required ?? required}
+      name={name}
+      disabled={disabled}
+      readOnly={readOnly}
+      required={required}
       aria-required={ariaAttr(required)}
       aria-invalid={ariaAttr(invalid)}
       aria-describedby={joinIds(describedBy, describedByProp)}

@@ -1,4 +1,4 @@
-import type { ComponentPropsWithRef, HTMLAttributes, KeyboardEvent, MouseEvent, ReactNode } from 'react';
+import type { ComponentPropsWithRef, ForwardedRef, KeyboardEvent, MouseEvent, ReactNode } from 'react';
 import { connect, machine } from '@zag-js/toggle';
 import { normalizeProps, useMachine } from '@zag-js/react';
 import { forwardRef } from 'react';
@@ -6,7 +6,6 @@ import { buttonAnatomy } from './internal/anatomy.js';
 import { ariaAttr, assertContract, dataAttr, splitProps } from './internal/props.js';
 
 type ButtonElementProps = Omit<ComponentPropsWithRef<'button'>, 'type'>;
-type MachineElementProps = Omit<HTMLAttributes<HTMLElement>, 'children'>;
 
 /** Props that steer button behaviour, independent of the native `button` attributes. */
 export interface ButtonBehaviorProps {
@@ -57,33 +56,29 @@ const BEHAVIOR_KEYS = [
   'iconOnly',
 ] as const;
 
-/** The frozen anatomy for `button` is `root` only, so the scope is re-labelled from Zag's `toggle`. */
 const ROOT_ATTRS = buttonAnatomy.root.attrs;
-const IDLE_PROPS: MachineElementProps = {};
+
+interface ToggleButtonProps {
+  behavior: ButtonBehaviorProps;
+  domProps: Omit<ComponentPropsWithRef<'button'>, 'type'>;
+  buttonRef: ForwardedRef<HTMLButtonElement>;
+  blocked: boolean;
+  loading: boolean;
+  iconOnly: boolean;
+}
 
 /**
- * Headless button. It renders a real `<button>` element so that `Space`/`Enter` keep
- * their native activation semantics, and layers the contract attributes on top:
- *
- * - `toggle` runs the `@zag-js/toggle` machine, which owns `aria-pressed` and `data-state`.
- * - `loading` sets `aria-busy`, disables the control and swallows activation, so neither
- *   a consumer `onClick` nor the machine can fire.
- * - `disabled`/`loading` also emit `aria-disabled` — the state is never signalled by
- *   colour alone; the styled layer reads these attributes.
- *
- * Emits `data-scope="button"` + `data-part="root"` and no styling of any kind.
+ * Inner component used exclusively when toggle mode is activated.
+ * Mounts Zag.js toggle machine and binds `aria-pressed` + `data-state` ("on" | "off").
  */
-export const ButtonRoot = forwardRef<HTMLButtonElement, ButtonRootProps>(function ButtonRoot(inProps, ref) {
-  const [behavior, domProps] = splitProps(inProps, BEHAVIOR_KEYS);
-  const { type = 'button', loading = false, toggle = false, iconOnly = false } = behavior;
-  const disabled = inProps.disabled === true;
-  const blocked = disabled || loading;
-
-  assertContract(
-    !iconOnly || inProps['aria-label'] != null || inProps['aria-labelledby'] != null,
-    'Button: icon-only buttons require an accessible name via "aria-label" or "aria-labelledby".',
-  );
-
+function ToggleButtonInner({
+  behavior,
+  domProps,
+  buttonRef,
+  blocked,
+  loading,
+  iconOnly,
+}: ToggleButtonProps) {
   const service = useMachine(machine, {
     disabled: blocked,
     pressed: behavior.pressed,
@@ -91,14 +86,13 @@ export const ButtonRoot = forwardRef<HTMLButtonElement, ButtonRootProps>(functio
     onPressedChange: behavior.onPressedChange,
   });
   const api = connect(service, normalizeProps);
+  const machineProps = api.getRootProps();
 
+  const { type = 'button' } = behavior;
   const { children, onClick, onKeyDown, ...restDomProps } = domProps;
-  const machineProps: MachineElementProps = toggle ? api.getRootProps() : IDLE_PROPS;
 
   const handleClick = (event: MouseEvent<HTMLButtonElement>): void => {
     if (blocked) {
-      // A blocked button never activates: neither the consumer handler nor the
-      // machine sees the event.
       event.preventDefault();
       return;
     }
@@ -112,11 +106,91 @@ export const ButtonRoot = forwardRef<HTMLButtonElement, ButtonRootProps>(functio
       return;
     }
     onKeyDown?.(event);
+    machineProps.onKeyDown?.(event);
   };
 
   return (
     <button
       {...machineProps}
+      {...restDomProps}
+      {...ROOT_ATTRS}
+      ref={buttonRef}
+      type={type}
+      disabled={blocked}
+      aria-disabled={ariaAttr(blocked)}
+      aria-busy={ariaAttr(loading)}
+      data-disabled={dataAttr(blocked)}
+      data-loading={dataAttr(loading)}
+      data-icon-only={dataAttr(iconOnly)}
+      onClick={handleClick}
+      onKeyDown={handleKeyDown}
+    >
+      {children as ReactNode}
+    </button>
+  );
+}
+
+/**
+ * Headless button. It renders a real `<button>` element so that `Space`/`Enter` keep
+ * their native activation semantics, and layers the contract attributes on top:
+ *
+ * - By default, behaves as a standard HTML `<button>` action button without internal
+ *   toggle state machine side-effects (does not instantiate or bind `@zag-js/toggle`).
+ * - When toggle mode is enabled (`toggle?: boolean` or `pressed !== undefined`), conditionally
+ *   activates Zag.js toggle machine binding `aria-pressed` and `data-state` ("on" | "off").
+ * - `loading` sets `aria-busy`, disables the control and swallows activation, so neither
+ *   a consumer `onClick` nor the machine can fire.
+ * - `disabled`/`loading` also emit `aria-disabled` — the state is never signalled by
+ *   colour alone; the styled layer reads these attributes.
+ *
+ * Emits `data-scope="button"` + `data-part="root"` and no styling of any kind.
+ */
+export const ButtonRoot = forwardRef<HTMLButtonElement, ButtonRootProps>(function ButtonRoot(inProps, ref) {
+  const [behavior, domProps] = splitProps(inProps, BEHAVIOR_KEYS);
+  const { type = 'button', loading = false, toggle = false, iconOnly = false, pressed, defaultPressed, onPressedChange } = behavior;
+  const disabled = inProps.disabled === true;
+  const blocked = disabled || loading;
+
+  assertContract(
+    !iconOnly || inProps['aria-label'] != null || inProps['aria-labelledby'] != null,
+    'Button: icon-only buttons require an accessible name via "aria-label" or "aria-labelledby".',
+  );
+
+  const isToggle = toggle === true || pressed !== undefined || defaultPressed !== undefined || onPressedChange !== undefined;
+
+  if (isToggle) {
+    return (
+      <ToggleButtonInner
+        behavior={behavior}
+        domProps={domProps}
+        buttonRef={ref}
+        blocked={blocked}
+        loading={loading}
+        iconOnly={iconOnly}
+      />
+    );
+  }
+
+  const { children, onClick, onKeyDown, ...restDomProps } = domProps;
+
+  const handleClick = (event: MouseEvent<HTMLButtonElement>): void => {
+    if (blocked) {
+      event.preventDefault();
+      return;
+    }
+    onClick?.(event);
+  };
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLButtonElement>): void => {
+    if (blocked) {
+      event.preventDefault();
+      return;
+    }
+    onKeyDown?.(event);
+  };
+
+  return (
+    <button
       {...restDomProps}
       {...ROOT_ATTRS}
       ref={ref}
